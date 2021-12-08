@@ -1,4 +1,4 @@
-![Clutch logo](resources/logo.svg "Clutch")
+![Clutch logo](resources/logo_with_background.png "Clutch")
 
 ExamClutch is a study-note discovery and aggregation site.
 
