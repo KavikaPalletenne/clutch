@@ -1,6 +1,6 @@
 ![Clutch logo](resources/logo_with_background.png "Clutch")
 
-ExamClutch is a study-note discovery and aggregation site.
+Open-source studying for everyone.
 
 ## Features
 - Upload your notes and append tags
