@@ -38,7 +38,7 @@ export default function Pricing() {
                                 <p className="md:w-80 text-base leading-6 mt-4 text-gray-600">200MB upload limit. Anyone can download your files.</p>
                             </div>
                         </div>
-                        <div role="listitem" className="bg-white cursor-pointer shadow rounded-lg p-8 relative z-30 mt-7">
+                        <div role="listitem" className="bg-white cursor-pointer shadow rounded-lg p-8 relative z-30 mt-3">
                             <div className="md:flex items-center justify-between">
                                 <h2 className="text-2xl font-semibold leading-6 text-gray-800">Community</h2>
                                 <p className="text-2xl md:mt-0 mt-4 font-semibold leading-6 text-gray-800">
