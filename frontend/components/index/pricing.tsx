@@ -24,7 +24,7 @@ export default function Pricing() {
                                 <h2 className="text-2xl font-semibold leading-6 text-exclpurple">Starter</h2>
                                 <p className="text-2xl font-semibold md:mt-0 mt-4 leading-6 text-gray-800">FREE</p>
                             </div>
-                            <p className="md:w-80 text-base leading-6 mt-4 text-gray-600">Full access to all features. 20MB upload limit.</p>
+                            <p className="md:w-80 text-base leading-6 mt-4 text-gray-600">Full access to all features. 20MB upload/download limit.</p>
                         </div>
                         <div role="listitem" className="bg-white cursor-pointer shadow rounded-lg mt-3 flex relative z-30">
                             <div className="w-2.5  h-auto rounded-tl-md rounded-bl-md" />
@@ -35,7 +35,7 @@ export default function Pricing() {
                                         $2<span className="font-normal text-base">/mo</span>
                                     </p>
                                 </div>
-                                <p className="md:w-80 text-base leading-6 mt-4 text-gray-600">200MB upload limit. Anyone can download your files.</p>
+                                <p className="md:w-80 text-base leading-6 mt-4 text-gray-600">200MB upload/download limit.</p>
                             </div>
                         </div>
                         <div role="listitem" className="bg-white cursor-pointer shadow rounded-lg p-8 relative z-30 mt-3">
