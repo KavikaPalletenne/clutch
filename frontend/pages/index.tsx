@@ -26,10 +26,10 @@ const Home: NextPage = () => {
             
             <nav>  
                 <div className={styles.headerButtonSection}>
-                    <Link href="/login">
+                    <Link href="/">
                         <a className={styles.headerSignInButton}>Sign in</a>
                     </Link>
-                    <Link href="/register">
+                    <Link href="/">
                         <a className={styles.headerSignUpButton}>
                             Sign up
                         </a>

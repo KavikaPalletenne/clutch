@@ -79,8 +79,8 @@ export default function Register() {
           <meta name="description" content="Sign Up to ScanTag - The Modern Name Tag" />
           <meta name="robots" content="all" />
           <meta name="googlebot" content="all" />
-          <title>Sign Up - ScanTag</title>
-          <link rel="icon" href="https://raw.githubusercontent.com/KavikaPalletenne/scantag-assets/main/scantag-logo.svg" />
+          <title>Sign Up - ExamClutch</title>
+          <link rel="icon" href="/gradient_logo.svg" />
         </Head>
 
 

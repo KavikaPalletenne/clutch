@@ -76,8 +76,8 @@ export default function Login() {
           <meta name="description" content="Login to ScanTag - The Modern Name Tag" />
           <meta name="robots" content="all" />
           <meta name="googlebot" content="all" />
-          <title>Login - ScanTag</title>
-          <link rel="icon" href="https://raw.githubusercontent.com/KavikaPalletenne/scantag-assets/main/scantag-logo.svg" />
+          <title>Sign In - ExamClutch</title>
+          <link rel="icon" href="/gradient_logo.svg" />
         </Head>
 
 
@@ -86,7 +86,7 @@ export default function Login() {
                 <div>
                 <Link href="/">
                     <a>
-                        <img className="mx-auto h-100 w-auto" src="https://raw.githubusercontent.com/KavikaPalletenne/scantag-assets/main/scantag-logo.svg" alt="Workflow"/>
+                        <img className="mx-auto w-48" src="/gradient_logo.svg" alt="Workflow"/>
                     </a>
                 </Link>
                 <h2 className="mt-6 text-center text-3xl text-gray-900" style={{fontFamily: "Space Mono", fontWeight: 'bold'}}>
