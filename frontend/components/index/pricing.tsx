@@ -11,7 +11,7 @@ export default function Pricing() {
                             Our pricing
                         </h1>
                         <p role="contentinfo" className="text-base leading-5 mt-5 text-gray-600 mr-16">
-                            Our notes might be free, but servers are not. Support ExamClutch's development by subscribing.
+                            Our notes might be free, but servers are not. Support ExamClutch&apos;s development by subscribing.
                         </p>
                         <div className="w-56">
                             

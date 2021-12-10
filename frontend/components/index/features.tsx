@@ -36,7 +36,7 @@ export default function Features() {
             A better way to study
           </p>
           <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-            Software is better when it's open-source. Why not studying?
+            Software is better when it&apos;s open-source. Why not studying?
           </p>
         </div>
 
