@@ -1,0 +1,4 @@
+Here is the gradient we will be using:
+
+css:
+linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%);
