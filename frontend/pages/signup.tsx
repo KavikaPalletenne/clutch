@@ -20,53 +20,7 @@ export default function Register() {
    
 
     const submit = async (e: SyntheticEvent) => {
-        e.preventDefault();
-
-        var getUserURL = "https://api.scantag.co/v1/users/getByEmail?email=" + email
-
-        setErrorMessage('')
-
-        if(email != confirmEmail) {
-            
-            document.getElementById("confirmEmailText").className = "text-red-500 text-xs float-right pr-1"
-            setErrorMessage('Email does not match')
-            
-            if(password != confirmPassword) {
-                document.getElementById("confirmPasswordText").className = "text-red-500 text-xs float-right pr-1"
-            }
-
-            return
-        }
-
-        if(password != confirmPassword) {
-            document.getElementById("confirmPasswordText").className = "text-red-500 text-xs float-right pr-1"
-            return
-        }
-
-        await fetch(getUserURL, {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'},
-        }).then(function(response) {
-            return response.json();
-        }).then(function(json) {
-
-            if(json.email != "empty") {
-                document.getElementById("confirmEmailText").className = "text-red-500 text-xs float-right pr-1"
-                setErrorMessage("User with email already exists")
-                setUserExists(true)
-
-                return
-            }
-
-            if(json.email == "empty") {
-                console.log(JSON.stringify(json))
-
-                router.push({
-                    pathname: '/auth/flow/new',
-                    query: { email: email, password: password}
-                })
-            }
-        });
+    
 
     }
     

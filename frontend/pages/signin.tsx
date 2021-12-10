@@ -37,33 +37,6 @@ export default function Login() {
 
     
     const submit = async (e: SyntheticEvent) => {
-        e.preventDefault();
-        
-        await fetch("https://api.scantag.co/v1/auth/authenticate", {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                'username': username,
-                'password': password
-            })
-        }).then(function(response) {
-            return response.json();
-        }).then(function(json) {
-            
-            if(json.jwt == null) {
-                document.getElementById("invalidCredentialsText").className = "text-red-500 text-sm float-left pl-1 pb-5 pt-2"
-                setErrorMessage("Invalid email or password")
-                localStorage.removeItem('token')
-                return
-            }
-
-            localStorage.setItem('token', json.jwt)
-            localStorage.setItem('userId', json.userId)
-            
-            loggedIn = true
-
-            router.push("/account/tags")
-        });
 
     }
     
