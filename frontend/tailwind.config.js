@@ -5,7 +5,14 @@ module.exports = {
 ],
   darkMode: false, // or 'media' or 'class'
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        exclpurple: {
+          DEFAULT: '#C290FF',
+          dark: '#8C9AFF',
+        },
+      },
+    },
   },
   variants: {
     extend: {},
