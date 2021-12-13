@@ -1,5 +1,6 @@
 import Head from "next/head";
-import Members from "../components/app/members";
+import Members from "../../components/app/Members";
+import GroupTitle from "../../components/app/GroupTitle";
 
 export default function App() {
 
@@ -12,8 +13,9 @@ export default function App() {
         <       link rel="icon" href="/favicon.png" />
             </Head>
 
-            <body>
-                <Members/>
+            <body className="flex items-start justify-center pt-10">
+                <GroupTitle />
+                <Members />
             </body>
         </div>
     )
