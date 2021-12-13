@@ -1,4 +1,4 @@
-![Clutch logo](resources/logo_with_background.png "Clutch")
+![ExamClutch logo](frontend/public/gradient_logo.svg "ExamClutch")
 
 Open-source studying for everyone.
 
