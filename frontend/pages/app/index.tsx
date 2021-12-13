@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Members from "../../components/app/Members";
 import GroupTitle from "../../components/app/GroupTitle";
+import ResourceCard from "../../components/app/ResourceCard";
 
 export default function App() {
 
@@ -13,10 +14,12 @@ export default function App() {
         <       link rel="icon" href="/favicon.png" />
             </Head>
 
-            <body className="flex items-start justify-center pt-10">
+            <div className="flex items-start justify-center pt-10">
                 <GroupTitle />
                 <Members />
-            </body>
+            </div>
+
+            <ResourceCard />
         </div>
     )
 }
