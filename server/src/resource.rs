@@ -1,87 +1,185 @@
-use actix_web::{HttpResponse, Responder, web, get, post, HttpRequest};
+use crate::models::{FileReference, Resource, ResourceForm, Tag};
+use actix_web::web::resource;
+use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use bson::oid::ObjectId;
+use bson::Document;
 use chrono::{NaiveDateTime, Utc};
-use mongodb::{Database};
+use mongodb::bson::doc;
+use mongodb::results::InsertOneResult;
+use mongodb::{Cursor, Database};
+use std::str::FromStr;
+use tokio_stream::StreamExt;
 use uuid::Uuid;
-use crate::models::{Resource, ResourceForm, Tag};
 
 // A resource is any document or link to a website.
 
 impl Resource {
-
-    pub fn new(id: Option<ObjectId>, user_id: Uuid, title: String, description: String, tags: Option<Vec<Tag>>,
-        resource_location: String, created_at: NaiveDateTime, last_edited_at: NaiveDateTime,
+    pub fn new(
+        id: Option<ObjectId>,
+        user_id: Uuid,
+        group_id: Uuid,
+        title: String,
+        description: String,
+        tags: Option<Vec<Tag>>,
+        files: Option<Vec<FileReference>>,
+        last_edited_at: NaiveDateTime,
     ) -> Resource {
         Resource {
             id,
             user_id,
+            group_id,
             title,
             description,
             tags,
-            resource_location,
-            created_at,
+            files,
             last_edited_at,
         }
     }
 }
 
 #[post("/resource/create")]
-pub async fn create_resource(database: web::Data<Database>, resource: web::Form<ResourceForm>) -> impl Responder {
+pub async fn create_resource(
+    database: web::Data<Database>,
+    resource: web::Json<ResourceForm>,
+) -> impl Responder {
     // Check whether current user (JWT) is the same as resource user id.
-    // TODO: Use MongoDB's GridFS to upload any PDF file straight to the database.
+    // TODO: Follow this for the CDN backend https://blog.logrocket.com/file-upload-and-download-in-rust/
     let id = Uuid::new_v4();
-    let created_at = Utc::now().naive_local();
     let last_edited_at = Utc::now().naive_local();
     let resource = resource.into_inner();
 
     let id = Option::from(ObjectId::new());
     let resource = Resource::new(
         id,
-        resource.user_id,
+        Uuid::from_str(resource.user_id.as_str()).unwrap(),
+        Uuid::from_str(resource.group_id.as_str()).unwrap(),
         resource.title,
         resource.description,
         resource.tags,
-        resource.resource_location,
-        created_at,
+        resource.files,
         last_edited_at,
     );
 
-    let bson = bson::to_bson(&resource).expect("Error converting struct to BSON"); // TODO: How to convert struct to a BSON document
+    let bson = bson::to_bson(&resource).expect("Error converting struct to BSON");
     let document = bson.as_document().unwrap();
 
-    let insert_result = database.collection("notes").insert_one(document.to_owned(), None).await.expect("Error inserting document into collection");
+    let insert_result = database
+        .collection("notes")
+        .insert_one(document.to_owned(), None)
+        .await
+        .expect("Error inserting document into collection");
 
     HttpResponse::Ok().body("Successfully created resource.")
 }
 
-#[post("/resource/update/{resource_id}")]
-pub async fn update_resource(database: web::Data<Database>, req: HttpRequest, resource: web::Form<ResourceForm>) -> impl Responder {
+#[get("/resource/get/{resource_id}")]
+pub async fn fetch_resource_by_id(
+    database: web::Data<Database>,
+    req: HttpRequest,
+) -> impl Responder {
+    let resource_id = ObjectId::from_str(req.match_info().get("resource_id").unwrap()).unwrap();
 
-    let resource_id = req.match_info().get("resource_id");
+    let query = doc! {
+        "_id": resource_id,
+    };
 
-    if let Some(id) = resource_id {
-        let last_edited_at = Utc::now().naive_local();
+    let result: Option<Resource> = database
+        .collection("notes")
+        .find_one(query, None)
+        .await
+        .expect("Could not fetch all documents for provided group id");
 
-        //let resource = database.collection("notes").find_one_and_update(); // TODO: Find how to do this
-
-        return HttpResponse::Ok().body("Successfully updated resource.");
+    if let Some(resource) = result {
+        return HttpResponse::Ok().body(serde_json::to_string(&resource).unwrap());
     }
 
-    HttpResponse::BadRequest().body("No resource id provided.")
+    HttpResponse::BadRequest().body("Invalid resource id provided.")
 }
 
-#[post("/resource/update2/{resource_id}")]
-pub async fn update_resource2(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
+#[get("/resource/getByGroupId/{group_id}")]
+pub async fn fetch_resource_by_group_id(
+    database: web::Data<Database>,
+    req: HttpRequest,
+) -> impl Responder {
+    let group_id = Uuid::from_str(req.match_info().get("group_id").unwrap()).unwrap();
 
-    let resource_id = req.match_info().get("resource_id");
+    let query = doc! {
+        "group_id": group_id,
+    };
 
-    if let Some(id) = resource_id {
-        let last_edited_at = Utc::now().naive_local();
+    let mut cursor = database
+        .collection("notes")
+        .find(query, None)
+        .await
+        .expect("Could not fetch all documents for provided group id");
 
-        //let resource = database.collection("notes").find_one_and_update(); // TODO: Find how to do this
-
-        return HttpResponse::Ok().body("Successfully updated resource.");
+    let mut result: Vec<Resource> = Vec::new();
+    while let Some(resource) = cursor.next().await {
+        result.push(bson::from_document::<Resource>(resource.expect("Error")).expect("Error"))
     }
 
-    HttpResponse::BadRequest().body("No resource id provided.")
+    HttpResponse::Ok().body(serde_json::to_string(&result).unwrap())
+}
+
+#[post("/resource/update/{resource_id}")]
+pub async fn update_resource(
+    database: web::Data<Database>,
+    req: HttpRequest,
+    resource_form: web::Json<ResourceForm>,
+) -> impl Responder {
+    let resource_id = ObjectId::from_str(req.match_info().get("resource_id").unwrap()).unwrap();
+
+    let resource_form = resource_form.into_inner();
+    let last_edited_at = Utc::now().naive_local();
+    let query = doc! {
+      "_id": resource_id,
+    };
+
+    let id = Option::from(ObjectId::new());
+    let resource = Resource::new(
+        id,
+        Uuid::from_str(resource_form.user_id.as_str()).unwrap(),
+        Uuid ::from_str(resource_form.group_id.as_str()).unwrap(),
+        resource_form.title.clone(),
+        resource_form.description.clone(),
+        resource_form.tags.clone(),
+        resource_form.files.clone(),
+        last_edited_at,
+    );
+
+    let bson = bson::to_bson(&resource_form).expect("Error converting struct to BSON");
+    let doc = bson.as_document().unwrap().clone();
+
+    let result = database
+        .collection::<Resource>("notes")
+        .update_one(query, doc, None)
+        .await
+        .expect("Error updating document");
+
+    if result.modified_count == 0 {
+        return HttpResponse::BadRequest().body("No such resource exists.");
+    }
+
+    HttpResponse::Ok().body("Successfully updated resource.")
+}
+
+#[get("/resource/delete/{resource_id}")]
+pub async fn delete_resource(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
+    let resource_id = ObjectId::from_str(req.match_info().get("resource_id").unwrap()).unwrap();
+
+    let filter = doc! {
+        "_id": resource_id,
+    };
+
+    let result = database
+        .collection::<Resource>("notes")
+        .delete_one(filter, None)
+        .await
+        .expect("Error deleting document");
+
+    if result.deleted_count == 0 {
+        return HttpResponse::BadRequest().body("No such resource exists.");
+    }
+
+    HttpResponse::Ok().body("Successfully deleted resource.")
 }

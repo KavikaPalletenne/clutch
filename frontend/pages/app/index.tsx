@@ -19,11 +19,13 @@ export default function App() {
                 <Members />
             </div>
 
-            <ResourceCard />
-            <ResourceCard />
-            <ResourceCard />
-            <ResourceCard />
-            <ResourceCard />
+            <div className="flex inline-grid">
+                <ResourceCard />
+                <ResourceCard />
+                <ResourceCard />
+                <ResourceCard />
+                <ResourceCard />
+            </div>
 
         </div>
     )

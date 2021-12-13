@@ -1,6 +1,6 @@
-use std::env;
 use anyhow::Result;
-use mongodb::{Client, Database, options::ClientOptions};
+use mongodb::{options::ClientOptions, Client, Database};
+use std::env;
 
 // TODO: Setup a local mongodb test server
 pub async fn create_mongodb_client() -> Result<Database> {
