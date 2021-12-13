@@ -13,7 +13,7 @@ export default function ResourceCard() {
     
     const listFiles = resource.files.map((f) => 
         <div className="px-4 py-1">
-            <div className="py-4 px-4 border-2 hover:border-gray-400 inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", }}>
+            <div className="py-4 px-4 shadow-sm hover:shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", }}>
                 <li className="justify-center flex" style={{listStyle: 'none'}} key={f.title}>
                     <div className="font-bold">
                         {f.title}
@@ -27,8 +27,8 @@ export default function ResourceCard() {
     );
 
     return(
-        <div className="px-4">
-            <div className="py-4 px-4 shadow-lg inline-block rounded-2xl bg-white hover:shadow-xl duration-150" style={{fontFamily: "Roboto Mono"}}>
+        <div className="px-4 py-2">
+            <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono"}}>
 
             <div className="inline-block">
                 <h1 className="font-bold text-2xl pb-2 text-black inline-block">{ resource.title }</h1>
