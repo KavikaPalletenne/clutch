@@ -17,14 +17,13 @@ export default function GroupTitle() {
                 <h1 className="font-bold text-2xl pb-2 text-exclpurple inline-block">{ groupTitle }</h1>
                 <h1>{ groupDescription }</h1>
             </div>
-            <Link href={ discordLink }>
-                <a className="float-right inline-block pt-6 flex items-center">
-                    <FaDiscord className="pr-2" size="25px"/>
-                    <h1>
-                        Discord
-                    </h1>
-                </a>
-            </Link>
+            
+            <a target="_blank" href={ discordLink } rel="noopener noreferrer" className="float-right inline-block pt-6 flex items-center">
+                <FaDiscord className="pr-2" size="25px"/>
+                <h1>
+                    Discord
+                </h1>
+            </a>
 
         </div>
         </div>
