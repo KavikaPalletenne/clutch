@@ -20,6 +20,11 @@ export default function App() {
             </div>
 
             <ResourceCard />
+            <ResourceCard />
+            <ResourceCard />
+            <ResourceCard />
+            <ResourceCard />
+
         </div>
     )
 }
