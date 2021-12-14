@@ -10,8 +10,8 @@ Cargo.lock
 **/*.rs.bk
 
 # Files generated when Rust project is compiled
-**/server/target/**
-**/server/.idea/**
+**/backend/resource-service/target/**
+**/backend/resource-service/.idea/**
 
 **/discord-bot/target/**
 **/discord-bot/.idea/**
