@@ -10,6 +10,7 @@ use mongodb::{Cursor, Database};
 use std::str::FromStr;
 use tokio_stream::StreamExt;
 use uuid::Uuid;
+use std::borrow::Borrow;
 
 // A resource is any document or link to a website.
 
@@ -101,7 +102,7 @@ pub async fn fetch_resource_by_group_id(
     database: web::Data<Database>,
     req: HttpRequest,
 ) -> impl Responder {
-    let group_id = Uuid::from_str(req.match_info().get("group_id").unwrap()).unwrap();
+    let group_id = req.match_info().get("group_id").unwrap();
 
     let query = doc! {
         "group_id": group_id,
@@ -113,12 +114,16 @@ pub async fn fetch_resource_by_group_id(
         .await
         .expect("Could not fetch all documents for provided group id");
 
-    let mut result: Vec<Resource> = Vec::new();
+    let mut results: Vec<Resource> = Vec::new();
     while let Some(resource) = cursor.next().await {
-        result.push(bson::from_document::<Resource>(resource.expect("Error")).expect("Error"))
+        results.push(bson::from_document::<Resource>(resource.expect("Error")).expect("Error"))
     }
 
-    HttpResponse::Ok().body(serde_json::to_string(&result).unwrap())
+    if results.is_empty() {
+        return HttpResponse::BadRequest().body("Group does not contain any resources.")
+    }
+
+    HttpResponse::Ok().body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
 }
 
 #[post("/resource/update/{resource_id}")]
@@ -135,7 +140,7 @@ pub async fn update_resource(
       "_id": resource_id,
     };
 
-    let id = Option::from(ObjectId::new());
+    let id = Option::from(resource_id);
     let resource = Resource::new(
         id,
         Uuid::from_str(resource_form.user_id.as_str()).unwrap(),
@@ -147,12 +152,12 @@ pub async fn update_resource(
         last_edited_at,
     );
 
-    let bson = bson::to_bson(&resource_form).expect("Error converting struct to BSON");
-    let doc = bson.as_document().unwrap().clone();
+    let bson_document = bson::to_bson(&resource_form).expect("Error converting struct to BSON");
+    let doc = bson_document.as_document().unwrap().clone();
 
     let result = database
         .collection::<Resource>("notes")
-        .update_one(query, doc, None)
+        .replace_one(query,  resource, None)
         .await
         .expect("Error updating document");
 
