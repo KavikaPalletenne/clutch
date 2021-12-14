@@ -9,7 +9,6 @@ use tokio_stream::StreamExt;
 use uuid::Uuid;
 
 // A resource is any document or link to a website.
-
 impl Resource {
     pub fn new(
         id: Option<ObjectId>,
@@ -33,6 +32,10 @@ impl Resource {
         }
     }
 }
+
+/////////////////
+// CRUD Functions
+/////////////////
 
 #[post("/resource/create")]
 pub async fn create_resource(
