@@ -119,7 +119,7 @@ pub async fn fetch_resource_by_group_id(
     }
 
     if results.is_empty() {
-        return HttpResponse::BadRequest().body("Group does not contain any resources.")
+        return HttpResponse::BadRequest().body("Group does not contain any resources.");
     }
 
     HttpResponse::Ok().body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
@@ -148,7 +148,7 @@ pub async fn fetch_resource_by_user_id(
     }
 
     if results.is_empty() {
-        return HttpResponse::BadRequest().body("User has not created any resources.")
+        return HttpResponse::BadRequest().body("User has not created any resources.");
     }
 
     HttpResponse::Ok().body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
@@ -172,7 +172,7 @@ pub async fn update_resource(
     let resource = Resource::new(
         id,
         Uuid::from_str(resource_form.user_id.as_str()).unwrap(),
-        Uuid ::from_str(resource_form.group_id.as_str()).unwrap(),
+        Uuid::from_str(resource_form.group_id.as_str()).unwrap(),
         resource_form.title.clone(),
         resource_form.description.clone(),
         resource_form.tags.clone(),
@@ -182,7 +182,7 @@ pub async fn update_resource(
 
     let result = database
         .collection::<Resource>("notes")
-        .replace_one(query,  resource, None)
+        .replace_one(query, resource, None)
         .await
         .expect("Error updating document");
 
