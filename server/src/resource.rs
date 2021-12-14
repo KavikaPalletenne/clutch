@@ -125,6 +125,35 @@ pub async fn fetch_resource_by_group_id(
     HttpResponse::Ok().body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
 }
 
+#[get("/resource/getByUserId/{user_id}")]
+pub async fn fetch_resource_by_user_id(
+    database: web::Data<Database>,
+    req: HttpRequest,
+) -> impl Responder {
+    let group_id = req.match_info().get("user_id").unwrap();
+
+    let query = doc! {
+        "user_id": group_id,
+    };
+
+    let mut cursor = database
+        .collection("notes")
+        .find(query, None)
+        .await
+        .expect("Could not fetch all documents for provided user id");
+
+    let mut results: Vec<Resource> = Vec::new();
+    while let Some(resource) = cursor.next().await {
+        results.push(bson::from_document::<Resource>(resource.expect("Error")).expect("Error"))
+    }
+
+    if results.is_empty() {
+        return HttpResponse::BadRequest().body("User has not created any resources.")
+    }
+
+    HttpResponse::Ok().body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
+}
+
 #[post("/resource/update/{resource_id}")]
 pub async fn update_resource(
     database: web::Data<Database>,
