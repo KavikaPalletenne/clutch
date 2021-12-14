@@ -130,10 +130,10 @@ pub async fn fetch_resource_by_user_id(
     database: web::Data<Database>,
     req: HttpRequest,
 ) -> impl Responder {
-    let group_id = req.match_info().get("user_id").unwrap();
+    let user_id = req.match_info().get("user_id").unwrap();
 
     let query = doc! {
-        "user_id": group_id,
+        "user_id": user_id,
     };
 
     let mut cursor = database
