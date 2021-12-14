@@ -1,6 +1,6 @@
 [package]
-name = "examclutch-server"
-authors = ["Kavika Palletenne"]
+name = "resource-service"
+authors = ["Kavika Palletenne", "ExamClutch.com"]
 version = "0.1.0"
 edition = "2018"
 description = "ExamClutch is a study note discovery and aggregation site allowing everyone to study together."
