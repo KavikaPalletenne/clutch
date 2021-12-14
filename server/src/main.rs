@@ -1,6 +1,5 @@
 use actix_web::{App, HttpServer};
 use anyhow::Result;
-use clap::Parser;
 
 mod models;
 mod persistence;

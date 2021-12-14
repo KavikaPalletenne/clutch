@@ -1,16 +1,12 @@
 use crate::models::{FileReference, Resource, ResourceForm, Tag};
-use actix_web::web::resource;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use bson::oid::ObjectId;
-use bson::Document;
 use chrono::{NaiveDateTime, Utc};
 use mongodb::bson::doc;
-use mongodb::results::InsertOneResult;
-use mongodb::{Cursor, Database};
+use mongodb::Database;
 use std::str::FromStr;
 use tokio_stream::StreamExt;
 use uuid::Uuid;
-use std::borrow::Borrow;
 
 // A resource is any document or link to a website.
 
@@ -45,7 +41,6 @@ pub async fn create_resource(
 ) -> impl Responder {
     // Check whether current user (JWT) is the same as resource user id.
     // TODO: Follow this for the CDN backend https://blog.logrocket.com/file-upload-and-download-in-rust/
-    let id = Uuid::new_v4();
     let last_edited_at = Utc::now().naive_local();
     let resource = resource.into_inner();
 
@@ -69,6 +64,10 @@ pub async fn create_resource(
         .insert_one(document.to_owned(), None)
         .await
         .expect("Error inserting document into collection");
+
+    if insert_result.inserted_id.to_string().is_empty() {
+        return HttpResponse::BadRequest().body("Error creating new resource.");
+    }
 
     HttpResponse::Ok().body("Successfully created resource.")
 }
@@ -151,9 +150,6 @@ pub async fn update_resource(
         resource_form.files.clone(),
         last_edited_at,
     );
-
-    let bson_document = bson::to_bson(&resource_form).expect("Error converting struct to BSON");
-    let doc = bson_document.as_document().unwrap().clone();
 
     let result = database
         .collection::<Resource>("notes")
