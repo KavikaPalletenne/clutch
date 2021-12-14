@@ -37,6 +37,8 @@ impl Resource {
 // CRUD Functions
 /////////////////
 
+//TODO: Add Authorization checks (using authorization service) for all crud functions (check if the user has authorization to create/read/update/delete the resources)
+
 #[post("/resource/create")]
 pub async fn create_resource(
     database: web::Data<Database>,
