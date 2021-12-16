@@ -1,23 +1,23 @@
-use actix_web::{get, post, Responder, web, HttpResponse, HttpRequest};
-use bson::oid::ObjectId;
 use crate::group::Group;
-use mongodb::Database;
+use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
+use bson::oid::ObjectId;
 use mongodb::bson::doc;
+use mongodb::Database;
+use serde::{Deserialize, Serialize};
 use std::str::FromStr;
-use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]  // rename to _id and use and document id in database
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    // rename to _id and use and document id in database
     id: Option<ObjectId>,
     oauth2_id: String, // user id supplied from Google/Discord etc.
-    username: String, // displayed as @<username>
+    username: String,  // displayed as @<username>
     email: String,
     groups: Vec<Group>, // id of group that the user is a part of
 }
 
 impl User {
-
     pub fn new(oauth2_id: String, username: String, email: String) -> User {
         User {
             id: Option::from(ObjectId::new()),
@@ -35,8 +35,12 @@ impl User {
 
 // Create
 #[post("/user/create")] // TODO: This function can only be called by the oauth2 user registration service. Maybe implement a secret (with every request) that only this and that know.
-pub async fn create_user(database: web::Data<Database>, oauth2_id: String, username: String, email: String) -> impl Responder {
-
+pub async fn create_user(
+    database: web::Data<Database>,
+    oauth2_id: String,
+    username: String,
+    email: String,
+) -> impl Responder {
     let user = User::new(oauth2_id, username, email); // TODO: email is set using the email the user used for oauth2 for Google/Discord etc.
 
     let bson = bson::to_bson(&user).expect("Error converting struct to BSON");
@@ -79,7 +83,10 @@ pub async fn get_user_by_id(database: web::Data<Database>, req: HttpRequest) -> 
 
 // Update username
 #[post("/user/updateUsername/{id}/{username}")]
-pub async fn update_username_by_user_id(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
+pub async fn update_username_by_user_id(
+    database: web::Data<Database>,
+    req: HttpRequest,
+) -> impl Responder {
     let user_id = ObjectId::from_str(req.match_info().get("id").unwrap()).unwrap();
     let update_username = req.match_info().get("username").unwrap().to_string();
 
@@ -114,7 +121,6 @@ pub async fn update_username_by_user_id(database: web::Data<Database>, req: Http
         if insert_result.inserted_id.to_string().is_empty() {
             return HttpResponse::BadRequest().body("Error updating username.");
         }
-
     }
 
     HttpResponse::BadRequest().body("Could not update user.")

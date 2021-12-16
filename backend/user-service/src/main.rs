@@ -1,9 +1,9 @@
 use actix_web::{App, HttpServer};
 use anyhow::Result;
 
-mod user;
 mod group;
 mod persistence;
+mod user;
 
 #[actix_web::main]
 async fn main() -> Result<()> {
@@ -21,9 +21,9 @@ async fn main() -> Result<()> {
             .service(user::update_username_by_user_id)
             .service(user::delete_user_by_id)
     })
-        .bind("0.0.0.0:443")?
-        .run()
-        .await?;
+    .bind("0.0.0.0:443")?
+    .run()
+    .await?;
 
     Ok(())
 }
