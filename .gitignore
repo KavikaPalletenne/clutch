@@ -16,4 +16,9 @@ Cargo.lock
 **/discord-bot/target/**
 **/discord-bot/.idea/**
 
+**/backend/**/target/**
+**/backend/**/.idea/**
+**/backend/**/keys/**
 **/*.lock
+
+**/bin/**

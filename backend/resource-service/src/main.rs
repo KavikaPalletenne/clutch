@@ -10,9 +10,9 @@ async fn main() -> Result<()> {
     let database = persistence::create_mongodb_client()
         .await
         .expect("Failed to connect to DB");
+    println!("Successfully connected to database");
 
     println!("Starting server on port 443");
-
     HttpServer::new(move || {
         App::new()
             .data(database.clone())
