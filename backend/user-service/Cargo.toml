@@ -8,7 +8,6 @@ authors = ["Kavika Palletenne", "ExamClutch.com"]
 
 [dependencies]
 actix-web = "3.3.2"
-yup-oauth2 = "6.1.0"
 anyhow = "1.0.51"
 dotenv ="0.15"
 chrono = { version = "0.4", features = ["serde"] }
