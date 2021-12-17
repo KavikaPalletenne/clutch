@@ -8,20 +8,17 @@ use std::str::FromStr;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    // rename to _id and use and document id in database
-    id: Option<ObjectId>,
-    oauth2_id: String, // user id supplied from Google/Discord etc.
+    #[serde(rename = "_id")] // rename to _id and use and document id in database
+    id: String, // user id supplied from Discord etc.
     username: String,  // displayed as @<username>
     email: String,
     groups: Vec<Group>, // id of group that the user is a part of
 }
 
 impl User {
-    pub fn new(oauth2_id: String, username: String, email: String) -> User {
+    pub fn new(id: String, username: String, email: String) -> User {
         User {
-            id: Option::from(ObjectId::new()),
-            oauth2_id,
+            id,
             username,
             email,
             groups: Vec::<Group>::new(),
@@ -34,14 +31,14 @@ impl User {
 /////////////////
 
 // Create
-#[post("/user/create")] // TODO: This function can only be called by the oauth2 user registration service. Maybe implement a secret (with every request) that only this and that know.
+#[post("/api/protected/user/create")] // TODO: This function can only be called by the oauth2 user registration service. Maybe implement a secret (with every request) that only this and that know.
 pub async fn create_user(
     database: web::Data<Database>,
-    oauth2_id: String,
+    id: String,
     username: String,
     email: String,
 ) -> impl Responder {
-    let user = User::new(oauth2_id, username, email); // TODO: email is set using the email the user used for oauth2 for Google/Discord etc.
+    let user = User::new(id, username, email); // TODO: email is set using the email the user used for oauth2 for Google/Discord etc.
 
     let bson = bson::to_bson(&user).expect("Error converting struct to BSON");
     let document = bson.as_document().unwrap();
@@ -62,7 +59,7 @@ pub async fn create_user(
 // Read
 #[get("/user/{id}")]
 pub async fn get_user_by_id(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
-    let user_id = ObjectId::from_str(req.match_info().get("id").unwrap()).unwrap();
+    let user_id = req.match_info().get("id").unwrap().to_string();
 
     let query = doc! {
         "_id": user_id,
@@ -87,8 +84,8 @@ pub async fn update_username_by_user_id(
     database: web::Data<Database>,
     req: HttpRequest,
 ) -> impl Responder {
-    let user_id = ObjectId::from_str(req.match_info().get("id").unwrap()).unwrap();
-    let update_username = req.match_info().get("username").unwrap().to_string();
+    let user_id = req.match_info().get("id").unwrap().to_string();
+    let updated_username = req.match_info().get("username").unwrap().to_string();
 
     let query = doc! {
         "_id": user_id,
@@ -103,8 +100,7 @@ pub async fn update_username_by_user_id(
     if let Some(old_user) = old_user_result {
         let updated_user = User {
             id: old_user.id,
-            oauth2_id: old_user.oauth2_id,
-            username: update_username,
+            username: updated_username,
             email: old_user.email,
             groups: old_user.groups,
         };
@@ -129,7 +125,7 @@ pub async fn update_username_by_user_id(
 // Delete
 #[get("/user/delete/{id}")]
 pub async fn delete_user_by_id(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
-    let user_id = ObjectId::from_str(req.match_info().get("id").unwrap()).unwrap();
+    let user_id = req.match_info().get("id").unwrap().to_string();
 
     let filter = doc! {
         "_id": user_id,
