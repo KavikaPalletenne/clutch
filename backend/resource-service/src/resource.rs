@@ -12,7 +12,7 @@ use uuid::Uuid;
 impl Resource {
     pub fn new(
         id: Option<ObjectId>,
-        user_id: Uuid,
+        user_id: String,
         group_id: Uuid,
         title: String,
         description: String,
@@ -47,17 +47,17 @@ pub async fn create_resource(
     // Check whether current user (JWT) is the same as resource user id.
     // TODO: Follow this for the CDN backend https://blog.logrocket.com/file-upload-and-download-in-rust/
     let last_edited_at = Utc::now().naive_local();
-    let resource = resource.into_inner();
+    let resource_form = resource.into_inner();
 
     let id = Option::from(ObjectId::new());
     let resource = Resource::new(
         id,
-        Uuid::from_str(resource.user_id.as_str()).unwrap(),
-        Uuid::from_str(resource.group_id.as_str()).unwrap(),
-        resource.title,
-        resource.description,
-        resource.tags,
-        resource.files,
+        resource_form.user_id,
+        Uuid::from_str(resource_form.group_id.as_str()).unwrap(),
+        resource_form.title,
+        resource_form.description,
+        resource_form.tags,
+        resource_form.files,
         last_edited_at,
     );
 
@@ -98,7 +98,9 @@ pub async fn fetch_resource_by_id(
         return HttpResponse::Ok().body(serde_json::to_string(&resource).unwrap());
     }
 
-    HttpResponse::BadRequest().body("Invalid resource id provided.")
+    HttpResponse::BadRequest()
+        .header("Content-Type", "application/json")
+        .body("Invalid resource id provided.")
 }
 
 #[get("/resource/getByGroupId/{group_id}")]
@@ -127,7 +129,9 @@ pub async fn fetch_resource_by_group_id(
         return HttpResponse::BadRequest().body("Group does not contain any resources.");
     }
 
-    HttpResponse::Ok().body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
+    HttpResponse::Ok()
+        .header("Content-Type", "application/json")
+        .body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
 }
 
 #[get("/resource/getByUserId/{user_id}")]
@@ -156,7 +160,9 @@ pub async fn fetch_resource_by_user_id(
         return HttpResponse::BadRequest().body("User has not created any resources.");
     }
 
-    HttpResponse::Ok().body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
+    HttpResponse::Ok()
+        .header("Content-Type", "application/json")
+        .body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
 }
 
 #[post("/resource/update/{resource_id}")]
@@ -176,7 +182,7 @@ pub async fn update_resource(
     let id = Option::from(resource_id);
     let resource = Resource::new(
         id,
-        Uuid::from_str(resource_form.user_id.as_str()).unwrap(),
+        resource_form.user_id,
         Uuid::from_str(resource_form.group_id.as_str()).unwrap(),
         resource_form.title.clone(),
         resource_form.description.clone(),
