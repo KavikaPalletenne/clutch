@@ -31,7 +31,7 @@ impl User {
 /////////////////
 
 // Create
-#[post("/api/user/protected/create")] // TODO: This function can only be called by the oauth2 user registration service. Maybe implement a secret (with every request) that only this and that know.
+#[post("/api/user/protected/create")]
 pub async fn create_user(
     database: web::Data<Database>,
     web::Query(user_request): web::Query<NewUserRequest>,
@@ -41,7 +41,7 @@ pub async fn create_user(
         return HttpResponse::Unauthorized().body("This is a protected URI.");
     }
 
-    let user = User::new(user_request.id, user_request.username, user_request.email); // TODO: email is set using the email the user used for oauth2 for Google/Discord etc.
+    let user = User::new(user_request.id, user_request.username, user_request.email);
 
     let bson = bson::to_bson(&user).expect("Error converting struct to BSON");
     let document = bson.as_document().unwrap();
