@@ -164,6 +164,50 @@ pub async fn update_username_by_user_id(
         }
     }
 
+    HttpResponse::BadRequest().body("Could not update username.")
+}
+
+// Update email
+#[post("/api/user/updateEmail/{id}/{email}")]
+pub async fn update_email_by_user_id(
+    database: web::Data<Database>,
+    req: HttpRequest,
+) -> impl Responder {
+    let user_id = req.match_info().get("id").unwrap().to_string();
+    let updated_email = req.match_info().get("username").unwrap().to_string();
+
+    let query = doc! {
+        "_id": user_id,
+    };
+
+    let old_user_result: Option<User> = database
+        .collection("users")
+        .find_one(query, None)
+        .await
+        .expect("Could not update user.");
+
+    if let Some(old_user) = old_user_result {
+        let updated_user = User {
+            id: old_user.id,
+            username: old_user.username,
+            email: updated_email,
+            groups: old_user.groups,
+        };
+
+        let bson = bson::to_bson(&updated_user).expect("Error converting struct to BSON");
+        let document = bson.as_document().unwrap();
+
+        let insert_result = database
+            .collection("users")
+            .insert_one(document.to_owned(), None)
+            .await
+            .expect("Error inserting document into collection");
+
+        if insert_result.inserted_id.to_string().is_empty() {
+            return HttpResponse::BadRequest().body("Error updating username.");
+        }
+    }
+
     HttpResponse::BadRequest().body("Could not update user.")
 }
 
