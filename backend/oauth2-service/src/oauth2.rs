@@ -1,14 +1,15 @@
 use serde::{Deserialize, Serialize};
 use bson::oid::ObjectId;
 use actix_web::{get, post, web, Responder, HttpRequest, HttpResponse};
-use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, AuthorizationInformation, Group, AccessTokenRequest};
+use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, AuthorizationInformation, Group, AccessTokenRequest, NewUserRequest, UserExistsResponse};
 use jsonwebtoken::EncodingKey;
 use form_urlencoded::Serializer;
 use std::env;
-use crate::jwt::create_auth_token;
+use crate::jwt::{create_auth_token, decode_auth_token};
 use std::str::FromStr;
 use actix_web::client::Client;
 use std::str;
+use url::Url;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
@@ -48,10 +49,43 @@ pub async fn user_registration(
     let current_user = http_client
         .get("https://discord.com/api/oauth2/@me")
         .header("Authorization", bearer_token)
-        .send().await.expect("Error sending GET request").json::<AuthorizationInformation>().await.expect("Error parsing json");
+        .send().await.expect("Error sending GET request")
+        .json::<AuthorizationInformation>().await.expect("Error parsing JSON");
 
     let user_id = current_user.user.id;
     let username = current_user.user.username.clone();
+
+    let user_exists = http_client
+        .get(Url::parse(format!("https://examclutch.com/api/user/protected/userExists/{}/{}", user_id.clone(), env::var("USER_SERVICE_SECRET").unwrap()).as_str()).unwrap().as_str())
+        .send().await.expect("Error sending GET request")
+        .json::<UserExistsResponse>().await.expect("Error parsing JSON");
+
+    // Create new user if does not exist
+    if !user_exists.exists {
+        let new_user_request = NewUserRequest {
+            secret: env::var("USER_SERVICE_SECRET").unwrap(),
+            id: user_id.clone(),
+            username: usename.clone(),
+            email: "Not Used".to_string(), // Hard-coded null email as website will use Discord DMs.
+        };
+
+        let uri = Url::parse_with_params("https://examclutch.com/api/user/protected/create",
+                                         &[
+                                             ("secret", env::var("USER_SERVICE_SECRET").unwrap()),
+                                             ("id", user_id.clone()),
+                                             ("username", username.clone()),
+                                             ("email", "Not Used")
+                                         ])?;
+
+        let create_user_response = http_client
+            .get(uri.as_str())
+            .send().await.expect("Error sending GET request");
+
+
+        if !create_user_response.status().is_success() {
+            return HttpResponse::BadRequest().body("Error creating user.");
+        }
+    }
 
     let token = create_auth_token(user_id, username, response, encoding_key);
     let auth_token = format!("auth_token={}; Path=/; Max-Age=604800; Secure; HttpOnly", token);
@@ -63,3 +97,20 @@ pub async fn user_registration(
             format!("Logged in as user {:?}", current_user.user.username.clone())
         )
 }
+
+#[get("/api/oauth2/authorize/{token}")]
+pub async fn authorize(
+    req: HttpRequest,
+) -> impl Responder {
+    let token = req.match_info().get("token").unwrap().to_string();
+
+    let decoded_claims = decode_auth_token(token);
+
+    if let Some(claims) = decoded_claims {
+        return HttpResponse::Ok().body(claims.sub); // Return the user id
+    }
+
+    HttpResponse::Unauthorized().body("Invalid token provided.")
+}
+
+// TODO: Send a request to the user-service either through HTTP or gRPC (to learn it as well) to create a new user.

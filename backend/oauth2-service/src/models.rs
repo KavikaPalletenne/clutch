@@ -21,7 +21,7 @@ pub struct Group {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AuthorizationJwtPayload {
     pub iss: String, // issuer
-    pub sub: String, // subject (user's ObjectId from MongoDB)
+    pub sub: String, // subject (user's id)
     pub jti: Uuid, // id
     pub aud: Vec<String>, // audience (uri the JWT is meant for)
 
@@ -80,4 +80,17 @@ pub struct DiscordApplication {
     pub bot_public: bool,
     pub bot_require_code_grant: bool,
     pub verify_key: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct NewUserRequest {
+    pub secret: String, // Secret that is shared with the oauth2-service
+    pub id: String,
+    pub username: String,
+    pub email: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct UserExistsResponse {
+    pub exists: bool,
 }
