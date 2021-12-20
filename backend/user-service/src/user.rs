@@ -31,7 +31,7 @@ impl User {
 /////////////////
 
 // Create
-#[post("/api/user/protected/create")]
+#[get("/api/user/protected/create")]
 pub async fn create_user(
     database: web::Data<Database>,
     web::Query(user_request): web::Query<NewUserRequest>,
@@ -75,7 +75,9 @@ pub async fn get_user_by_id(database: web::Data<Database>, req: HttpRequest) -> 
         .expect("Could not fetch user with provided id");
 
     if let Some(user) = result {
-        return HttpResponse::Ok().body(serde_json::to_string(&user).unwrap());
+        return HttpResponse::Ok()
+            .header("Content-Type", "application/json")
+            .body(serde_json::to_string(&user).unwrap());
     }
 
     HttpResponse::BadRequest().body("Invalid user id provided.")
@@ -103,14 +105,18 @@ pub async fn user_exists(database: web::Data<Database>, req: HttpRequest) -> imp
         .expect("Could not fetch user with provided id");
 
     if let Some(_) = result {
-        return HttpResponse::Ok().body(serde_json::to_string(
+        return HttpResponse::Ok()
+            .header("Content-Type", "application/json")
+            .body(serde_json::to_string(
             &UserExistsResponse {
                 exists: true,
             }
         ).unwrap());
     }
 
-    HttpResponse::Ok().body(serde_json::to_string(
+    HttpResponse::Ok()
+        .header("Content-Type", "application/json")
+        .body(serde_json::to_string(
         &UserExistsResponse {
             exists: false,
         }

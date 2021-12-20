@@ -53,14 +53,16 @@ pub async fn user_registration(
     let user_id = current_user.user.id;
     let username = current_user.user.username.clone();
 
+    let exists_url = Url::parse(&*format!("http://localhost:442/api/user/protected/userExists/{}/{}", user_id.clone(), env::var("USER_SERVICE_SECRET").unwrap())).unwrap().to_string();
+
     let user_exists = http_client
-        .get(Url::parse(format!("https://examclutch.com/api/user/protected/userExists/{}/{}", user_id.clone(), env::var("USER_SERVICE_SECRET").unwrap()).as_str()).unwrap().as_str())
+        .get(exists_url)
         .send().await.expect("Error sending GET request")
         .json::<UserExistsResponse>().await.expect("Error parsing JSON");
 
     // Create new user if does not exist
     if !user_exists.exists {
-        let uri = Url::parse_with_params("https://examclutch.com/api/user/protected/create",
+        let uri = Url::parse_with_params("http://localhost:442/api/user/protected/create",
                                          &[
                                              ("secret", env::var("USER_SERVICE_SECRET").unwrap()),
                                              ("id", user_id.clone()),

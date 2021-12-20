@@ -12,17 +12,18 @@ async fn main() -> Result<()> {
         .await
         .expect("Failed to connect to DB");
 
-    println!("Starting server on port 443");
+    println!("Starting server on port 442");
 
     HttpServer::new(move || {
         App::new()
             .data(database.clone())
             .service(user::create_user)
             .service(user::get_user_by_id)
+            .service(user::user_exists)
             .service(user::update_username_by_user_id)
             .service(user::delete_user_by_id)
     })
-    .bind("0.0.0.0:443")?
+    .bind("0.0.0.0:442")?
     .run()
     .await?;
 
