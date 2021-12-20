@@ -1,10 +1,10 @@
 use crate::group::Group;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
-use bson::oid::ObjectId;
 use mongodb::bson::doc;
 use mongodb::Database;
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
+use crate::models::{NewUserRequest, UserExistsResponse};
+use std::env;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
@@ -31,14 +31,17 @@ impl User {
 /////////////////
 
 // Create
-#[post("/api/protected/user/create")] // TODO: This function can only be called by the oauth2 user registration service. Maybe implement a secret (with every request) that only this and that know.
+#[post("/api/user/protected/create")] // TODO: This function can only be called by the oauth2 user registration service. Maybe implement a secret (with every request) that only this and that know.
 pub async fn create_user(
     database: web::Data<Database>,
-    id: String,
-    username: String,
-    email: String,
+    web::Query(user_request): web::Query<NewUserRequest>,
 ) -> impl Responder {
-    let user = User::new(id, username, email); // TODO: email is set using the email the user used for oauth2 for Google/Discord etc.
+
+    if user_request.secret != env::var("USER_SERVICE_SECRET").unwrap() {
+        return HttpResponse::Unauthorized().body("This is a protected URI.");
+    }
+
+    let user = User::new(user_request.id, user_request.username, user_request.email); // TODO: email is set using the email the user used for oauth2 for Google/Discord etc.
 
     let bson = bson::to_bson(&user).expect("Error converting struct to BSON");
     let document = bson.as_document().unwrap();
@@ -57,7 +60,7 @@ pub async fn create_user(
 }
 
 // Read
-#[get("/user/{id}")]
+#[get("/api/user/{id}")]
 pub async fn get_user_by_id(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
     let user_id = req.match_info().get("id").unwrap().to_string();
 
@@ -78,8 +81,44 @@ pub async fn get_user_by_id(database: web::Data<Database>, req: HttpRequest) -> 
     HttpResponse::BadRequest().body("Invalid user id provided.")
 }
 
+// Read
+#[get("/api/user/protected/userExists/{id}/{secret}")]
+pub async fn user_exists(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
+    let path = req.match_info();
+    let user_id = path.get("id").unwrap().to_string();
+    let secret = path.get("secret").unwrap().to_string();
+
+    if secret != env::var("USER_SERVICE_SECRET").unwrap() {
+        return HttpResponse::Unauthorized().body("This is a protected URI.");
+    }
+
+    let query = doc! {
+        "_id": user_id,
+    };
+
+    let result: Option<User> = database
+        .collection("users")
+        .find_one(query, None)
+        .await
+        .expect("Could not fetch user with provided id");
+
+    if let Some(_) = result {
+        return HttpResponse::Ok().body(serde_json::to_string(
+            &UserExistsResponse {
+                exists: true,
+            }
+        ).unwrap());
+    }
+
+    HttpResponse::Ok().body(serde_json::to_string(
+        &UserExistsResponse {
+            exists: false,
+        }
+    ).unwrap())
+}
+
 // Update username
-#[post("/user/updateUsername/{id}/{username}")]
+#[post("/api/user/updateUsername/{id}/{username}")]
 pub async fn update_username_by_user_id(
     database: web::Data<Database>,
     req: HttpRequest,
@@ -123,7 +162,7 @@ pub async fn update_username_by_user_id(
 }
 
 // Delete
-#[get("/user/delete/{id}")]
+#[get("/api/user/delete/{id}")]
 pub async fn delete_user_by_id(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
     let user_id = req.match_info().get("id").unwrap().to_string();
 

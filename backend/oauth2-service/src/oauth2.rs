@@ -1,12 +1,10 @@
 use serde::{Deserialize, Serialize};
 use bson::oid::ObjectId;
-use actix_web::{get, post, web, Responder, HttpRequest, HttpResponse};
-use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, AuthorizationInformation, Group, AccessTokenRequest, NewUserRequest, UserExistsResponse};
+use actix_web::{get, web, Responder, HttpRequest, HttpResponse};
+use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, AuthorizationInformation, Group, AccessTokenRequest, UserExistsResponse};
 use jsonwebtoken::EncodingKey;
-use form_urlencoded::Serializer;
 use std::env;
 use crate::jwt::{create_auth_token, decode_auth_token};
-use std::str::FromStr;
 use actix_web::client::Client;
 use std::str;
 use url::Url;
@@ -62,20 +60,13 @@ pub async fn user_registration(
 
     // Create new user if does not exist
     if !user_exists.exists {
-        let new_user_request = NewUserRequest {
-            secret: env::var("USER_SERVICE_SECRET").unwrap(),
-            id: user_id.clone(),
-            username: usename.clone(),
-            email: "Not Used".to_string(), // Hard-coded null email as website will use Discord DMs.
-        };
-
         let uri = Url::parse_with_params("https://examclutch.com/api/user/protected/create",
                                          &[
                                              ("secret", env::var("USER_SERVICE_SECRET").unwrap()),
                                              ("id", user_id.clone()),
                                              ("username", username.clone()),
-                                             ("email", "Not Used")
-                                         ])?;
+                                             ("email", "Not Used".to_string())
+                                         ]).expect("Error parsing URL");
 
         let create_user_response = http_client
             .get(uri.as_str())

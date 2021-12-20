@@ -4,6 +4,7 @@ use anyhow::Result;
 mod group;
 mod persistence;
 mod user;
+mod models;
 
 #[actix_web::main]
 async fn main() -> Result<()> {

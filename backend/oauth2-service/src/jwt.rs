@@ -4,7 +4,6 @@ use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, D
 use uuid::Uuid;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use crate::models::{AuthorizationJwtPayload, AccessTokenResponse};
-use bson::oid::ObjectId;
 
 
 pub fn create_auth_token(user_id: String, username: String, access_token: AccessTokenResponse, encoding_key: &EncodingKey) -> String {
