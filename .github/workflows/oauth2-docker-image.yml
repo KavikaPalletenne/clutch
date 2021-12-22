@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build . --file ./backend/oauth2-service/Dockerfile --tag oauth2-service:$(date +%s)
+      run:  docker build -t oauth2-service:$(date +%s) -f ./backend/oauth2-service/Dockerfile .
