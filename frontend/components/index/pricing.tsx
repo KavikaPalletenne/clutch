@@ -45,7 +45,7 @@ export default function Pricing() {
                                     $1.50<span className="font-normal text-base">/member</span>
                                 </p>
                             </div>
-                            <p className="md:w-80 text-base leading-6 mt-4 text-gray-600">200MB upload limit for all members. Monetise your community with our white-label payments solution.</p>
+                            <p className="md:w-80 text-base leading-6 mt-4 text-gray-600">200MB upload limit for all members.</p>
                         </div>
                     </div>
                 </div>

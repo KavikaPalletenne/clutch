@@ -10,6 +10,10 @@
 .headerSignUpButton {
     background-color: White;
     color: #C290FF;
+    /* display items horizontally */
+    display: flex;
+    align-items: center;
+    
 }
 
 /* Center .heroSection */

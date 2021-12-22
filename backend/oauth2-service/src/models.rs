@@ -57,16 +57,36 @@ pub struct AuthorizationInformation {
     pub application: DiscordApplication,
     pub scopes: Vec<String>,
     pub expires: String,
-    pub user: DiscordUser,
+    pub user: DiscordAuthInfoUser,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DiscordAuthInfoUser {
+    pub id: String,
+    pub username: String,
+    pub avatar: String,
+    pub discriminator: String,
+    pub public_flags: u64,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DiscordUser {
     pub id: String,
     pub username: String,
-    pub avatar: String,
     pub discriminator: String,
-    pub public_flags: u64,
+    pub avatar: String,
+    pub bot: Option<bool>,
+    pub system: Option<bool>,
+    pub mfa_enabled: Option<bool>,
+    pub banner: Option<String>,
+    pub banner_color: Option<i64>,
+    pub accent_color: Option<i64>,
+    pub locale: Option<String>,
+    pub verified: bool,
+    pub email: String,
+    pub flags: Option<i64>,
+    pub premium_type: Option<i64>,
+    pub public_flags: Option<i64>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

@@ -11,6 +11,9 @@ module.exports = {
           DEFAULT: '#C290FF',
           dark: '#8C9AFF',
         },
+        blurple: {
+          DEFAULT: '#5865F2',
+        },
       },
     },
   },

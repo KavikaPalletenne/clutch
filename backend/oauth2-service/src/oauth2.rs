@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use bson::oid::ObjectId;
-use actix_web::{get, web, Responder, HttpRequest, HttpResponse};
-use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, AuthorizationInformation, Group, AccessTokenRequest, UserExistsResponse};
+use actix_web::{get, web, Responder, HttpRequest, HttpResponse, HttpMessage};
+use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, AuthorizationInformation, Group, AccessTokenRequest, UserExistsResponse, DiscordUser};
 use jsonwebtoken::EncodingKey;
 use std::env;
 use crate::jwt::{create_auth_token, decode_auth_token};
@@ -44,14 +44,24 @@ pub async fn user_registration(
         .await.expect("Error sending POST request").json::<AccessTokenResponse>().await.expect("Error parsing JSON");
 
     let bearer_token = format!("Bearer {}", response.access_token);
+    // let current_user = http_client
+    //     .get("https://discord.com/api/oauth2/@me")
+    //     .header("Authorization", bearer_token)
+    //     .send().await.expect("Error sending GET request")
+    //     .json::<AuthorizationInformation>().await.expect("Error parsing JSON");
+
+    println!("Bearer token: {}", bearer_token);
+
     let current_user = http_client
-        .get("https://discord.com/api/oauth2/@me")
+        .get("https://discord.com/api/users/@me")
         .header("Authorization", bearer_token)
         .send().await.expect("Error sending GET request")
-        .json::<AuthorizationInformation>().await.expect("Error parsing JSON");
+        .json::<DiscordUser>().await.expect("Error parsing JSON");
 
-    let user_id = current_user.user.id;
-    let username = current_user.user.username.clone();
+    println!("Current user: {:?}", current_user);
+    let user_id = current_user.id;
+    let username = current_user.username.clone();
+    let email = current_user.email;
 
     let exists_url = Url::parse(&*format!("http://localhost:442/api/user/protected/userExists/{}/{}", user_id.clone(), env::var("USER_SERVICE_SECRET").unwrap())).unwrap().to_string();
 
@@ -67,7 +77,7 @@ pub async fn user_registration(
                                              ("secret", env::var("USER_SERVICE_SECRET").unwrap()),
                                              ("id", user_id.clone()),
                                              ("username", username.clone()),
-                                             ("email", "Not Used".to_string())
+                                             ("email", email.clone())
                                          ]).expect("Error parsing URL");
 
         let create_user_response = http_client
@@ -83,11 +93,11 @@ pub async fn user_registration(
     let token = create_auth_token(user_id, username, response, encoding_key);
     let auth_token = format!("auth_token={}; Path=/; Max-Age=604800; Secure; HttpOnly", token);
 
-    HttpResponse::Ok()
+    HttpResponse::PermanentRedirect()
         .header("Set-Cookie", auth_token)
-        //.header("Location", "https://examclutch.com/app")
+        .header("Location", "https://examclutch.com/app")
         .body(
-            format!("Logged in as user {:?}", current_user.user.username.clone())
+            format!("Logged in as user {:?}", current_user.username.clone())
         )
 }
 

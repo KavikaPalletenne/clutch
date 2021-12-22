@@ -36,6 +36,7 @@ async fn main() -> Result<()> {
         App::new()
             .data(jwt_encoding_key.clone())
             .service(oauth2::user_registration)
+            .service(oauth2::authorize)
     })
         .bind_rustls("0.0.0.0:443", config)?
         .run()

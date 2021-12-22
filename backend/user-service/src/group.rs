@@ -3,10 +3,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Group {
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "_id")]
     // rename to _id and use and document id in database
-    id: Option<ObjectId>,
+    id: String, // Same id as Discord guild id
     name: String,
-    members: Vec<ObjectId>,        // id's of users that are members
-    administrators: Vec<ObjectId>, // id's of users that are administrators
+    members: Vec<String>,        // id's of users that are members
+    administrators: Vec<String>, // id's of users that are administrators
 }

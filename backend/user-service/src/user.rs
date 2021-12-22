@@ -12,7 +12,7 @@ pub struct User {
     id: String, // user id supplied from Discord etc.
     username: String,  // displayed as @<username>
     email: String,
-    groups: Vec<Group>, // id of group that the user is a part of
+    groups: Vec<String>, // id's of groups that the user is a part of
 }
 
 impl User {
@@ -21,7 +21,7 @@ impl User {
             id,
             username,
             email,
-            groups: Vec::<Group>::new(),
+            groups: Vec::<String>::new(),
         }
     }
 }
