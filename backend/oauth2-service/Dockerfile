@@ -5,6 +5,7 @@ FROM rust:1.57 as builder
 
 RUN USER=root cargo new --bin docker-oauth2-service
 WORKDIR ./docker-oauth2-service
+RUN ls
 COPY ./Cargo.toml ./Cargo.toml
 RUN cargo build --release
 RUN rm src/*.rs
