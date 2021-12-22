@@ -8,7 +8,7 @@ pub struct Resource {
     // rename to _id and use and document id in database
     pub id: Option<ObjectId>,
     pub user_id: String,  // owner
-    pub group_id: Uuid, // group it belongs to
+    pub group_id: String, // group it belongs to
     pub title: String,
     pub description: String,
     pub tags: Option<Vec<Tag>>,            // Tags are optional

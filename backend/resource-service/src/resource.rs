@@ -6,14 +6,13 @@ use mongodb::bson::doc;
 use mongodb::Database;
 use std::str::FromStr;
 use tokio_stream::StreamExt;
-use uuid::Uuid;
 
 // A resource is any document or link to a website.
 impl Resource {
     pub fn new(
         id: Option<ObjectId>,
         user_id: String,
-        group_id: Uuid,
+        group_id: String,
         title: String,
         description: String,
         tags: Option<Vec<Tag>>,
@@ -53,7 +52,7 @@ pub async fn create_resource(
     let resource = Resource::new(
         id,
         resource_form.user_id,
-        Uuid::from_str(resource_form.group_id.as_str()).unwrap(),
+        resource_form.group_id,
         resource_form.title,
         resource_form.description,
         resource_form.tags,
@@ -95,12 +94,12 @@ pub async fn fetch_resource_by_id(
         .expect("Could not fetch all documents for provided group id");
 
     if let Some(resource) = result {
-        return HttpResponse::Ok().body(serde_json::to_string(&resource).unwrap());
+        return HttpResponse::Ok()
+            .header("Content-Type", "application/json")
+            .body(serde_json::to_string(&resource).unwrap());
     }
 
-    HttpResponse::BadRequest()
-        .header("Content-Type", "application/json")
-        .body("Invalid resource id provided.")
+    HttpResponse::BadRequest().body("Invalid resource id provided.")
 }
 
 #[get("/resource/getByGroupId/{group_id}")]
@@ -183,7 +182,7 @@ pub async fn update_resource(
     let resource = Resource::new(
         id,
         resource_form.user_id,
-        Uuid::from_str(resource_form.group_id.as_str()).unwrap(),
+        resource_form.group_id,
         resource_form.title.clone(),
         resource_form.description.clone(),
         resource_form.tags.clone(),
