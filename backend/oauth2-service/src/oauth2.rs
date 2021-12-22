@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use bson::oid::ObjectId;
-use actix_web::{get, web, Responder, HttpRequest, HttpResponse, HttpMessage};
-use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, AuthorizationInformation, Group, AccessTokenRequest, UserExistsResponse, DiscordUser};
+use actix_web::{get, web, Responder, HttpRequest, HttpResponse};
+use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, Group, AccessTokenRequest, UserExistsResponse, DiscordUser};
 use jsonwebtoken::EncodingKey;
 use std::env;
 use crate::jwt::{create_auth_token, decode_auth_token};

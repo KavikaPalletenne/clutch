@@ -1,11 +1,7 @@
 use actix_web::{App, HttpServer};
-use rustls::internal::pemfile::{certs, pkcs8_private_keys};
-use rustls::{NoClientAuth, ServerConfig};
 use anyhow::Result;
 use jsonwebtoken::EncodingKey;
 use std::env;
-use std::io::BufReader;
-use std::fs::File;
 
 mod oauth2;
 mod models;
