@@ -11,7 +11,7 @@ RUN rm src/*.rs
 
 ADD . ./
 
-RUN rm ./target/release/deps/docker-oauth2-service*
+RUN rm ./target/release/deps/docker_oauth2_service*
 RUN cargo build --release
 
 
@@ -31,11 +31,11 @@ RUN groupadd $APP_USER \
     && useradd -g $APP_USER $APP_USER \
     && mkdir -p ${APP}
 
-COPY --from=builder /docker-oauth2-service/target/release/docker-oauth2-service ${APP}/docker-oauth2-service
+COPY --from=builder /docker-oauth2-service/target/release/docker_oauth2_service ${APP}/docker_oauth2_service
 
 RUN chown -R $APP_USER:$APP_USER ${APP}
 
 USER $APP_USER
 WORKDIR ${APP}
 
-CMD ["./docker-oauth2-service"]
+CMD ["./docker_oauth2_service"]
