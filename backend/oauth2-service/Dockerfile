@@ -1,3 +1,6 @@
+# To make the docker image run: `docker build -t oauth2-service -f ./Dockerfile .`
+
+
 FROM rust:1.57 as builder
 
 RUN USER=root cargo new --bin docker-oauth2-service
