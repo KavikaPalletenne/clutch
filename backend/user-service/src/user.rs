@@ -5,10 +5,11 @@ use mongodb::Database;
 use serde::{Deserialize, Serialize};
 use crate::models::{NewUserRequest, UserExistsResponse};
 use std::env;
+use crate::middleware::authorize;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
-    #[serde(rename = "_id")] // rename to _id and use and document id in database
+    #[serde(rename = "_id")] // rename to _id and use as document id in database
     id: String, // user id supplied from Discord etc.
     username: String,  // displayed as @<username>
     email: String,
@@ -132,6 +133,19 @@ pub async fn update_username_by_user_id(
     let user_id = req.match_info().get("id").unwrap().to_string();
     let updated_username = req.match_info().get("username").unwrap().to_string();
 
+    //////////////////////////////////////////////////////////////////////////
+    // Auth //
+    let authorized = authorize(req.clone()).await;
+
+    if authorized.user_id.is_none() {
+        return HttpResponse::Unauthorized();
+    }
+
+    if authorized.user_id.unwrap().ne(&user_id) {
+        return HttpResponse::Unauthorized();
+    }
+    //////////////////////////////////////////////////////////////////////////
+
     let query = doc! {
         "_id": user_id,
     };
@@ -176,6 +190,20 @@ pub async fn update_email_by_user_id(
     let user_id = req.match_info().get("id").unwrap().to_string();
     let updated_email = req.match_info().get("username").unwrap().to_string();
 
+    //////////////////////////////////////////////////////////////////////////
+    // Auth //
+    let authorized = authorize(req.clone()).await;
+
+    if authorized.user_id.is_none() {
+        return HttpResponse::Unauthorized();
+    }
+
+    if authorized.user_id.unwrap().ne(&user_id) {
+        return HttpResponse::Unauthorized();
+    }
+    //////////////////////////////////////////////////////////////////////////
+
+
     let query = doc! {
         "_id": user_id,
     };
@@ -215,6 +243,19 @@ pub async fn update_email_by_user_id(
 #[get("/api/user/delete/{id}")]
 pub async fn delete_user_by_id(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
     let user_id = req.match_info().get("id").unwrap().to_string();
+
+    //////////////////////////////////////////////////////////////////////////
+    // Auth //
+    let authorized = authorize(req.clone()).await;
+
+    if authorized.user_id.is_none() {
+        return HttpResponse::Unauthorized();
+    }
+
+    if authorized.user_id.unwrap().ne(&user_id) {
+        return HttpResponse::Unauthorized();
+    }
+    //////////////////////////////////////////////////////////////////////////
 
     let filter = doc! {
         "_id": user_id,
