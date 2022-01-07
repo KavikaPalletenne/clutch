@@ -34,7 +34,7 @@ export default function GroupPage() {
     useEffect(() => {
         
         setUsername(localStorage.getItem("username"))
-        
+        console.log(group.administrators[0].username);
         async function getGroup() {
             await fetch(`http://localhost:441/api/group/${groupId}`, {
                 method: 'GET'
@@ -76,7 +76,7 @@ export default function GroupPage() {
 
             <div className="flex items-start justify-center pt-10">
                 <GroupTitle propGroup={group} />
-                <Members />
+                <Members admins={group.administrators} members={group.members} />
             </div>
 
             <div className="flex inline-grid">

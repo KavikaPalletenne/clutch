@@ -1,9 +1,17 @@
 import { useState } from 'react';
 
-export default function Members() {
+type GroupUser = {
+    id: string;
+    username: string;
+}
 
-    const [groupMembers, setGroupMembers] = useState(["@mihir", "@kavika", "@madderz", "@bushby"]);
-    const listMembers = groupMembers.map((d) => <li style={{listStyle: 'none'}} key={d}>{d}</li>);
+export default function Members(props: {
+    members: GroupUser[]; admins: GroupUser[];
+    }) {
+
+    
+    const listAdmins = props.admins.map((d) => <li style={{listStyle: 'none'}} key={d.username}>{d.username}</li>);
+    const listMembers = props.members.map((d) => <li style={{listStyle: 'none'}} key={d.username}>{d.username}</li>);
 
     return(
         
@@ -11,6 +19,10 @@ export default function Members() {
         
             <h1 className="font-bold text-2xl pb-2 text-exclpurple">Members</h1>
             <div>
+                <div className="text-exclpurple-dark font-bold">
+                    { listAdmins }
+                </div>
+                
                 { listMembers }
             </div>            
         </div>
