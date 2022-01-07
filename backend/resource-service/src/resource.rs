@@ -12,6 +12,7 @@ impl Resource {
     pub fn new(
         id: Option<ObjectId>,
         user_id: String,
+        username: String,
         group_id: String,
         title: String,
         description: String,
@@ -22,6 +23,7 @@ impl Resource {
         Resource {
             id,
             user_id,
+            username,
             group_id,
             title,
             description,
@@ -43,7 +45,7 @@ pub async fn create_resource(
     database: web::Data<Database>,
     resource: web::Json<ResourceForm>,
 ) -> impl Responder {
-    // Check whether current user (JWT) is the same as resource user id.
+    // TODO: Check whether current user (JWT) is the same as resource user id.
     // TODO: Follow this for the CDN backend https://blog.logrocket.com/file-upload-and-download-in-rust/
     let last_edited_at = Utc::now().naive_local();
     let resource_form = resource.into_inner();
@@ -52,6 +54,7 @@ pub async fn create_resource(
     let resource = Resource::new(
         id,
         resource_form.user_id,
+        resource_form.username,
         resource_form.group_id,
         resource_form.title,
         resource_form.description,
@@ -102,7 +105,7 @@ pub async fn fetch_resource_by_id(
     HttpResponse::BadRequest().body("Invalid resource id provided.")
 }
 
-#[get("/resource/getByGroupId/{group_id}")]
+#[get("/api/resource/get_all/{group_id}")]
 pub async fn fetch_resource_by_group_id(
     database: web::Data<Database>,
     req: HttpRequest,
@@ -182,6 +185,7 @@ pub async fn update_resource(
     let resource = Resource::new(
         id,
         resource_form.user_id,
+        resource_form.username,
         resource_form.group_id,
         resource_form.title.clone(),
         resource_form.description.clone(),

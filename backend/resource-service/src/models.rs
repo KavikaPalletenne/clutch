@@ -8,6 +8,7 @@ pub struct Resource {
     // rename to _id and use and document id in database
     pub id: Option<ObjectId>,
     pub user_id: String,  // owner
+    pub username: String,
     pub group_id: String, // group it belongs to
     pub title: String,
     pub description: String,
@@ -20,6 +21,7 @@ pub struct Resource {
 pub struct ResourceForm {
     // No need for a document Id as MongoDB generates an Id for the document when you insert it
     pub user_id: String,
+    pub username: String,
     pub group_id: String,
     pub title: String,
     pub description: String,
