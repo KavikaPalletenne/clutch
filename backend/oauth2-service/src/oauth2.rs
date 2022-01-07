@@ -95,7 +95,8 @@ pub async fn user_registration(
 
     HttpResponse::PermanentRedirect()
         .header("Set-Cookie", auth_token)
-        .header("Location", "https://examclutch.com/app")
+        // .header("Location", "https://examclutch.com/app")
+        .header("Location", "http://localhost:3000/app/group/647329273568559114")
         .body(
             format!("Logged in as user {:?}", current_user.username.clone())
         )
