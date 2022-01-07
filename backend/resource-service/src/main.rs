@@ -12,7 +12,7 @@ async fn main() -> Result<()> {
         .expect("Failed to connect to DB");
     println!("Successfully connected to database");
 
-    println!("Starting server on port 443");
+    println!("Starting server on port 440");
     HttpServer::new(move || {
         App::new()
             .data(database.clone())
@@ -22,7 +22,7 @@ async fn main() -> Result<()> {
             .service(resource::update_resource)
             .service(resource::delete_resource)
     })
-    .bind("0.0.0.0:443")?
+    .bind("0.0.0.0:440")?
     .run()
     .await?;
 
