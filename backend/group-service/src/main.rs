@@ -12,7 +12,7 @@ async fn main() -> Result<()> {
         .await
         .expect("Failed to connect to DB");
 
-    println!("Starting server on port 442");
+    println!("Starting server on port 441");
 
     HttpServer::new(move || {
         App::new()
