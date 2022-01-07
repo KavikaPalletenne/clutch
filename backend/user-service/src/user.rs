@@ -138,11 +138,11 @@ pub async fn update_username_by_user_id(
     let authorized = authorize(req.clone()).await;
 
     if authorized.user_id.is_none() {
-        return HttpResponse::Unauthorized();
+        return HttpResponse::Unauthorized().body("");
     }
 
     if authorized.user_id.unwrap().ne(&user_id) {
-        return HttpResponse::Unauthorized();
+        return HttpResponse::Unauthorized().body("");
     }
     //////////////////////////////////////////////////////////////////////////
 
@@ -195,11 +195,11 @@ pub async fn update_email_by_user_id(
     let authorized = authorize(req.clone()).await;
 
     if authorized.user_id.is_none() {
-        return HttpResponse::Unauthorized();
+        return HttpResponse::Unauthorized().body("");
     }
 
     if authorized.user_id.unwrap().ne(&user_id) {
-        return HttpResponse::Unauthorized();
+        return HttpResponse::Unauthorized().body("");
     }
     //////////////////////////////////////////////////////////////////////////
 
@@ -249,11 +249,11 @@ pub async fn delete_user_by_id(database: web::Data<Database>, req: HttpRequest) 
     let authorized = authorize(req.clone()).await;
 
     if authorized.user_id.is_none() {
-        return HttpResponse::Unauthorized();
+        return HttpResponse::Unauthorized().body("");
     }
 
     if authorized.user_id.unwrap().ne(&user_id) {
-        return HttpResponse::Unauthorized();
+        return HttpResponse::Unauthorized().body("");
     }
     //////////////////////////////////////////////////////////////////////////
 

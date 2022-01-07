@@ -12,3 +12,8 @@ pub struct NewUserRequest {
 pub struct UserExistsResponse {
     pub exists: bool,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct AuthorizeResponse {
+    pub user_id: Option<String>,
+}

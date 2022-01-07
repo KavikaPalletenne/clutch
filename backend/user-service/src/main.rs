@@ -5,6 +5,7 @@ mod group;
 mod persistence;
 mod user;
 mod models;
+mod middleware;
 
 #[actix_web::main]
 async fn main() -> Result<()> {
