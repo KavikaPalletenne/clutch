@@ -21,7 +21,7 @@ pub fn create_auth_token(user_id: String, username: String, access_token: Access
         nbf: i64::try_from(current_time.as_secs()).unwrap(),
         iat: i64::try_from(current_time.as_secs()).unwrap(),
         username,
-        access_token,
+        access_token_response: access_token,
     };
 
     encode(&Header::default(), &claims, encoding_key).unwrap()

@@ -31,7 +31,7 @@ pub struct AuthorizationJwtPayload {
     pub iat: i64, // issued-at (UNIX timestamp)
 
     pub username: String, // username
-    pub access_token: AccessTokenResponse,
+    pub access_token_response: AccessTokenResponse,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -113,4 +113,26 @@ pub struct NewUserRequest {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UserExistsResponse {
     pub exists: bool,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct AuthorizeResponse {
+    pub user_id: Option<String>,
+}
+
+// Check user's guilds
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PartialGuild {
+    pub id: String,
+    pub name: String,
+    pub icon: Option::<String>,
+    pub owner: bool,
+    pub permissions: i64,
+    pub features: Vec::<String>,
+    pub permissions_new: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct GuildResponse {
+    pub guilds: Vec::<PartialGuild>,
 }
