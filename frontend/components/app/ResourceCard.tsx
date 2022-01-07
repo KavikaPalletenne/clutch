@@ -1,17 +1,31 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-export default function ResourceCard() {
+type Resource = {
+    id: string;
+    title: string;
+    description: string;
+    files: File[];
+}
+
+type File = {
+    id: string;
+    title: string;
+    size: string;
+}
+
+
+export default function ResourceCard(props: {
+    propResource: Resource;
+}) {
 
     const [resource, setResource] = useState({
-        "id": "cd505bba-1bb4-4ff7-b3b3-f57854d0099e",
-        "title": "Electronegativity",
-        "description": "Electronegativity chart that we will get on the exam",
-        "files": [
-            {"id": "1bf1f868-6aa7-4821-9aff-12002114c360","title": "electronegativity_chart.png", "size": "1.5MB"},
-            {"id": "33adf97e-afe8-4d28-95b7-99eba22bee8d", "title": "data_booklet_2021.pdf", "size": "2.5MB"}
-        ]
+        "id": props.propResource.id,
+        "title": props.propResource.title,
+        "description": props.propResource.description,
+        "files": props.propResource.files,
     });
+    
     
     const listFiles = resource.files.map((f) => 
         <div className="px-4 py-1">

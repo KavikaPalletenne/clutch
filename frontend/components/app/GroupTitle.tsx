@@ -2,11 +2,28 @@ import { FaDiscord } from "react-icons/fa";
 import Link from "next/link";
 import { useState } from 'react';
 
-export default function GroupTitle() {
+
+type GroupUser = {
+    id: string;
+    username: string;
+}
+
+type Group = {
+    _id: string;
+    name: string;
+    description: string;
+    discord_link: string;
+    members: GroupUser[];
+    administrators: GroupUser[];
+}
+
+export default function GroupTitle(props: {
+    propGroup: Group;
+    }) {
     
-    const [groupTitle, setGroupTitle] = useState("MGS Year 11");
-    const [groupDescription, setGroupDescription] = useState("Melbourne Grammar School Yr 11 study group");
-    const [discordLink, setDiscordLink] = useState("https://discord.gg/V38R3ByGQb");
+    const groupTitle = props.propGroup.name;
+    const groupDescription = props.propGroup.description;
+    const discordLink = props.propGroup.discord_link;
 
     return(
         
