@@ -37,7 +37,7 @@ export default function ResourceCard(props: {
     
     
     const listFiles = resource.files.map((f) => 
-        <div className="px-4 py-1">
+        <div className="px-4 py-1" key={f.id}>
             <Link href={ "https://cdn.examclutch.com/file/" + f.id }>
                 <a>
                     <div className="py-4 px-4 shadow-sm hover:shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", minWidth: "750px"}}>

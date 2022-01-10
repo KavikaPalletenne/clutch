@@ -47,7 +47,9 @@ export default function GroupPage({ group, resources }: {
 }) {
 
     const listResources = resources.map((r: Resource) =>
-            <ResourceCard propResource={r} />
+            <div key={r._id.$oid}>
+                <ResourceCard propResource={r} />
+            </div>
     );
 
     return(

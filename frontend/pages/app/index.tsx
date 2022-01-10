@@ -1,7 +1,4 @@
 import Head from "next/head";
-import Members from "../../components/app/Members";
-import GroupTitle from "../../components/app/GroupTitle";
-import ResourceCard from "../../components/app/ResourceCard";
 
 export default function App() {
 
@@ -25,12 +22,11 @@ export default function App() {
             </Head>
 
             <div className="flex items-start justify-center pt-10">
-                <GroupTitle groupTitle={"MGS Year 11"} groupDescription={"Melbourne Grammar School Yr 11 study group"} discordLink={"https://discord.gg/V38R3ByGQb"} />
-                <Members />
+                
             </div>
 
             <div className="flex inline-grid">
-                <ResourceCard propResource={resource} />
+                
             </div>
 
         </div>
