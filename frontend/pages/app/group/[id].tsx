@@ -36,12 +36,15 @@ export type ObjectId = {
 }
 
 export type File = {
-    _id: string;
-    title: String;
+    id: string;
+    title: string;
     size: number;
 }
 
-export default function GroupPage({ group, resources }) {
+export default function GroupPage({ group, resources }: {
+    group: Group;
+    resources: Resource[];
+}) {
 
     const listResources = resources.map((r: Resource) =>
             <ResourceCard propResource={r} />
