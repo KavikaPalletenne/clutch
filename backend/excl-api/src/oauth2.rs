@@ -134,6 +134,7 @@ pub async fn authorize(
             .body(serde_json::to_string(
             &AuthorizeResponse {
                 user_id: Option::from(claims.sub),
+                username: claims.username,
             }).unwrap()
         ); // Return the user id as a AuthorizeResponse JSON
     }
