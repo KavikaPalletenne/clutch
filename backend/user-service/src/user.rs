@@ -10,10 +10,10 @@ use crate::middleware::authorize;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
     #[serde(rename = "_id")] // rename to _id and use as document id in database
-    id: String, // user id supplied from Discord etc.
-    username: String,  // displayed as @<username>
-    email: String,
-    groups: Vec<String>, // id's of groups that the user is a part of
+    pub id: String, // user id supplied from Discord etc.
+    pub username: String,  // displayed as @<username>
+    pub email: String,
+    pub groups: Vec<String>, // id's of groups that the user is a part of
 }
 
 impl User {
