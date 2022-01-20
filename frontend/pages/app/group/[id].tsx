@@ -5,6 +5,7 @@ import Head from "next/head";
 import Members from "../../../components/app/Members";
 import GroupTitle from "../../../components/app/GroupTitle";
 import ResourceCard from "../../../components/app/ResourceCard";
+import { GetServerSideProps } from "next";
 
 type GroupUser = {
     id: string;
@@ -75,7 +76,7 @@ export default function GroupPage({ group, resources }: {
 }
 
 
-export async function getServerSideProps(context: any) {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
     
     const group_res = await fetch(`http://localhost:441/api/group/${context.params.id}`);
     const group = await group_res.json() as Group;
