@@ -21,7 +21,7 @@ const Home: NextPage = () => {
           <section className="lg:pl-20 lg:pt-12 pl-5 pt-10 lg:pr-20 pr-5">
             <Link href="/">
               <a>
-              <Image src="/logo_white.svg" className="lg:w-80 w-36 relative float-left"/>
+              <img src="/logo_white.svg" className="lg:w-80 w-36 relative float-left"/>
               </a>
             </Link>
             
@@ -42,7 +42,7 @@ const Home: NextPage = () => {
             <h1 className={styles.heroSectionH1}>Study together.</h1>
             <h2 className={styles.heroSectionH2}>Clutch your exams.</h2>
             <div className={styles.heroImageContainer} >
-              <Image src="/homepage.svg" width="1000px"/>
+              <img src="/homepage.svg" width="1000px"/>
             </div>
         </div>
       </div>
