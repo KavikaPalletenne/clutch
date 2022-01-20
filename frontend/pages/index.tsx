@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
-import styles from '../../styles/index.module.css'
+import styles from '../styles/index.module.css'
 import Features from '../components/index/features'
 import Pricing from '../components/index/pricing'
 import { FaDiscord } from 'react-icons/fa'

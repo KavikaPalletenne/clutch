@@ -18,9 +18,9 @@
     "paths": { 
       "@static/*": ["./public/static/*"], 
       "@generated/*": ["./src/__generated__/*"],
-      "@*": ["./src*"]
+      "@*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/pages/components/**/*", "src/pages/**/*", "src/components/**/*"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/components/**/*", "pages/**/*", "components/**/*"],
   "exclude": ["node_modules"]
 }
