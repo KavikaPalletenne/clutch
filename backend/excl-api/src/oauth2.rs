@@ -7,6 +7,7 @@ use std::env;
 use crate::jwt::{create_auth_token, decode_auth_token};
 use actix_web::client::{Client};
 use std::str;
+use std::time::Duration;
 use url::Url;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -27,7 +28,18 @@ pub async fn user_registration(
 ) -> impl Responder {
     let code = info.code;
     let encoding_key = encoding_key.get_ref();
-    let http_client = Client::default();
+    // let http_client = Client::default();
+
+    let connector = awc::Connector::new()
+        // This is the timeout setting for connector. It's 1 second by default
+        .timeout(Duration::from_secs(30))
+        .finish();
+
+    let http_client = awc::Client::builder()
+        .connector(connector)
+        // This is the timeout setting for requests. It's 5 seconds by default.
+        .timeout(Duration::from_secs(50))
+        .finish();
 
     let body = AccessTokenRequest {
         client_id: env::var("CLIENT_ID").expect("Error").to_string(),
@@ -37,7 +49,11 @@ pub async fn user_registration(
         redirect_uri: "https://localhost/api/oauth2/redirect".to_string(),
     };
 
-    //print!("Encoded Body: {:?}", encoded_body);
+    // return HttpResponse::Ok()
+    //     .header("Content-Type", "application/json")
+    //     .body(serde_json::to_string::<AccessTokenRequest>(&body).unwrap());
+
+    // println!("Encoded Body: {:?}", body);
     let response = http_client
         .post("https://discord.com/api/oauth2/token")
         .send_form::<AccessTokenRequest>(&body)
@@ -50,7 +66,7 @@ pub async fn user_registration(
     //     .send().await.expect("Error sending GET request")
     //     .json::<AuthorizationInformation>().await.expect("Error parsing JSON");
 
-    println!("Bearer token: {}", bearer_token);
+    // println!("Bearer token: {}", bearer_token);
 
     let current_user = http_client
         .get("https://discord.com/api/users/@me")
@@ -58,7 +74,7 @@ pub async fn user_registration(
         .send().await.expect("Error sending GET request")
         .json::<DiscordUser>().await.expect("Error parsing JSON");
 
-    println!("Current user: {:?}", current_user);
+    // println!("Current user: {:?}", current_user);
     let user_id = current_user.id;
     let username = current_user.username.clone();
     let email = current_user.email;

@@ -24,3 +24,5 @@ rustls = "0.18.0"
 mongodb = { version = "2.0.2", default-features = false, features = ["async-std-runtime", "bson-uuid-0_8", "bson-chrono-0_4"] }
 clap = { version = "3.0.0-beta.5", features = ["color"] }
 tokio-stream = "0.1.8"
+
+awc = "2.0.3"
