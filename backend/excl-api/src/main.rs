@@ -68,7 +68,8 @@ async fn main() -> Result<()> {
             .service(user::update_email_by_user_id)
             .service(user::delete_user_by_id)
     })
-        .bind_rustls("0.0.0.0:443", config)?
+        //.bind_rustls("0.0.0.0:443", config)?
+        .bind("0.0.0.0:443")?
         .run()
         .await?;
 
