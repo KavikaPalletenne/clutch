@@ -78,10 +78,10 @@ export default function GroupPage({ group, resources }: {
 
 export const getServerSideProps: GetServerSideProps = async (context: any) => {
     
-    const group_res = await fetch(`https://localhost:441/api/group/${context.params.id}`);
+    const group_res = await fetch(`https://localhost/api/group/${context.params.id}`);
     const group = await group_res.json() as Group;
 
-    const resources_res = await fetch(`https://localhost:440/api/resource/get_all/${context.params.id}`);
+    const resources_res = await fetch(`https://localhost/api/resource/get_all/${context.params.id}`);
     const resources = await resources_res.json() as Resource[];
 
     return {

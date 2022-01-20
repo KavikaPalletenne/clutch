@@ -1,14 +1,16 @@
 use serde::{Deserialize, Serialize};
 use bson::oid::ObjectId;
 use actix_web::{get, web, Responder, HttpRequest, HttpResponse};
-use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, Group, AccessTokenRequest, UserExistsResponse, DiscordUser, AuthorizeResponse, GuildResponse, PartialGuild};
+use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, Group, AccessTokenRequest, UserExistsResponse, DiscordUser, AuthorizeResponse, GuildResponse, PartialGuild, NewUserRequest};
 use jsonwebtoken::EncodingKey;
 use std::env;
 use crate::jwt::{create_auth_token, decode_auth_token};
 use actix_web::client::{Client};
 use std::str;
 use std::time::Duration;
+use mongodb::Database;
 use url::Url;
+use crate::user::{create_user_service, user_exists_service};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
@@ -24,6 +26,7 @@ pub struct User {
 #[get("/api/oauth2/redirect")]
 pub async fn user_registration(
     web::Query(info): web::Query<AuthorizationCodeGrantRedirect>,
+    database: web::Data<Database>,
     encoding_key: web::Data<EncodingKey>,
 ) -> impl Responder {
     let code = info.code;
@@ -75,38 +78,37 @@ pub async fn user_registration(
         .json::<DiscordUser>().await.expect("Error parsing JSON");
 
     // println!("Current user: {:?}", current_user);
-    let user_id = current_user.id;
+    let user_id = current_user.id.clone();
     let username = current_user.username.clone();
     let email = current_user.email;
 
-    let exists_url = Url::parse(&*format!("https://localhost/api/user/protected/userExists/{}/{}", user_id.clone(), env::var("USER_SERVICE_SECRET").unwrap())).unwrap().to_string();
-
-    let user_exists = http_client
-        .get(exists_url)
-        .send().await.expect("Error sending GET request")
-        .json::<UserExistsResponse>().await.expect("Error parsing JSON");
+    let user_exists = user_exists_service(&user_id, database.get_ref()).await;
 
     // Create new user if does not exist
-    if !user_exists.exists {
-        let uri = Url::parse_with_params("https://localhost/api/user/protected/create",
-                                         &[
-                                             ("secret", env::var("USER_SERVICE_SECRET").unwrap()),
-                                             ("id", user_id.clone()),
-                                             ("username", username.clone()),
-                                             ("email", email.clone())
-                                         ]).expect("Error parsing URL");
+    if !user_exists {
+        // let uri = Url::parse_with_params("https://localhost/api/user/protected/create",
+        //                                  &[
+        //                                      ("secret", env::var("USER_SERVICE_SECRET").unwrap()),
+        //                                      ("id", user_id.),
+        //                                      ("username", username.clone()),
+        //                                      ("email", email.clone())
+        //                                  ]).expect("Error parsing URL");
 
-        let create_user_response = http_client
-            .get(uri.as_str())
-            .send().await.expect("Error sending GET request");
+        let user_request = NewUserRequest {
+            secret: "N/A".to_string(),
+            id: user_id.clone(),
+            username: username.clone(),
+            email
+        };
+        let create_user_response = create_user_service(user_request, &database).await;
 
 
-        if !create_user_response.status().is_success() {
+        if !create_user_response {
             return HttpResponse::BadRequest().body("Error creating user.");
         }
     }
 
-    let token = create_auth_token(user_id, username, response, encoding_key);
+    let token = create_auth_token(user_id.clone(), username.clone(), response, encoding_key);
     let auth_token = format!("auth_token={}; Path=/; Max-Age=604800; Secure; HttpOnly", token);
 
     HttpResponse::PermanentRedirect()

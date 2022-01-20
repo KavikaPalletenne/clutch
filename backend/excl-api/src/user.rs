@@ -60,6 +60,25 @@ pub async fn create_user(
     HttpResponse::Ok().body("Successfully created user.")
 }
 
+pub async fn create_user_service(user_request : NewUserRequest, database: &Database) -> bool { // Return true if success or false if failure
+    let user = User::new(user_request.id, user_request.username, user_request.email);
+
+    let bson = bson::to_bson(&user).expect("Error converting struct to BSON");
+    let document = bson.as_document().unwrap();
+
+    let insert_result = database
+        .collection("users")
+        .insert_one(document.to_owned(), None)
+        .await
+        .expect("Error inserting document into collection");
+
+    if insert_result.inserted_id.to_string().is_empty() {
+        return false;
+    }
+
+    true
+}
+
 // Read
 #[get("/api/user/{id}")]
 pub async fn get_user_by_id(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
@@ -122,6 +141,24 @@ pub async fn user_exists(database: web::Data<Database>, req: HttpRequest) -> imp
             exists: false,
         }
     ).unwrap())
+}
+
+pub async fn user_exists_service(user_id: &String, database: &Database) -> bool {
+    let query = doc! {
+        "_id": user_id,
+    };
+
+    let result: Option<User> = database
+        .collection("users")
+        .find_one(query, None)
+        .await
+        .expect("Could not fetch user with provided id");
+
+    if let Some(_) = result {
+        return true;
+    }
+
+    false
 }
 
 // Update username
