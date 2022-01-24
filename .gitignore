@@ -21,4 +21,6 @@ Cargo.lock
 **/backend/**/keys/**
 **/*.lock
 
+.idea/**
+
 **/bin/**
