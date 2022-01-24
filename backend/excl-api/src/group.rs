@@ -10,12 +10,12 @@ use actix_web::client::Client;
 pub struct Group {
     #[serde(rename = "_id")]
     // rename to _id and use and document id in database
-    id: String, // Same id as Discord guild id
-    name: String,
-    description: String,
-    discord_link: String,
-    members: Vec<GroupUser>,        // id's of users that are members
-    administrators: Vec<GroupUser>, // id's of users that are administrators
+    pub id: String, // Same id as Discord guild id
+    pub name: String,
+    pub description: String,
+    pub discord_link: String,
+    pub members: Vec<GroupUser>,        // id's of users that are members
+    pub administrators: Vec<GroupUser>, // id's of users that are administrators
 }
 
 impl Group {
@@ -127,6 +127,67 @@ pub async fn get_group_by_id(
     }
 
     HttpResponse::BadRequest().body("Invalid group id provided.")
+}
+
+#[get("/api/group/join/{id}")]
+pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
+    let group_id = req.match_info().get("id").unwrap().to_string();
+    let user_response = authorize(req).await;
+
+    if let Some(id) = user_response.user_id {
+        let query = doc! {
+            "_id": group_id,
+        };
+
+        let result: Option<Group> = database
+            .collection("groups")
+            .find_one(query, None)
+            .await
+            .expect("Could not fetch group with provided id");
+
+        if let Some(mut group) = result {
+            // TODO: Add the logged in user to the group if they don't already exist.
+            if !group.members.contains(
+                &GroupUser {
+                    id: id.clone(),
+                    username: user_response.username.clone(),
+                }
+            ) ||
+            !group.administrators.contains(
+                &GroupUser {
+                    id: id.clone(),
+                    username: user_response.username.clone(),
+                }
+            ) {
+                return HttpResponse::BadRequest().body("Already joined group.")
+            }
+
+
+            group.members.push(
+                GroupUser {
+                    id: id.clone(),
+                    username: user_response.username.clone(),
+                }
+            );
+
+            let bson = bson::to_bson(&group).expect("Error converting struct to BSON");
+            let document = bson.as_document().unwrap();
+
+            let insert_result = database
+                .collection("groups")
+                .insert_one(document.to_owned(), None)
+                .await
+                .expect("Error inserting document into collection");
+
+            if insert_result.inserted_id.to_string().is_empty() {
+                return HttpResponse::BadRequest().body("Error joining group.");
+            }
+
+
+            return HttpResponse::Ok().body("Successfully joined group")
+        }
+    }
+    HttpResponse::BadRequest().body("Not logged in.")
 }
 
 // TODO: Function to check whether user belongs to group

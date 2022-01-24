@@ -23,5 +23,6 @@ pub async fn authorize(req: HttpRequest) -> AuthorizeResponse {
     // return
     AuthorizeResponse {
         user_id: Option::None,
+        username: String::new(),
     }
 }

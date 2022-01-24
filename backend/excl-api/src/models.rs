@@ -118,6 +118,7 @@ pub struct UserExistsResponse {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AuthorizeResponse {
     pub user_id: Option<String>,
+    pub username: String,
 }
 
 // Check user's guilds
@@ -204,7 +205,7 @@ pub struct User {
     pub groups: Vec<String>, // id's of groups that the user is a part of
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct GroupUser {
     pub id: String,
     pub username: String,
