@@ -109,12 +109,12 @@ pub async fn user_registration(
     }
 
     let token = create_auth_token(user_id.clone(), username.clone(), response, encoding_key);
-    let auth_token = format!("auth_token={}; Path=/; Max-Age=604800; Secure; HttpOnly", token);
+    let auth_token = format!("auth_token={}; Path=/; Max-Age=604800; Secure; HttpOnly; domain=localhost;", token);
 
-    HttpResponse::PermanentRedirect()
+    HttpResponse::Ok()
         .header("Set-Cookie", auth_token)
         // .header("Location", "https://examclutch.com/app")
-        .header("Location", "http://localhost:3000/app/group/647329273568559114")
+        // .header("Location", "http://localhost:3000/app/group/647329273568559114")
         .body(
             format!("Logged in as user {:?}", current_user.username.clone())
         )

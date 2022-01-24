@@ -3,8 +3,9 @@ use actix_web::{HttpRequest, web, Responder, HttpMessage, HttpResponse, post, ge
 use mongodb::Database;
 use mongodb::bson::doc;
 use crate::models::{NewGroupRequest, AuthorizeResponse, User, GroupUser};
-use crate::middleware::authorize;
+use crate::middleware::{authorize, find_and_remove_user_from_vector};
 use actix_web::client::Client;
+use bson::Document;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Group {
@@ -132,7 +133,7 @@ pub async fn get_group_by_id(
 #[get("/api/group/join/{id}")]
 pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
     let group_id = req.match_info().get("id").unwrap().to_string();
-    let user_response = authorize(req).await;
+    let user_response = authorize(&req).await;
 
     if let Some(id) = user_response.user_id {
         let query = doc! {
@@ -141,19 +142,19 @@ pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl
 
         let result: Option<Group> = database
             .collection("groups")
-            .find_one(query, None)
+            .find_one(query.clone(), None)
             .await
             .expect("Could not fetch group with provided id");
 
         if let Some(mut group) = result {
             // TODO: Add the logged in user to the group if they don't already exist.
-            if !group.members.contains(
+            if group.members.contains(
                 &GroupUser {
                     id: id.clone(),
                     username: user_response.username.clone(),
                 }
             ) ||
-            !group.administrators.contains(
+            group.administrators.contains(
                 &GroupUser {
                     id: id.clone(),
                     username: user_response.username.clone(),
@@ -170,24 +171,102 @@ pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl
                 }
             );
 
-            let bson = bson::to_bson(&group).expect("Error converting struct to BSON");
-            let document = bson.as_document().unwrap();
 
-            let insert_result = database
-                .collection("groups")
-                .insert_one(document.to_owned(), None)
+            let update_result = database
+                .collection::<Group>("groups")
+                .replace_one(query.clone(), group, None)
+                // .insert_one(document.to_owned(), None)
                 .await
-                .expect("Error inserting document into collection");
+                .expect("Error updating document in collection");
 
-            if insert_result.inserted_id.to_string().is_empty() {
-                return HttpResponse::BadRequest().body("Error joining group.");
+            if update_result.modified_count == 0 {
+                return HttpResponse::BadRequest()
+                    .header("Content-Type", "text/plain")
+                    .body("Error joining group.");
             }
 
 
-            return HttpResponse::Ok().body("Successfully joined group")
+            return HttpResponse::Ok()
+                .header("Content-Type", "text/plain")
+                .body("Successfully joined group")
         }
     }
-    HttpResponse::BadRequest().body("Not logged in.")
+    HttpResponse::Unauthorized()
+        .header("Content-Type", "text/plain")
+        .body("Not logged in.")
+}
+
+#[get("/api/group/leave/{id}")]
+pub async fn leave_group(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
+    let group_id = req.match_info().get("id").unwrap().to_string();
+    let user_response = authorize(&req).await;
+
+    if let Some(id) = user_response.user_id {
+        let query = doc! {
+            "_id": group_id,
+        };
+
+        let result: Option<Group> = database
+            .collection("groups")
+            .find_one(query.clone(), None)
+            .await
+            .expect("Could not fetch group with provided id");
+
+        if let Some(mut group) = result {
+            if group.members.contains(
+                &GroupUser {
+                    id: id.clone(),
+                    username: user_response.username.clone(),
+                }
+            ) {
+                find_and_remove_user_from_vector(
+                    &mut group.members,
+                    GroupUser {
+                        id: id.clone(),
+                        username: user_response.username.clone(),
+                    }
+                );
+            }
+
+            if group.administrators.contains(
+                &GroupUser {
+                    id: id.clone(),
+                    username: user_response.username.clone(),
+                }
+            ) {
+                find_and_remove_user_from_vector(
+                    &mut group.administrators,
+                    GroupUser {
+                        id: id.clone(),
+                        username: user_response.username.clone(),
+                    }
+                );
+            }
+
+            let update_result = database
+                .collection::<Group>("groups")
+                .replace_one(query.clone(), group, None)
+                // .insert_one(document.to_owned(), None)
+                .await
+                .expect("Error updating document in collection");
+
+            if update_result.modified_count == 0 {
+                return HttpResponse::BadRequest()
+                    .header("Content-Type", "text/plain")
+                    .body("Error leaving group.");
+            }
+
+            return HttpResponse::Ok()
+                .header("Content-Type", "text/plain")
+                .body("Successfully left group.");
+        }
+        return HttpResponse::BadRequest()
+            .header("Content-Type", "text/plain")
+            .body("Could not find group.");
+    }
+    HttpResponse::Unauthorized()
+        .header("Content-Type", "text/plain")
+        .body("Not logged in.")
 }
 
 // TODO: Function to check whether user belongs to group

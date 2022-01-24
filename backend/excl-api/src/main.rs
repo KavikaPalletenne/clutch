@@ -22,8 +22,15 @@ async fn main() -> Result<()> {
 
     // load ssl keys
     let mut config = ServerConfig::new(NoClientAuth::new());
-    let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
-    let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
+
+    // XPS file location
+    // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
+    // let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
+
+    // PC file location
+    let cert_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/cert.pem").unwrap());
+    let key_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/key.pem").unwrap());
+
     let cert_chain = certs(cert_file).unwrap();
     let mut keys = pkcs8_private_keys(key_file).unwrap();
     if keys.is_empty() {
@@ -61,6 +68,7 @@ async fn main() -> Result<()> {
             .service(group::create_group)
             .service(group::get_group_by_id)
             .service(group::join_group)
+            .service(group::leave_group)
             // User Service
             .service(user::create_user)
             .service(user::get_user_by_id)
