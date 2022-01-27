@@ -1,11 +1,9 @@
 use serde::{Deserialize, Serialize};
-use actix_web::{HttpRequest, web, Responder, HttpMessage, HttpResponse, post, get};
+use actix_web::{HttpRequest, web, Responder, HttpResponse, post, get};
 use mongodb::Database;
 use mongodb::bson::doc;
-use crate::models::{NewGroupRequest, AuthorizeResponse, User, GroupUser};
+use crate::models::{NewGroupRequest, User, GroupUser};
 use crate::middleware::{authorize, find_and_remove_user_from_vector};
-use actix_web::client::Client;
-use bson::Document;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Group {
@@ -53,15 +51,15 @@ pub async fn create_group(
 
     //////////////////////////////////////////////////////////////////////////
     // Auth //
-    // let authorized = authorize(req.clone()).await;
-    //
-    // if authorized.user_id.is_none() {
-    //     return HttpResponse::Unauthorized().body("");
-    // }
-    //
-    // if authorized.user_id.unwrap().ne(&group.creator_id) {
-    //     return  HttpResponse::Unauthorized().body("");
-    // }
+    let authorized = authorize(&req).await;
+
+    if authorized.user_id.is_none() {
+        return HttpResponse::Unauthorized().body("Not logged in.");
+    }
+
+    if authorized.user_id.unwrap().ne(&group.creator_id) {
+        return  HttpResponse::Unauthorized().body("Incorrect user id supplied.");
+    }
     //////////////////////////////////////////////////////////////////////////
     // TODO: Check the current user is a part of the guild with provided id using Discord API [Optional](and check they are the owner).
 
