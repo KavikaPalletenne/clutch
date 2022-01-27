@@ -15,6 +15,7 @@ mod persistence;
 mod middleware;
 mod group;
 mod user;
+mod shared;
 
 
 #[actix_web::main]
@@ -76,6 +77,8 @@ async fn main() -> Result<()> {
             .service(user::update_username_by_user_id)
             .service(user::update_email_by_user_id)
             .service(user::delete_user_by_id)
+            // Easter Eggs
+            .service(shared::easter_egg)
     })
         //.bind_rustls("0.0.0.0:443", config)?
         .bind("0.0.0.0:443")?
