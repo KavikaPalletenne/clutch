@@ -10,7 +10,7 @@ pub async fn authorize(req: &HttpRequest) -> AuthorizeResponse {
     if let Some(token) = auth_token {
         let token = token.value();
         let authorize_uri = format!("http://localhost:443/api/oauth2/authorize/{}", token);
-        let mut response = http_client
+        let mut response = http_client // TODO: Convert this to a local function call to the oauth2 file
             .get(authorize_uri).send()
             .await.expect("Error sending GET request");
 

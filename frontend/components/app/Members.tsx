@@ -10,8 +10,8 @@ export default function Members(props: {
     }) {
 
     
-    const listAdmins = props.admins.map((d) => <li style={{listStyle: 'none'}} key={d.username}>{d.username}</li>);
-    const listMembers = props.members.map((d) => <li style={{listStyle: 'none'}} key={d.username}>{d.username}</li>);
+    const listAdmins = props.admins.map((d) => <li style={{listStyle: 'none'}} key={d.username}>{"@"+d.username}</li>);
+    const listMembers = props.members.map((d) => <li style={{listStyle: 'none'}} key={d.username}>{"@"+d.username}</li>);
 
     return(
         
@@ -23,7 +23,9 @@ export default function Members(props: {
                     { listAdmins }
                 </div>
                 
-                { listMembers }
+                <div className="text-gray-500 font-bold">
+                    { listMembers }
+                </div>
             </div>            
         </div>
     )

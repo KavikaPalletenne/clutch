@@ -1,4 +1,3 @@
-use crate::group::Group;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use mongodb::bson::doc;
 use mongodb::Database;

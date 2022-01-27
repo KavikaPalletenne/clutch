@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use bson::oid::ObjectId;
 use actix_web::{get, web, Responder, HttpRequest, HttpResponse};
-use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, Group, AccessTokenRequest, UserExistsResponse, DiscordUser, AuthorizeResponse, GuildResponse, PartialGuild, NewUserRequest};
+use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, Group, AccessTokenRequest, DiscordUser, AuthorizeResponse, PartialGuild, NewUserRequest};
 use jsonwebtoken::EncodingKey;
 use std::env;
 use crate::jwt::{create_auth_token, decode_auth_token};
@@ -9,7 +9,6 @@ use actix_web::client::{Client};
 use std::str;
 use std::time::Duration;
 use mongodb::Database;
-use url::Url;
 use crate::user::{create_user_service, user_exists_service};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -154,7 +153,7 @@ pub async fn get_user_guilds(
         let bearer_token = format!("Bearer {}", access_token);
 
         let http_client = Client::default();
-        let mut current_user_guilds = http_client
+        let current_user_guilds = http_client
             .get("https://discord.com/api/users/@me/guilds")
             .header("Authorization", bearer_token)
             .send().await.expect("Error sending GET request")

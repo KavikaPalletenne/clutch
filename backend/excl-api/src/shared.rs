@@ -121,7 +121,7 @@ pub async fn easter_egg() -> impl Responder {
                 <div style=\"display: inline; position: absolute; bottom: 30px; left: 91.71px\">
                 <a style=\"display: inline; text-decoration: none\" href=\"https://examclutch.com\">ExamClutch</a>
 
-                <h1 style=\"display: inline\">API v0.1.109 created by the </h1>
+                <h1 style=\"display: inline\">API v0.1.110 created by the </h1>
                   <a style=\"display: inline; text-decoration: none\" href=\"https://examclutch.com/about-us\">ExCl team</a>
 
 
