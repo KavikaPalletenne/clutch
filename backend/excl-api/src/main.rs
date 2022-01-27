@@ -16,6 +16,7 @@ mod middleware;
 mod group;
 mod user;
 mod shared;
+mod cdn;
 
 
 #[actix_web::main]
