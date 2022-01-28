@@ -153,7 +153,8 @@ pub struct Resource {
     pub group_id: String, // group it belongs to
     pub title: String,
     pub description: String,
-    pub tags: Option<Vec<Tag>>,            // Tags are optional
+    pub subject: String,
+    pub tags: Option<Vec<Tag>>, // Tags are optional
     pub files: Option<Vec<FileReference>>, // URL to the data (stored on server or on something like AWS S3)
     pub last_edited_at: chrono::NaiveDateTime,
 }
@@ -166,6 +167,7 @@ pub struct ResourceForm {
     pub group_id: String,
     pub title: String,
     pub description: String,
+    pub subject: String,
     pub tags: Option<Vec<Tag>>,            // Tags are optional
     pub files: Option<Vec<FileReference>>, // URL to the data (stored on server or on something like AWS S3)
 }
@@ -179,7 +181,7 @@ pub struct Tag {
 pub struct FileReference {
     pub id: Uuid, // This is the id the file will be stored under on the CDN
     pub title: String,
-    pub size: i64, // Size in kilobytes
+    pub size: i64, // Size in bytes
 }
 
 
