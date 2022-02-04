@@ -309,3 +309,27 @@ pub async fn delete_user_by_id(database: web::Data<Database>, req: HttpRequest) 
 
     HttpResponse::Ok().body("Successfully deleted user.")
 }
+
+#[get("/api/user/get_user_groups/{user_id}")]
+pub async fn get_user_groups(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
+    let user_id = req.match_info().get("user_id").unwrap().to_string();
+
+    let query = doc! {
+        "_id": user_id,
+    };
+
+    let user = database
+        .collection::<User>("users")
+        .find_one(query, None)
+        .await.expect("Error finding user in collection");
+
+    if let Some(u) = user {
+        return HttpResponse::Ok()
+            .header("Content-Type", "application/json")
+            .body(serde_json::to_string::<Vec<String>>(&u.groups).unwrap());
+    }
+
+    HttpResponse::BadRequest()
+        .header("Content-Type", "text/plain")
+        .body("User does not exist.")
+}

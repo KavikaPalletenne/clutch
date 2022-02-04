@@ -3,7 +3,7 @@ use actix_web::{HttpRequest, web, Responder, HttpResponse, post, get};
 use mongodb::Database;
 use mongodb::bson::doc;
 use crate::models::{NewGroupRequest, User, GroupUser};
-use crate::middleware::{authorize, find_and_remove_user_from_vector};
+use crate::middleware::{authorize, find_and_remove_string_from_vector, find_and_remove_user_from_vector};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Group {
@@ -135,7 +135,7 @@ pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl
 
     if let Some(id) = user_response.user_id {
         let query = doc! {
-            "_id": group_id,
+            "_id": group_id.clone(),
         };
 
         let result: Option<Group> = database
@@ -183,6 +183,28 @@ pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl
                     .body("Error joining group.");
             }
 
+            // Add group to user's record
+            let user_query = doc! {
+                "_id": id.clone(),
+            };
+
+            let mut user: User = database
+                .collection("users")
+                .find_one(user_query.clone(), None)
+                .await.expect("Error finding user").unwrap();
+
+            user.groups.push(group_id.clone());
+
+            let user_update_response = database
+                .collection::<User>("users")
+                .replace_one(user_query, user, None)
+                .await.expect("Error updating user");
+
+            if user_update_response.modified_count == 0 {
+                return HttpResponse::BadRequest()
+                    .header("Content-Type", "text/plain")
+                    .body("Error joining group.");
+            }
 
             return HttpResponse::Ok()
                 .header("Content-Type", "text/plain")
@@ -201,7 +223,7 @@ pub async fn leave_group(database: web::Data<Database>, req: HttpRequest) -> imp
 
     if let Some(id) = user_response.user_id {
         let query = doc! {
-            "_id": group_id,
+            "_id": group_id.clone(),
         };
 
         let result: Option<Group> = database
@@ -253,6 +275,33 @@ pub async fn leave_group(database: web::Data<Database>, req: HttpRequest) -> imp
                     .header("Content-Type", "text/plain")
                     .body("Error leaving group.");
             }
+
+            // Remove group from user's record
+            let user_query = doc! {
+                "_id": id.clone(),
+            };
+
+            let mut user: User = database
+                .collection("users")
+                .find_one(user_query.clone(), None)
+                .await.expect("Error finding user").unwrap();
+
+            find_and_remove_string_from_vector(
+                &mut user.groups,
+                group_id.clone()
+            );
+
+            let user_update_response = database
+                .collection::<User>("users")
+                .replace_one(user_query, user, None)
+                .await.expect("Error updating user");
+
+            if user_update_response.modified_count == 0 {
+                return HttpResponse::BadRequest()
+                    .header("Content-Type", "text/plain")
+                    .body("Error leaving group.");
+            }
+
 
             return HttpResponse::Ok()
                 .header("Content-Type", "text/plain")
