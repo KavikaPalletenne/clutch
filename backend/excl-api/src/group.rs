@@ -13,8 +13,8 @@ pub struct Group {
     pub name: String,
     pub description: String,
     pub discord_link: String,
-    pub members: Vec<GroupUser>,        // id's of users that are members
-    pub administrators: Vec<GroupUser>, // id's of users that are administrators
+    pub members: Vec<String>,        // id's of users that are members
+    pub administrators: Vec<String>, // id's of users that are administrators
 }
 
 impl Group {
@@ -23,15 +23,15 @@ impl Group {
         name: String,
         description: String,
         discord_link: String,
-        creator: GroupUser,
+        creator: String,
     ) -> Group {
         let mut new_group = Group {
             id,
             name,
             description,
             discord_link,
-            members: Vec::<GroupUser>::new(),
-            administrators: Vec::<GroupUser>::new(),
+            members: Vec::<String>::new(),
+            administrators: Vec::<String>::new(),
         };
 
         new_group.administrators.push(creator); // Make creator an admin
@@ -78,10 +78,7 @@ pub async fn create_group(
         group.name.clone(),
         group.description.clone(),
         group.discord_link.clone(),
-        GroupUser {
-            id: creator.id,
-            username: creator.username,
-        },
+        creator.id,
     );
 
     let bson = bson::to_bson(&group).expect("Error converting struct to BSON");
@@ -147,26 +144,17 @@ pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl
         if let Some(mut group) = result {
             // TODO: Add the logged in user to the group if they don't already exist.
             if group.members.contains(
-                &GroupUser {
-                    id: id.clone(),
-                    username: user_response.username.clone(),
-                }
+                &id.clone()
             ) ||
             group.administrators.contains(
-                &GroupUser {
-                    id: id.clone(),
-                    username: user_response.username.clone(),
-                }
+                &id.clone()
             ) {
                 return HttpResponse::BadRequest().body("Already joined group.")
             }
 
 
             group.members.push(
-                GroupUser {
-                    id: id.clone(),
-                    username: user_response.username.clone(),
-                }
+                id.clone()
             );
 
 
@@ -234,32 +222,20 @@ pub async fn leave_group(database: web::Data<Database>, req: HttpRequest) -> imp
 
         if let Some(mut group) = result {
             if group.members.contains(
-                &GroupUser {
-                    id: id.clone(),
-                    username: user_response.username.clone(),
-                }
+                &id.clone()
             ) {
-                find_and_remove_user_from_vector(
+                find_and_remove_string_from_vector(
                     &mut group.members,
-                    GroupUser {
-                        id: id.clone(),
-                        username: user_response.username.clone(),
-                    }
+                    id.clone(),
                 );
             }
 
             if group.administrators.contains(
-                &GroupUser {
-                    id: id.clone(),
-                    username: user_response.username.clone(),
-                }
+                &id.clone()
             ) {
-                find_and_remove_user_from_vector(
+                find_and_remove_string_from_vector(
                     &mut group.administrators,
-                    GroupUser {
-                        id: id.clone(),
-                        username: user_response.username.clone(),
-                    }
+                    id.clone()
                 );
             }
 
