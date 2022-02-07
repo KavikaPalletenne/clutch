@@ -6,25 +6,24 @@ use mongodb::bson::doc;
 use mongodb::Database;
 use std::str::FromStr;
 use tokio_stream::StreamExt;
+use crate::middleware::authorize;
 
 // A resource is any document or link to a website.
 impl Resource {
     pub fn new(
         id: Option<ObjectId>,
         user_id: String,
-        username: String,
         group_id: String,
         title: String,
         description: String,
         subject: String,
-        tags: Option<Vec<Tag>>,
+        tags: Option<Vec<String>>,
         files: Option<Vec<FileReference>>,
         last_edited_at: NaiveDateTime,
     ) -> Resource {
         Resource {
             id,
             user_id,
-            username,
             group_id,
             title,
             description,
@@ -44,19 +43,30 @@ impl Resource {
 
 #[post("/resource/create")]
 pub async fn create_resource(
+    req: HttpRequest,
     database: web::Data<Database>,
     resource: web::Json<ResourceForm>,
 ) -> impl Responder {
     // TODO: Check whether current user (JWT) is the same as resource user id.
     // TODO: Follow this for the CDN backend https://blog.logrocket.com/file-upload-and-download-in-rust/
+
+    //////////////////////////////////////////////////////////////////////////
+    // Auth //
+    let authorized = authorize(&req).await;
+
+    if authorized.user_id.is_none() {
+        return HttpResponse::Unauthorized().body("Not logged in.");
+    }
+    // TODO: Check if the user belongs to the group (later as if they have the group id, they most likely belong to the group)
+    //////////////////////////////////////////////////////////////////////////
+
     let last_edited_at = Utc::now().naive_local();
     let resource_form = resource.into_inner();
 
     let id = Option::from(ObjectId::new());
     let resource = Resource::new(
         id,
-        resource_form.user_id,
-        resource_form.username,
+        authorized.user_id.unwrap(),
         resource_form.group_id,
         resource_form.title,
         resource_form.description,
@@ -176,6 +186,18 @@ pub async fn update_resource(
     req: HttpRequest,
     resource_form: web::Json<ResourceForm>,
 ) -> impl Responder {
+
+    //////////////////////////////////////////////////////////////////////////
+    // Auth //
+    let authorized = authorize(&req).await;
+
+    if authorized.user_id.is_none() {
+        return HttpResponse::Unauthorized().body("Not logged in.");
+    }
+
+    // TODO: Check if the user belongs to the group (later as if they have the group id, they most likely belong to the group)
+    //////////////////////////////////////////////////////////////////////////
+
     let resource_id = ObjectId::from_str(req.match_info().get("resource_id").unwrap()).unwrap();
 
     let resource_form = resource_form.into_inner();
@@ -184,31 +206,44 @@ pub async fn update_resource(
       "_id": resource_id,
     };
 
-    let id = Option::from(resource_id);
-    let resource = Resource::new(
-        id,
-        resource_form.user_id,
-        resource_form.username,
-        resource_form.group_id,
-        resource_form.title.clone(),
-        resource_form.description.clone(),
-        resource_form.subject.clone(),
-        resource_form.tags.clone(),
-        resource_form.files.clone(),
-        last_edited_at,
-    );
-
-    let result = database
+    let old_resource = database
         .collection::<Resource>("notes")
-        .replace_one(query, resource, None)
+        .find_one(query.clone(), None)
         .await
-        .expect("Error updating document");
+        .expect("Error fetching resource from database");
 
-    if result.modified_count == 0 {
-        return HttpResponse::BadRequest().body("No such resource exists.");
+    if let Some(r) = old_resource {
+        if authorized.user_id.clone().unwrap().ne(&r.user_id) {
+            return HttpResponse::Unauthorized().body("Unauthorized to edit resource.");
+        }
+
+        let id = Option::from(resource_id);
+        let resource = Resource::new(
+            id,
+            authorized.user_id.unwrap(),
+            resource_form.group_id,
+            resource_form.title.clone(),
+            resource_form.description.clone(),
+            resource_form.subject.clone(),
+            resource_form.tags.clone(),
+            resource_form.files.clone(),
+            last_edited_at,
+        );
+
+        let result = database
+            .collection::<Resource>("notes")
+            .replace_one(query, resource, None)
+            .await
+            .expect("Error updating document");
+
+        if result.modified_count == 0 {
+            return HttpResponse::BadRequest().body("No such resource exists.");
+        }
+
+        return HttpResponse::Ok().body("Successfully updated resource.");
     }
 
-    HttpResponse::Ok().body("Successfully updated resource.")
+    HttpResponse::BadRequest().body("No such resource exists.")
 }
 
 #[get("/resource/delete/{resource_id}")]

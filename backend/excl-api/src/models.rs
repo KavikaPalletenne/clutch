@@ -149,12 +149,11 @@ pub struct Resource {
     // rename to _id and use and document id in database
     pub id: Option<ObjectId>,
     pub user_id: String,  // owner
-    pub username: String,
     pub group_id: String, // group it belongs to
     pub title: String,
     pub description: String,
     pub subject: String,
-    pub tags: Option<Vec<Tag>>, // Tags are optional
+    pub tags: Option<Vec<String>>, // Tags are optional
     pub files: Option<Vec<FileReference>>, // URL to the data (stored on server or on something like AWS S3)
     pub last_edited_at: chrono::NaiveDateTime,
 }
@@ -162,13 +161,11 @@ pub struct Resource {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ResourceForm {
     // No need for a document Id as MongoDB generates an Id for the document when you insert it
-    pub user_id: String,
-    pub username: String,
     pub group_id: String,
     pub title: String,
     pub description: String,
     pub subject: String,
-    pub tags: Option<Vec<Tag>>,            // Tags are optional
+    pub tags: Option<Vec<String>>,            // Tags are optional
     pub files: Option<Vec<FileReference>>, // URL to the data (stored on server or on something like AWS S3)
 }
 
