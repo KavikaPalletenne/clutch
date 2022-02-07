@@ -44,7 +44,30 @@ export default function NewResourcePage(props: {
 
     
     const submit = async (e: SyntheticEvent) => {
-        
+        e.preventDefault()
+
+        fetch(`http://localhost:443/resource/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'group_id': id,
+                'title': title,
+                'description': description,
+                'subject': subject,
+                'tags': [
+                    subject,
+                ],
+                'files': [
+                    {
+                        'id': 'asldijflaskdjf',
+                        'title': fileTitle,
+                        'size': fileSize,
+                    }
+                ]
+            })
+        })
     }
     
     return (
