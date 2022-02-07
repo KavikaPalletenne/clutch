@@ -2,7 +2,7 @@
 
 Open-source studying for everyone.
 
-![ExamClutch Dashboard](frontend/public/homepage.svg "Dashboard")
+<img src="./frontend/public/homepage.svg" alt="Dashboard Mockup" width="600"/>
 
 ## Features
 - Upload your notes and append tags.
