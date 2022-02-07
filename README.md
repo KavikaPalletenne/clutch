@@ -6,6 +6,6 @@ Open-source studying for everyone.
 
 ## Features
 - Upload your notes and append tags.
-- Search anyone's notes.
+- Search anyone's notes using full-text search.
 - Retrieve and search notes directly within Discord.
-- Use materials from trusted sources including MGS Canvas and LitCharts.
+- Use materials from trusted sources within your school.
