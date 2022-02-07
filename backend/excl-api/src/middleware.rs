@@ -39,3 +39,9 @@ pub fn find_and_remove_user_from_vector(vector: &mut Vec<GroupUser>, user: Group
         vector.remove(index);
     }
 }
+
+pub fn find_and_remove_string_from_vector(vector: &mut Vec<String>, string: String) {
+    if let Some(index) = vector.iter().position(|value| *value == string) {
+        vector.remove(index);
+    }
+}
