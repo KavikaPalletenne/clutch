@@ -2,6 +2,8 @@
 
 Open-source studying for everyone.
 
+![ExamClutch Dashboard](frontend/public/homepage.svg "Dashboard")
+
 ## Features
 - Upload your notes and append tags.
 - Search anyone's notes.
