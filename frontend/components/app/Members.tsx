@@ -1,17 +1,14 @@
 import { useState } from 'react';
+import UserName from './UserName';
 
-type GroupUser = {
-    id: string;
-    username: string;
-}
 
 export default function Members(props: {
-    members: GroupUser[]; admins: GroupUser[];
+    members: string[]; admins: string[];
     }) {
 
     
-    const listAdmins = props.admins.map((d) => <li style={{listStyle: 'none'}} key={d.username}>{"@"+d.username}</li>);
-    const listMembers = props.members.map((d) => <li style={{listStyle: 'none'}} key={d.username}>{"@"+d.username}</li>);
+    const listAdmins = props.admins.map((d) => <li style={{listStyle: 'none'}} key={d}>{<UserName userId={d}/>}</li>);
+    const listMembers = props.members.map((d) => <li style={{listStyle: 'none'}} key={d}>{<UserName userId={d}/>}</li>);
 
     return(
         

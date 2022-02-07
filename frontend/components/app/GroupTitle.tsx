@@ -13,8 +13,8 @@ type Group = {
     name: string;
     description: string;
     discord_link: string;
-    members: GroupUser[];
-    administrators: GroupUser[];
+    members: string[];
+    administrators: string[];
 }
 
 export default function GroupTitle(props: {
@@ -27,8 +27,8 @@ export default function GroupTitle(props: {
 
     return(
         
-        <div className="px-4">
-        <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", minWidth: "750px"}}>
+        <div className="" style={{maxWidth: "750px"}}>
+        <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", minWidth: "925px", maxWidth: "925"}}>
         
             <div className="inline-block">
                 <h1 className="font-bold text-2xl pb-2 text-exclpurple inline-block">{ groupTitle }</h1>

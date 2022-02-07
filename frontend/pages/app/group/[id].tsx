@@ -6,19 +6,15 @@ import Members from "../../../components/app/Members";
 import GroupTitle from "../../../components/app/GroupTitle";
 import ResourceCard from "../../../components/app/ResourceCard";
 import { GetServerSideProps } from "next";
-
-type GroupUser = {
-    id: string;
-    username: string;
-}
+import NewButton from "@components/app/NewButton";
 
 type Group = {
     _id: string;
     name: string;
     description: string;
     discord_link: string;
-    members: GroupUser[];
-    administrators: GroupUser[];
+    members: string[];
+    administrators: string[];
 }
 
 export type Resource = {
@@ -27,9 +23,14 @@ export type Resource = {
     group_id: string;
     title: string;
     description: string;
-    tags: string[];
+    subject: string;
+    tags: Tag[];
     files: File[];
     last_edited_at: Date;
+}
+
+export type Tag = {
+    name: string;
 }
 
 export type ObjectId = {
@@ -47,8 +48,10 @@ export default function GroupPage({ group, resources }: {
     resources: Resource[];
 }) {
 
+    const members = ["436035620905943041", "436035620905943041","436035620905943041","436035620905943041","436035620905943041","436035620905943041","436035620905943041",]
+
     const listResources = resources.map((r: Resource) =>
-            <div key={r._id.$oid}>
+            <div key={r._id.$oid} className="pb-3">
                 <ResourceCard propResource={r} />
             </div>
     );
@@ -59,16 +62,21 @@ export default function GroupPage({ group, resources }: {
                 <title>{group.name} - ExamClutch</title>
                 <meta name="description" content="Exam Clutch Dashboard" />
                 <meta name="robots" content="noindex" />
-        <       link rel="icon" href="/favicon.png" />
+                <link rel="icon" href="/gradient_logo.svg" />
             </Head>
 
             <div className="flex items-start justify-center pt-10">
                 <GroupTitle propGroup={group} />
-                <Members admins={group.administrators} members={group.members} />
+                <NewButton groupId={group._id}/>
             </div>
 
-            <div className="flex inline-grid justify-center pt-5">
+            <div className="flex justify-center pt-5 pr-20">
+                <div>
                 { listResources }
+                </div>
+                <div className="pl-5">
+                <Members admins={group.administrators} members={members} />
+                </div>
             </div>
 
         </div>
@@ -79,8 +87,21 @@ export default function GroupPage({ group, resources }: {
 export const getServerSideProps: GetServerSideProps = async (context: any) => {
     
     const group_res = await fetch(`http://localhost:443/api/group/${context.params.id}`);
+    
+    if (!group_res.ok) {
+        return {
+            notFound: true,
+        }
+    }
+    
     const group = await group_res.json() as Group;
 
+    if (!group) {
+        return {
+            notFound: true,
+        }
+    }
+    
     const resources_res = await fetch(`http://localhost:443/api/resource/get_all/${context.params.id}`);
     const resources = await resources_res.json() as Resource[];
 
