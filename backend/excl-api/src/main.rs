@@ -1,4 +1,5 @@
-use actix_web::{App, HttpServer};
+use actix_web::{App, http, HttpServer};
+use actix_cors::Cors;
 use rustls::internal::pemfile::{certs, pkcs8_private_keys};
 use rustls::{NoClientAuth, ServerConfig};
 use anyhow::Result;
@@ -17,6 +18,7 @@ mod group;
 mod user;
 mod shared;
 mod cdn;
+mod authz;
 
 
 #[actix_web::main]
@@ -26,12 +28,12 @@ async fn main() -> Result<()> {
     let mut config = ServerConfig::new(NoClientAuth::new());
 
     // XPS file location
-    // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
-    // let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
+    let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
+    let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
 
     // PC file location
-    let cert_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/cert.pem").unwrap());
-    let key_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/key.pem").unwrap());
+    // let cert_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/cert.pem").unwrap());
+    // let key_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/key.pem").unwrap());
 
     let cert_chain = certs(cert_file).unwrap();
     let mut keys = pkcs8_private_keys(key_file).unwrap();
@@ -53,7 +55,21 @@ async fn main() -> Result<()> {
 
     println!("Starting server on port 443.");
     HttpServer::new(move || {
+
+        let cors = Cors::default()
+            .allow_any_header()
+            .allow_any_method()
+            .allow_any_origin()
+            // .allowed_origin("http://localhost:3000/")
+            // .allowed_origin_fn(|origin, _req_head| {
+            //     origin.as_bytes().ends_with(b".localhost")
+            // })
+            // .allowed_methods(vec!["GET", "POST"])
+            // .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+            // .allowed_header(http::header::CONTENT_TYPE)
+            .max_age(3600);
         App::new()
+            .wrap(cors)
             // OAuth2 Service
             .data(jwt_encoding_key.clone())
             .service(oauth2::user_registration)
@@ -78,6 +94,9 @@ async fn main() -> Result<()> {
             .service(user::update_username_by_user_id)
             .service(user::update_email_by_user_id)
             .service(user::delete_user_by_id)
+            .service(user::get_user_groups)
+            //CDN
+            .service(cdn::download_file)
             // Easter Eggs
             .service(shared::easter_egg)
     })
