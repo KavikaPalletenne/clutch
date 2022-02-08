@@ -5,8 +5,10 @@ import { AiOutlinePlus } from "react-icons/ai"
 
 import Head from "next/head";
 import Members from "../../../../components/app/Members";
+import GroupNavigation from "../../../../components/app/GroupNavigation";
 import GroupTitle from "../../../../components/app/GroupTitle";
 import ResourceCard from "../../../../components/app/ResourceCard";
+import GroupName from "../../../../components/app/GroupName";
 import { GetServerSideProps } from "next";
 import NewButton from "@components/app/NewButton";
 
@@ -69,6 +71,9 @@ export default function GroupPage({ group, resources }: {
 
             <div className="flex justify-center">
             <div className="pt-10 grid grid-flow-col auto-cols-min">
+                <div className="pr-3 row-span-3 col-span-1">
+                <GroupNavigation currentGroupId={group._id} />
+                </div>
                 <div className="">
                 <GroupTitle propGroup={group} />
                 </div>
@@ -88,7 +93,7 @@ export default function GroupPage({ group, resources }: {
                 <div className="pl-3 row-span-3 col-span-1">
                 <Members admins={group.administrators} members={members} />
                 </div>
-                <div className="row-start-2 col-start-1 col-span-2 pt-5">
+                <div className="row-start-2 col-start-2 col-span-2 pt-5">
                 { listResources }
                 </div>
             </div>
