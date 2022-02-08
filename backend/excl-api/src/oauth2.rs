@@ -110,9 +110,11 @@ pub async fn user_registration(
     let token = create_auth_token(user_id.clone(), username.clone(), response, encoding_key);
     // TODO: Add security features to this cookie before production deployment
     let auth_token = format!("auth_token={}; Path=/api; Max-Age=604800; HttpOnly; Secure; SameSite=None; Domain=localhost; Port=443; Port=3000;", token);
+    let user_id_token = format!("user_id={}; Path=/; Max-Age=604800; Domain=localhost;", user_id);
 
     HttpResponse::Ok()
         .header("Set-Cookie", auth_token)
+        .header("Set-Cookie", user_id_token)
         // .header("Location", "https://examclutch.com/app")
         // .header("Location", "http://localhost:3000/app/group/647329273568559114")
         .body(
