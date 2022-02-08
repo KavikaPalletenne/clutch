@@ -28,7 +28,7 @@ export default function GroupTitle(props: {
     return(
         
         <div>
-        <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", minWidth: "725px"}}>
+        <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", minWidth: "632.5px"}}>
         
             <div className="inline-block">
                 <h1 className="font-bold text-2xl text-exclpurple inline-block">{ groupTitle }</h1>
