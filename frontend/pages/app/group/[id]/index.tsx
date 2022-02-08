@@ -50,7 +50,7 @@ export default function GroupPage({ group, resources }: {
     resources: Resource[];
 }) {
 
-    const members = ["436035620905943041", "436035620905943041","436035620905943041","436035620905943041","436035620905943041","436035620905943041","436035620905943041",]
+    const members = ["436035620905943041", "436035620905943041","436035620905943041","436035620905943041","436035620905943041"]
 
     const listResources = resources.map((r: Resource) =>
             <div key={r._id.$oid} className="pb-3">
@@ -67,12 +67,15 @@ export default function GroupPage({ group, resources }: {
                 <link rel="icon" href="/gradient_logo.svg" />
             </Head>
 
-            <div className="pt-10 grid grid-cols-2 justify-center">
+            <div className="flex justify-center">
+            <div className="pt-10 grid grid-flow-col auto-cols-min">
+                <div className="">
                 <GroupTitle propGroup={group} />
-                <div className="pt-2">
+                </div>
+                <div className="pt-2 row-start-1">
                 <Link href={`/app/group/${group._id}/new`}>  
                     <a>    
-                    <div className="py-3.5 px-5 shadow-md inline-block rounded-2xl bg-exclpurple hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", fontWeight: "bold"}}>
+                    <div className="py-3.5 px-5 shadow-md inline-block rounded-2xl hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", fontWeight: "bold", backgroundImage: "linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%)"}}>
                         <div className="text-2xl text-white">
                             <h1>
                                 New
@@ -82,16 +85,17 @@ export default function GroupPage({ group, resources }: {
                     </a>
                 </Link>
                 </div>
-                
+                <div className="pl-3 row-span-3 col-span-1">
+                <Members admins={group.administrators} members={members} />
+                </div>
+                <div className="row-start-2 col-start-1 col-span-2 pt-5">
+                { listResources }
+                </div>
+            </div>
             </div>
 
             <div className="flex justify-center pt-5 pr-20">
-                <div>
-                { listResources }
-                </div>
-                <div className="pl-5">
-                <Members admins={group.administrators} members={members} />
-                </div>
+                
             </div>
 
         </div>
