@@ -68,7 +68,7 @@ export default function ResourceCard(props: {
         <div className="">
             <Link href={`https://examclutch.com/app/group/${resource.group_id}/tag/${t.name}`}>
                 <a>
-                    <div className="flex justify-center">
+                    <div className="flex justify-center hover:text-exclpurple">
                         <li className="justify-items-center flex" style={{listStyle: 'none'}} key={t.name}>
                             {t.name}
                         </li>
@@ -80,7 +80,7 @@ export default function ResourceCard(props: {
 
     return(
             <div>
-                <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", maxWidth: "750px", minWidth: "750px"}}>
+                <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", maxWidth: "735px", minWidth: "735px"}}>
 
                 <div className="inline-block">
                     {/* <Link href={ "/app/resource/"+ resource.id }>
