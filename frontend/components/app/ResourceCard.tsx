@@ -80,14 +80,14 @@ export default function ResourceCard(props: {
 
     return(
             <div>
-                <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", maxWidth: "750px", minWidth: "750px"}}>
+                <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", maxWidth: "750px", minWidth: "750px"}}>
 
                 <div className="inline-block">
-                    <Link href={ "/app/resource/"+ resource.id }>
-                        <a>
-                            <h1 className="font-bold text-2xl pb-2 text-black inline-block hover:text-exclpurple duration-200">{ resource.title }</h1>
-                        </a>
-                    </Link>
+                    {/* <Link href={ "/app/resource/"+ resource.id }>
+                        <a> */}
+                            <h1 className="font-bold text-2xl pb-2 text-black inline-block duration-200">{ resource.title }</h1>
+                        {/* </a>
+                    </Link> */}
 
                     <Link href={ `/app/group/${resource.group_id}/subject/${resource.subject}` }>
                         <a>
