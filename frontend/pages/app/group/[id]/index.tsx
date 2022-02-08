@@ -1,10 +1,12 @@
 import { useRouter } from "next/router";
 import {SyntheticEvent, useEffect, useState} from  'react';
+import Link from "next/link";
+import { AiOutlinePlus } from "react-icons/ai"
 
 import Head from "next/head";
-import Members from "../../../components/app/Members";
-import GroupTitle from "../../../components/app/GroupTitle";
-import ResourceCard from "../../../components/app/ResourceCard";
+import Members from "../../../../components/app/Members";
+import GroupTitle from "../../../../components/app/GroupTitle";
+import ResourceCard from "../../../../components/app/ResourceCard";
 import { GetServerSideProps } from "next";
 import NewButton from "@components/app/NewButton";
 
@@ -65,9 +67,22 @@ export default function GroupPage({ group, resources }: {
                 <link rel="icon" href="/gradient_logo.svg" />
             </Head>
 
-            <div className="flex items-start justify-center pt-10">
+            <div className="pt-10 grid grid-cols-2 justify-center">
                 <GroupTitle propGroup={group} />
-                <NewButton groupId={group._id}/>
+                <div className="pt-2">
+                <Link href={`/app/group/${group._id}/new`}>  
+                    <a>    
+                    <div className="py-3.5 px-5 shadow-md inline-block rounded-2xl bg-exclpurple hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", fontWeight: "bold"}}>
+                        <div className="text-2xl text-white">
+                            <h1>
+                                New
+                            </h1>
+                        </div>
+                    </div>
+                    </a>
+                </Link>
+                </div>
+                
             </div>
 
             <div className="flex justify-center pt-5 pr-20">
