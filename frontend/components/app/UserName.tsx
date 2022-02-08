@@ -34,7 +34,7 @@ type User = {
 export default function UserName(props: {
     userId: String;
 }) {
-    const [data, setData] = useState(null)
+    const [data, setData] = useState<User>()
     const [isLoading, setLoading] = useState(false)
   
     useEffect(() => {

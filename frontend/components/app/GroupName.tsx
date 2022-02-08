@@ -43,7 +43,7 @@ type Group = {
 export default function UserName(props: {
     groupId: String;
 }) {
-    const [data, setData] = useState(null)
+    const [data, setData] = useState<Group>()
     const [isLoading, setLoading] = useState(false)
   
     useEffect(() => {
