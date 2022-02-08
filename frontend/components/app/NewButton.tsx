@@ -17,7 +17,7 @@ export default function NewButton(props: {
     }) {
     
     return(  
-        <Link href={`/app/resource/new/${props.groupId}`}>  
+        <Link href={`/app/group/${props.groupId}/new`}>  
         <a>    
         <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-exclpurple hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", fontWeight: "bold"}}>
             <div className="float-right inline-block text-2xl text-white flex items-center">
