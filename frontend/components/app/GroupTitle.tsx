@@ -27,15 +27,15 @@ export default function GroupTitle(props: {
 
     return(
         
-        <div className="" style={{maxWidth: "750px"}}>
-        <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", minWidth: "925px", maxWidth: "925"}}>
+        <div>
+        <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", minWidth: "725px"}}>
         
             <div className="inline-block">
-                <h1 className="font-bold text-2xl pb-2 text-exclpurple inline-block">{ groupTitle }</h1>
-                <h1>{ groupDescription }</h1>
+                <h1 className="font-bold text-2xl text-exclpurple inline-block">{ groupTitle }</h1>
+                {/* <h1>{ groupDescription }</h1> */}
             </div>
             
-            <a target="_blank" href={ discordLink } rel="noopener noreferrer" className="float-right inline-block pt-6 flex items-center">
+            <a target="_blank" href={ discordLink } rel="noopener noreferrer" className="float-right hover:text-exclpurple duration-150 inline-block pt-2 flex items-center">
                 <FaDiscord className="pr-2" size="25px"/>
                 <h1>
                     Discord
