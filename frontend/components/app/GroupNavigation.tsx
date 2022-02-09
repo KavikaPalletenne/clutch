@@ -4,7 +4,9 @@ import Cookies from 'js-cookie';
 import Link from 'next/link';
 
 
-export default function GroupNavigation(props) {
+export default function GroupNavigation(props: {
+        currentGroupId: string;
+    }) {
     
     const [data, setData] = useState(null);
     const [isLoading, setLoading] = useState(false);
