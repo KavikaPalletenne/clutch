@@ -4,15 +4,15 @@ import { useRouter } from 'next/router';
 import {SyntheticEvent, useEffect, useState} from  'react'
 import { GetServerSideProps } from "next";
 import { File } from "."
+import FileRender from "../../../../components/app/FileRender"
 import { AiOutlineClose } from "react-icons/ai"
-
-import styles from '../../../../styles/NewResource.module.css'
-
 
 export default function NewResourcePage(props) {
     
     const router = useRouter()
     const { id } = router.query
+
+    
 
     const [isBusy, setBusy] = useState(true);
 
@@ -37,7 +37,6 @@ export default function NewResourcePage(props) {
     const [tags, setTags] = useState([]);
 
     useEffect(() => {
-       
         /**
         function CheckLoggedIn() {
             if (localStorage.getItem('token') != null && autologin != 'false') {
@@ -90,7 +89,7 @@ export default function NewResourcePage(props) {
     }
 
     const onFileChange = (e) => {
-      setFiles(e.target.files[0])
+      files.push(e.target.files)
     }
 
     const deleteTag = (index) => {
@@ -134,7 +133,6 @@ export default function NewResourcePage(props) {
           <title>Create New Resource - ExamClutch</title>
           <link rel="icon" href="/gradient_logo.svg" />
         </Head>
-        <h1>Files: {files}</h1>
         <Link href={`/app/group/${id}`}>
         <a className="text-exclpurple">
             Return to Group
@@ -145,7 +143,7 @@ export default function NewResourcePage(props) {
         <div className="">
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="mt-5 md:mt-0 md:col-span-2">
-            <form onSubmit={submit}>
+            <form onSubmit={submit} id="my-form">
               <div className="shadow sm:rounded-md sm:overflow-hidden">
                 <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
                   <div className="grid grid-cols-3 gap-6">
@@ -191,7 +189,7 @@ export default function NewResourcePage(props) {
 
                   <div className="flex border overflow-x-auto border-gray-300 shadow-sm rounded-md py-2 px-3">
                     {tags.map((tag, index) => (
-                      <div className="flex max-h-10 inline-grid justify-center bg-exclpurple rounded-2xl py-2 px-2 text-white mr-2">
+                      <div key={index} className="flex max-h-10 inline-grid justify-center bg-exclpurple rounded-2xl py-2 px-2 text-white mr-2">
                         {tag}
 
                         {/* <button className={styles.tag.button} onClick={() => deleteTag(index)}>
@@ -262,11 +260,15 @@ export default function NewResourcePage(props) {
                           </label>
                           <p className="pl-1">or drag and drop</p>
                         </div>
-                        <p className="text-xs text-gray-500">PNG, JPG, PDF, DOCX, up to 20MB</p>
+                        <p className="text-xs text-gray-500">PNG, JPG, PDF, DOCX, up to 20MB</p>                      
                       </div>
+                    </div>
+                    <div id="uploaded-files">
+                        <FileRender propFiles={files} />
                     </div>
                   </div>
                 </div>
+                
                 <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
                   <button
                     type="submit"
