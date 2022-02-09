@@ -65,7 +65,7 @@ export default function ResourceCard(props: {
     );
 
     const listTags = resource.tags.map((t) =>
-        <div className="">
+        <div key={t.name} className="">
             <Link href={`https://examclutch.com/app/group/${resource.group_id}/tag/${t.name}`}>
                 <a>
                     <div className="flex justify-center hover:text-exclpurple">
