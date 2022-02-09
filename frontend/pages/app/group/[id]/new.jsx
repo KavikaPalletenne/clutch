@@ -264,7 +264,7 @@ export default function NewResourcePage(props) {
                       </div>
                     </div>
                     <div id="uploaded-files">
-                        <FileRender propFiles={files} />
+                        {/* <FileRender propFiles={files} /> */}
                     </div>
                   </div>
                 </div>
