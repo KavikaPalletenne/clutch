@@ -4,9 +4,7 @@ import Cookies from 'js-cookie';
 import Link from 'next/link';
 
 
-export default function GroupNavigation(props: {
-        currentGroupId: string;
-    }) {
+export default function GroupNavigation(props) {
     
     const [data, setData] = useState(null);
     const [isLoading, setLoading] = useState(false);
@@ -61,7 +59,14 @@ export default function GroupNavigation(props: {
         
         <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", minWidth: "250px"}}>
         
-            <h1 className="font-bold text-2xl pb-2 text-exclpurple">Groups</h1>
+            <div className="flex">
+                <h1 className="font-bold text-2xl pb-2 text-exclpurple">Groups</h1>
+                <Link href="/app/join">
+                    <a>
+                        <div className="pl-2 text-2xl text-gray-500">+</div>
+                    </a>
+                </Link>
+            </div>
             <div>
                 <div className="text-exclpurple-dark font-bold">
                     { listGroups }
