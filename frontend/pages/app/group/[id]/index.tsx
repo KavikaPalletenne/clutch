@@ -10,7 +10,6 @@ import GroupTitle from "../../../../components/app/GroupTitle";
 import ResourceCard from "../../../../components/app/ResourceCard";
 import GroupName from "../../../../components/app/GroupName";
 import { GetServerSideProps } from "next";
-import NewButton from "@components/app/NewButton";
 
 type Group = {
     _id: string;
