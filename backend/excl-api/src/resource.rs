@@ -18,7 +18,7 @@ impl Resource {
         description: String,
         subject: String,
         tags: Option<Vec<String>>,
-        files: Option<Vec<FileReference>>,
+        files: Option<Vec<String>>,
         last_edited_at: NaiveDateTime,
     ) -> Resource {
         Resource {

@@ -154,7 +154,7 @@ pub struct Resource {
     pub description: String,
     pub subject: String,
     pub tags: Option<Vec<String>>, // Tags are optional
-    pub files: Option<Vec<FileReference>>, // URL to the data (stored on server or on something like AWS S3)
+    pub files: Option<Vec<String>>, // keys of files stored on S3 (stored on server or on something like AWS S3)
     pub last_edited_at: chrono::NaiveDateTime,
 }
 
@@ -166,7 +166,6 @@ pub struct ResourceForm {
     pub description: String,
     pub subject: String,
     pub tags: Option<Vec<String>>,            // Tags are optional
-    pub files: Option<Vec<FileReference>>, // URL to the data (stored on server or on something like AWS S3)
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
