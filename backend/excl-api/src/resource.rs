@@ -1,4 +1,4 @@
-use crate::models::{FileReference, Resource, ResourceForm, Tag};
+use crate::models::{FileReference, IdResponse, Resource, ResourceForm, Tag};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use bson::oid::ObjectId;
 use chrono::{NaiveDateTime, Utc};
@@ -18,7 +18,7 @@ impl Resource {
         description: String,
         subject: String,
         tags: Option<Vec<String>>,
-        files: Option<Vec<String>>,
+        files: Option<Vec<FileReference>>,
         last_edited_at: NaiveDateTime,
     ) -> Resource {
         Resource {
@@ -85,11 +85,15 @@ pub async fn create_resource(
         .await
         .expect("Error inserting document into collection");
 
-    if insert_result.inserted_id.to_string().is_empty() {
+    if insert_result.inserted_id.to_string().clone().is_empty() {
         return HttpResponse::BadRequest().body("Error creating new resource.");
     }
 
-    HttpResponse::Ok().body("Successfully created resource.")
+    let response = IdResponse {
+        id: insert_result.inserted_id.to_string(),
+    };
+
+    HttpResponse::Ok().body(serde_json::to_string::<IdResponse>(&response))
 }
 
 #[get("/resource/get/{resource_id}")]

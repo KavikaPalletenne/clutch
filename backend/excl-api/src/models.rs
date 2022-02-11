@@ -154,7 +154,7 @@ pub struct Resource {
     pub description: String,
     pub subject: String,
     pub tags: Option<Vec<String>>, // Tags are optional
-    pub files: Option<Vec<String>>, // keys of files stored on S3 (stored on server or on something like AWS S3)
+    pub files: Option<Vec<FileReference>>, // URL to the data (stored on server or on something like AWS S3)
     pub last_edited_at: chrono::NaiveDateTime,
 }
 
@@ -166,6 +166,7 @@ pub struct ResourceForm {
     pub description: String,
     pub subject: String,
     pub tags: Option<Vec<String>>,            // Tags are optional
+    pub files: Option<Vec<FileReference>>, // URL to the data (stored on server or on something like AWS S3)
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -207,4 +208,10 @@ pub struct User {
 pub struct GroupUser {
     pub id: String,
     pub username: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
+/// Multipurpose struct to return an id for group, resource, user etc.
+pub struct IdResponse {
+    pub id: String,
 }
