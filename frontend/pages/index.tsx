@@ -12,7 +12,8 @@ const Home: NextPage = () => {
       <Head>
         <title>ExamClutch - Study together</title>
         <meta name="description" content="Share notes and more with your group. Improve together and clutch your exams." />
-        <meta name="robots" content="all" />
+        <meta name="robots" content="index" />
+        <meta name="googlebot" content="index" />
         <link rel="icon" href="/gradient_logo.svg" />
       </Head>
       <div style={{backgroundImage: "linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%)"}}>
