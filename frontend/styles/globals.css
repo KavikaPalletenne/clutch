@@ -5,6 +5,8 @@
 @tailwind components;
 @tailwind utilities;
 
+font-family: 'Roboto Mono', monospace;
+
 html,
 body {
   padding: 0;
