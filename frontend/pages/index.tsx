@@ -5,6 +5,7 @@ import styles from '../styles/index.module.css'
 import Features from '../components/index/features'
 import Pricing from '../components/index/pricing'
 import { FaDiscord } from 'react-icons/fa'
+import Image from 'next/image'
 
 const Home: NextPage = () => {
   return (
@@ -42,7 +43,7 @@ const Home: NextPage = () => {
             <h1 className={styles.heroSectionH1}>Study together.</h1>
             <h2 className={styles.heroSectionH2}>Clutch your exams.</h2>
             <div className={styles.heroImageContainer} >
-              <img src="/homepage.svg" width="1000px"/>
+              <Image src="/homepage.svg" width="1000px"/>
             </div>
         </div>
       </div>
