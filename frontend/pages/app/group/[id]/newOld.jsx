@@ -20,7 +20,7 @@ export default function NewResourcePage(props) {
 
     const {autologin} = router.query
 
-    const [tagInputPlaceHolder, setTagInputPlaceHolder] = useState('Separate by commas...')
+    const [tagInputPlaceHolder, setTagInputPlaceHolder] = useState('Enter tags separated by commas...')
 
     var isMounted = false
     var userIdLoaded = false
@@ -63,7 +63,7 @@ export default function NewResourcePage(props) {
       }
       
       if (tags.length == 0) {
-        setTagInputPlaceHolder('Separate by commas...')
+        setTagInputPlaceHolder('Enter tags separated by commas...')
       }
       
       
@@ -88,8 +88,8 @@ export default function NewResourcePage(props) {
       setIsKeyReleased(true);
     }
 
-    const onFileChange = (file) => {
-      files.push(file)
+    const onFileChange = (e) => {
+      files.push(e.target.files)
     }
 
     const deleteTag = (index) => {
@@ -99,7 +99,7 @@ export default function NewResourcePage(props) {
     const submit = async (e) => {
         e.preventDefault()
 
-        let res = await fetch(`http://localhost:443/resource/create`, {
+        fetch(`http://localhost:443/resource/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -110,11 +110,15 @@ export default function NewResourcePage(props) {
                 'description': description,
                 'subject': subject,
                 'tags': tags,
-                'files': [],
+                'files': [
+                    {
+                        'id': 'asldijflaskdjf',
+                        'title': fileTitle,
+                        'size': fileSize,
+                    }
+                ]
             })
         })
-
-        let json = await res.json()
     }
     
     return (
@@ -129,9 +133,14 @@ export default function NewResourcePage(props) {
           <title>Create New Resource - ExamClutch</title>
           <link rel="icon" href="/gradient_logo.svg" />
         </Head>
+        <Link href={`/app/group/${id}`}>
+        <a className="text-exclpurple">
+            Return to Group
+        </a>
+        </Link>
 
-        <div>
-        <div>
+        <div className="justify-center">
+        <div className="">
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="mt-5 md:mt-0 md:col-span-2">
             <form onSubmit={submit} id="my-form">
@@ -178,11 +187,7 @@ export default function NewResourcePage(props) {
                     </div>
                   </div>
 
-                  <div>
-                  <label htmlFor="company-website" className="block pb-1 text-sm text-sm font-medium text-gray-700">
-                        Tags
-                  </label>
-                  <div className="flex border overflow-x-auto border-gray-300 focus-within:border-exclpurple focus-within:focus:ring-exclpurple shadow-sm rounded-md py-2 px-3">
+                  <div className="flex border overflow-x-auto border-gray-300 shadow-sm rounded-md py-2 px-3">
                     {tags.map((tag, index) => (
                       <div key={index} className="flex max-h-10 inline-grid justify-center bg-exclpurple rounded-2xl py-2 px-2 text-white mr-2">
                         {tag}
@@ -202,7 +207,7 @@ export default function NewResourcePage(props) {
                       onChange={onChange}
                     />
                 </div>
-                </div>
+                  
 
                   <div>
                     <label htmlFor="about" className="block text-sm font-medium text-gray-700">
@@ -220,22 +225,54 @@ export default function NewResourcePage(props) {
                       />
                     </div>
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Files</label>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                      <div className="space-y-1 text-center">
+                        <svg
+                          className="mx-auto h-12 w-12 text-gray-400"
+                          stroke="currentColor"
+                          fill="none"
+                          viewBox="0 0 48 48"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <div className="flex text-sm text-gray-600">
+                          <label
+                            htmlFor="file-upload"
+                            className="relative cursor-pointer bg-white rounded-md font-medium text-exclpurple hover:text-exclpurple-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-exclpurple"
+                          >
+                            <span>Upload files</span>
+                              <input 
+                                id="file-upload"
+                                name="file-upload"
+                                type="file"
+                                className="sr-only"
+                                onChange={e => onFileChange(e)}
+                              />
+                          </label>
+                          <p className="pl-1">or drag and drop</p>
+                        </div>
+                        <p className="text-xs text-gray-500">PNG, JPG, PDF, DOCX, up to 20MB</p>                      
+                      </div>
+                    </div>
+                    <div id="uploaded-files">
+                        {/* <FileRender propFiles={files} /> */}
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                  <Link href={`/app/group/${id}`}>
-                  <a className="pr-1">
-                  <button
-                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:shadow-md duration-150"
-                  >
-                    Cancel
-                  </button>
-                  </a>
-                  </Link>
-                  
                   <button
                     type="submit"
-                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-exclpurple hover:shadow-md duration-150"
+                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-exclpurple hover:shadow-md duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-exclpurple"
                   >
                     Create
                   </button>

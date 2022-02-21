@@ -1,19 +1,28 @@
-import Head from "next/head";
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
 
 export default function App() {
 
-    const resource = {
-        id: "cd505bba-1bb4-4ff7-b3b3-f57854d0099e",
-        title: "Electronegativity",
-        description: "Electronegativity chart that we will get on the exam",
-        files: [
-            {"id": "1bf1f868-6aa7-4821-9aff-12002114c360","title": "electronegativity_chart.png", "size": "1.5MB"},
-            {"id": "33adf97e-afe8-4d28-95b7-99eba22bee8d", "title": "data_booklet_2021.pdf", "size": "2.5MB"}
-        ]
-    }
+    const router = useRouter()
+    const [groups, setGroups] = useState([])
+    const [userId, setUserId] = useState(Cookies.get('user_id'))
+
+    useEffect(() => {
+
+        fetch(`http://localhost:443/api/user/get_user_groups/${userId}`)
+        .then((res) => res.json())
+        .then((data) => {
+            setGroups(data)
+        })
+
+        router.push(`/app/group/${groups[0]}`)
+    })
+
 
     return(
-        <div>
+        <div className="bg-bg-gray-50">
             <Head>
                 <title>Dashboard - ExamClutch</title>
                 <meta name="description" content="Exam Clutch Dashboard" />

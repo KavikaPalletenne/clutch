@@ -1,11 +1,13 @@
-use crate::models::{FileReference, IdResponse, Resource, ResourceForm, Tag};
+use crate::models::{FileReference, IdResponse, NewResourceResponse, Resource, ResourceForm, Tag};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use bson::oid::ObjectId;
 use chrono::{NaiveDateTime, Utc};
 use mongodb::bson::doc;
 use mongodb::Database;
 use std::str::FromStr;
+use s3::Bucket;
 use tokio_stream::StreamExt;
+use crate::file::direct_upload;
 use crate::middleware::authorize;
 
 // A resource is any document or link to a website.
@@ -45,6 +47,7 @@ impl Resource {
 pub async fn create_resource(
     req: HttpRequest,
     database: web::Data<Database>,
+    bucket: web::Data<Bucket>,
     resource: web::Json<ResourceForm>,
 ) -> impl Responder {
     // TODO: Check whether current user (JWT) is the same as resource user id.
@@ -62,6 +65,8 @@ pub async fn create_resource(
 
     let last_edited_at = Utc::now().naive_local();
     let resource_form = resource.into_inner();
+
+    let group_id = resource_form.group_id.clone();
 
     let id = Option::from(ObjectId::new());
     let resource = Resource::new(
@@ -90,10 +95,11 @@ pub async fn create_resource(
     }
 
     let response = IdResponse {
-        id: insert_result.inserted_id.to_string(),
+        resource_id: insert_result.inserted_id.to_string(),
+        group_id,
     };
 
-    HttpResponse::Ok().body(serde_json::to_string::<IdResponse>(&response))
+    HttpResponse::Ok().body(serde_json::to_string::<IdResponse>(&response).unwrap())
 }
 
 #[get("/resource/get/{resource_id}")]

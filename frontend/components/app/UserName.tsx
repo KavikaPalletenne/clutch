@@ -48,19 +48,19 @@ export default function UserName(props: {
     }, [])
   
     if (isLoading) return (
-        <div className="font-bold text-exclpurple">
+        <div>
           <h1>@loading</h1>
         </div>
     )
 
     if (!data) return (
-      <div className="font-bold text-exclpurple">
+      <div>
         <h1>@deleted</h1>
       </div>
     )
   
     return (
-      <div className="font-bold text-exclpurple">
+      <div>
         <h1>@{data.username}</h1>
       </div>
     )

@@ -90,7 +90,7 @@ export default function GroupPage({ group, resources }: {
                 </Link>
                 </div>
                 <div className="pl-3 row-span-3 col-span-1">
-                <Members admins={group.administrators} members={members} />
+                <Members admins={group.administrators} members={group.members} />
                 </div>
                 <div className="row-start-2 col-start-2 col-span-2 pt-5">
                 { listResources }

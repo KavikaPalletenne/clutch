@@ -27,3 +27,7 @@ tokio-stream = "0.1.8"
 
 awc = "2.0.3"
 actix-cors = "0.5.4"
+
+# File upload/download
+actix-multipart = "0.3.0"
+rust-s3 = "0.28.1"

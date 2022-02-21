@@ -3,8 +3,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router';
 import {SyntheticEvent, useEffect, useState} from  'react'
 import { GetServerSideProps } from "next";
-import { File } from "."
-import FileRender from "../../../../components/app/FileRender"
 import { AiOutlineClose } from "react-icons/ai"
 
 export default function NewResourcePage(props) {
@@ -13,14 +11,13 @@ export default function NewResourcePage(props) {
     const { id } = router.query
 
     
-
     const [isBusy, setBusy] = useState(true);
 
     const [errorMessage, setErrorMessage] = useState('')
 
     const {autologin} = router.query
 
-    const [tagInputPlaceHolder, setTagInputPlaceHolder] = useState('Separate by commas...')
+    const [tagInputPlaceHolder, setTagInputPlaceHolder] = useState('Enter tags separated by commas...')
 
     var isMounted = false
     var userIdLoaded = false
@@ -63,7 +60,7 @@ export default function NewResourcePage(props) {
       }
       
       if (tags.length == 0) {
-        setTagInputPlaceHolder('Separate by commas...')
+        setTagInputPlaceHolder('Enter tags separated by commas...')
       }
       
       
@@ -99,7 +96,7 @@ export default function NewResourcePage(props) {
     const submit = async (e) => {
         e.preventDefault()
 
-        let res = await fetch(`http://localhost:443/resource/create`, {
+        fetch(`http://localhost:443/resource/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -110,11 +107,9 @@ export default function NewResourcePage(props) {
                 'description': description,
                 'subject': subject,
                 'tags': tags,
-                'files': [],
+                'files': files,
             })
         })
-
-        let json = await res.json()
     }
     
     return (
@@ -126,12 +121,12 @@ export default function NewResourcePage(props) {
           <meta name="description" content="Create a new resource" />
           <meta name="robots" content="none" />
           <meta name="googlebot" content="none" />
-          <title>Create New Resource - ExamClutch</title>
+          <title>Upload a New File - ExamClutch</title>
           <link rel="icon" href="/gradient_logo.svg" />
         </Head>
 
-        <div>
-        <div>
+        <div className="justify-center">
+        <div className="">
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="mt-5 md:mt-0 md:col-span-2">
             <form onSubmit={submit} id="my-form">
@@ -178,11 +173,7 @@ export default function NewResourcePage(props) {
                     </div>
                   </div>
 
-                  <div>
-                  <label htmlFor="company-website" className="block pb-1 text-sm text-sm font-medium text-gray-700">
-                        Tags
-                  </label>
-                  <div className="flex border overflow-x-auto border-gray-300 focus-within:border-exclpurple focus-within:focus:ring-exclpurple shadow-sm rounded-md py-2 px-3">
+                  <div className="flex border overflow-x-auto border-gray-300 shadow-sm rounded-md py-2 px-3">
                     {tags.map((tag, index) => (
                       <div key={index} className="flex max-h-10 inline-grid justify-center bg-exclpurple rounded-2xl py-2 px-2 text-white mr-2">
                         {tag}
@@ -202,7 +193,7 @@ export default function NewResourcePage(props) {
                       onChange={onChange}
                     />
                 </div>
-                </div>
+                  
 
                   <div>
                     <label htmlFor="about" className="block text-sm font-medium text-gray-700">
@@ -220,10 +211,18 @@ export default function NewResourcePage(props) {
                       />
                     </div>
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">File</label>
+                    <input
+                        type="file"
+                        onChange={e => onFileChange(e.target.value)}
+                    />
+                  </div>
                 </div>
                 
                 <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                  <Link href={`/app/group/${id}`}>
+                  <Link href={`/api/cancel-upload/${id}`}>
                   <a className="pr-1">
                   <button
                     className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:shadow-md duration-150"
@@ -232,7 +231,7 @@ export default function NewResourcePage(props) {
                   </button>
                   </a>
                   </Link>
-                  
+
                   <button
                     type="submit"
                     className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-exclpurple hover:shadow-md duration-150"
@@ -251,13 +250,4 @@ export default function NewResourcePage(props) {
 
     </div>
   )
-}
-
-export async function getServerSideProps(context) {
-
-    let groupId = context.params.id
-
-    return {
-        props: { groupId: groupId },
-    }
 }

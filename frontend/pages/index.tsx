@@ -42,7 +42,7 @@ const Home: NextPage = () => {
             <h1 className={styles.heroSectionH1}>Study together.</h1>
             <h2 className={styles.heroSectionH2}>Clutch your exams.</h2>
             <div className={styles.heroImageContainer} >
-              <img src="/homepage.svg" width="1000px"/>
+              <svg src="/homepage.svg" width="1000px"/>
             </div>
         </div>
       </div>

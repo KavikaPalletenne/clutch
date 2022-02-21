@@ -19,7 +19,7 @@ export default function Pricing() {
                         </div>
                     </div>
                     <div className="xl:w-1/2 lg:w-7/12 relative w-full lg:mt-0 mt-12 md:px-8" role="list">
-                        <Image src="/colour_burst.png" className="absolute w-full -ml-12" alt="background circle images" />
+                        <Image src="/colour_burst.png" layout="fill" className="absolute w-full -ml-12" alt="background circle images" />
                         <div role="listitem" className="bg-white cursor-pointer shadow rounded-lg p-8 relative z-30">
                             <div className="md:flex items-center justify-between">
                                 <h2 className="text-2xl font-semibold leading-6 text-exclpurple">Starter</h2>
