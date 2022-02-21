@@ -210,8 +210,16 @@ pub struct GroupUser {
     pub username: String,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+
 /// Multipurpose struct to return an id for group, resource, user etc.
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct IdResponse {
+    pub resource_id: String,
+    pub group_id: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
+pub struct NewResourceResponse {
     pub id: String,
+    pub upload_url: String,
 }

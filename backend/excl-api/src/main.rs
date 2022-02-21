@@ -7,6 +7,7 @@ use jsonwebtoken::EncodingKey;
 use std::env;
 use std::fs::File;
 use std::io::BufReader;
+use crate::storage::init_bucket;
 
 mod oauth2;
 mod models;
@@ -19,6 +20,8 @@ mod user;
 mod shared;
 mod cdn;
 mod authz;
+mod file;
+mod storage;
 
 
 #[actix_web::main]
@@ -52,6 +55,10 @@ async fn main() -> Result<()> {
         .await
         .expect("Failed to connect to DB");
     println!("Successfully connected to database");
+
+    // Initialise S3 Bucket
+    let bucket = init_bucket();
+    println!("Successfully connected to object storage");
 
     println!("Starting server on port 443.");
     HttpServer::new(move || {
@@ -96,7 +103,10 @@ async fn main() -> Result<()> {
             .service(user::delete_user_by_id)
             .service(user::get_user_groups)
             //CDN
-            .service(cdn::download_file)
+            .data(bucket.clone())
+            //.service(cdn::download_file)
+            .service(cdn::get_upload_url)
+            .service(cdn::uploaded_file)
             // Easter Eggs
             .service(shared::easter_egg)
     })
