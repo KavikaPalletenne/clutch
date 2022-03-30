@@ -28,7 +28,7 @@ export type Resource = {
     description: string;
     subject: string;
     tags: Tag[];
-    files: File[];
+    files: FileReference[];
     last_edited_at: Date;
 }
 
@@ -40,7 +40,7 @@ export type ObjectId = {
     $oid: string;
 }
 
-export type File = {
+export type FileReference = {
     id: string;
     title: string;
     size: number;
