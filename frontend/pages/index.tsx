@@ -27,7 +27,7 @@ const Home: NextPage = () => {
             
             <nav>  
                 <div className={styles.headerButtonSection}>
-                    <Link href="https://discord.com/api/oauth2/authorize?client_id=917954795384500236&redirect_uri=https%3A%2F%2Flocalhost%2Fapi%2Foauth2%2Fredirect&response_type=code&scope=identify%20email%20guilds">
+                    <Link href="https://discord.com/api/oauth2/authorize?client_id=917954795384500236&redirect_uri=http%3A%2F%2Flocalhost%3A443%2Fapi%2Foauth2%2Fredirect&response_type=code&scope=identify%20email%20guilds">
                         <a className={styles.headerSignUpButton}>
                             <FaDiscord className="pr-2 lg:w-8"/>
                             Sign in
@@ -42,7 +42,7 @@ const Home: NextPage = () => {
             <h1 className={styles.heroSectionH1}>Study together.</h1>
             <h2 className={styles.heroSectionH2}>Clutch your exams.</h2>
             <div className={styles.heroImageContainer} >
-              <svg src="/homepage.svg" width="1000px"/>
+              <img src="/homepage.svg" width="1000px"/>
             </div>
         </div>
       </div>
