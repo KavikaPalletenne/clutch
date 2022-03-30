@@ -1,0 +1,23 @@
+.uploadButton {
+    width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.uploadButtonLabel {
+    width: 120px;
+    height: 40px;
+    font-size: 15px;
+    font-weight: 400;
+    border-radius: 20px;
+    background-color: #C290FF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+  }
+  

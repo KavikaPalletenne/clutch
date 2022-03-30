@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router';
 import {SyntheticEvent, useEffect, useState} from  'react'
+import styles from '../../../../styles/newResource.module.css'
 import { GetServerSideProps } from "next";
 import { File } from "."
 import FileRender from "../../../../components/app/FileRender"
@@ -35,6 +36,7 @@ export default function NewResourcePage(props) {
 
     const [tagInput, setTagInput] = useState('');
     const [tags, setTags] = useState([]);
+    const [listFiles, setListFiles] = useState(<h1></h1>);
 
     useEffect(() => {
         /**
@@ -88,8 +90,18 @@ export default function NewResourcePage(props) {
       setIsKeyReleased(true);
     }
 
-    const onFileChange = (file) => {
-      files.push(file)
+    const onFileChange = (fileInput) => {
+      
+      var fileArray = Array.from(fileInput.files)
+      setFiles(fileArray)
+
+      setListFiles(
+      fileArray.map((f) => 
+      <div className={"pt-3"}>
+        <a className={"rounded-lg bg-white shadow-md py-1 px-1 text-black"}>{f.name}</a>
+      </div>
+      ))
+      
     }
 
     const deleteTag = (index) => {
@@ -116,7 +128,7 @@ export default function NewResourcePage(props) {
 
         let json = await res.json()
     }
-    
+
     return (
       
       <div style={{fontFamily: "Roboto Mono"}}>
@@ -130,6 +142,7 @@ export default function NewResourcePage(props) {
           <link rel="icon" href="/gradient_logo.svg" />
         </Head>
 
+        
         <div>
         <div>
         <div className="md:grid md:grid-cols-3 md:gap-6">
@@ -139,7 +152,7 @@ export default function NewResourcePage(props) {
                 <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
                   <div className="grid grid-cols-3 gap-6">
                     <div className="col-span-3 sm:col-span-2">
-                      <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
+                      <label htmlFor="title" className="block text-sm font-medium text-gray-700">
                         Title
                       </label>
                       <div className="mt-1 flex rounded-md shadow-sm">
@@ -157,7 +170,7 @@ export default function NewResourcePage(props) {
 
                   <div className="grid grid-cols-3 gap-6">
                     <div className="col-span-3 sm:col-span-2">
-                      <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
+                      <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
                         Subject
                       </label>
                       <div className="">
@@ -179,7 +192,7 @@ export default function NewResourcePage(props) {
                   </div>
 
                   <div>
-                  <label htmlFor="company-website" className="block pb-1 text-sm text-sm font-medium text-gray-700">
+                  <label htmlFor="tags" className="block pb-1 text-sm text-sm font-medium text-gray-700">
                         Tags
                   </label>
                   <div className="flex border overflow-x-auto border-gray-300 focus-within:border-exclpurple focus-within:focus:ring-exclpurple shadow-sm rounded-md py-2 px-3">
@@ -205,7 +218,7 @@ export default function NewResourcePage(props) {
                 </div>
 
                   <div>
-                    <label htmlFor="about" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                       Description
                     </label>
                     <div className="mt-1">
@@ -218,6 +231,23 @@ export default function NewResourcePage(props) {
                         placeholder="Tell the group a bit about this resource..."
                         defaultValue={''}
                       />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="about" className="block text-sm font-medium text-gray-700">
+                      
+                    </label>
+                    <div className="mt-1">
+                      <input 
+                      id={'fileUpload'} type={"file"} 
+                      className={styles.uploadButton}
+                      onChange={e => onFileChange(e.target)} 
+                      multiple={true}
+                      accept={"image/*, .pdf, .doc, .docx"}
+                      />
+                      <label for="fileUpload" className={styles.uploadButtonLabel}>Select files</label>
+                      {listFiles}
                     </div>
                   </div>
                 </div>
@@ -251,13 +281,4 @@ export default function NewResourcePage(props) {
 
     </div>
   )
-}
-
-export async function getServerSideProps(context) {
-
-    let groupId = context.params.id
-
-    return {
-        props: { groupId: groupId },
-    }
 }
