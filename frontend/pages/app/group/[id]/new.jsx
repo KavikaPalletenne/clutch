@@ -4,14 +4,17 @@ import { useRouter } from 'next/router';
 import {SyntheticEvent, useEffect, useState} from  'react'
 import styles from '../../../../styles/newResource.module.css'
 import { GetServerSideProps } from "next";
-import { File } from "."
+import { FileReference } from "./index"
 import FileRender from "../../../../components/app/FileRender"
 import { AiOutlineClose } from "react-icons/ai"
+import { randomUUID } from 'crypto';
 
 export default function NewResourcePage(props) {
     
     const router = useRouter()
     const { id } = router.query
+
+    const fileReader = () => new FileReader();
 
     
 
@@ -93,7 +96,16 @@ export default function NewResourcePage(props) {
     const onFileChange = (fileInput) => {
       
       var fileArray = Array.from(fileInput.files)
-      setFiles(fileArray)
+      var file;
+      fileArray.forEach( (f) =>
+      { file = {
+        "id": crypto.randomUUID(),
+        "name": f.name,
+        "size": f.size,
+      }
+      files.push(file) }
+      );
+      
 
       setListFiles(
       fileArray.map((f) => 
@@ -122,10 +134,10 @@ export default function NewResourcePage(props) {
                 'description': description,
                 'subject': subject,
                 'tags': tags,
-                'files': [],
+                'files': files,
             })
         })
-
+        console.log(JSON.stringify(files))
         let json = await res.json()
     }
 
@@ -162,7 +174,7 @@ export default function NewResourcePage(props) {
                           name="title"
                           id="title"
                           className="focus:ring-exclpurple focus:border-exclpurple flex-1 block w-full rounded-l-md rounded-none rounded-r-md sm:text-sm border-gray-300"
-                          placeholder="Physics notes..."
+                          placeholder="Choose a descriptive title to make searching easier..."
                         />
                       </div>
                     </div>
