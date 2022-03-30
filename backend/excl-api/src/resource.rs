@@ -85,7 +85,7 @@ pub async fn create_resource(
     let document = bson.as_document().unwrap();
 
     let insert_result = database
-        .collection("notes")
+        .collection("resources")
         .insert_one(document.to_owned(), None)
         .await
         .expect("Error inserting document into collection");
@@ -114,7 +114,7 @@ pub async fn fetch_resource_by_id(
     };
 
     let result: Option<Resource> = database
-        .collection("notes")
+        .collection("resources")
         .find_one(query, None)
         .await
         .expect("Could not fetch all documents for provided group id");
@@ -140,7 +140,7 @@ pub async fn fetch_resource_by_group_id(
     };
 
     let mut cursor = database
-        .collection("notes")
+        .collection("resources")
         .find(query, None)
         .await
         .expect("Could not fetch all documents for provided group id");
@@ -171,7 +171,7 @@ pub async fn fetch_resource_by_user_id(
     };
 
     let mut cursor = database
-        .collection("notes")
+        .collection("resources")
         .find(query, None)
         .await
         .expect("Could not fetch all documents for provided user id");
