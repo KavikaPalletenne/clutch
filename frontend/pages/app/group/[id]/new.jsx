@@ -41,6 +41,8 @@ export default function NewResourcePage(props) {
     const [fileData, setFileData] = useState([]);
     const [fileUrls, setFileUrls] = useState('');
 
+    const [loading, setLoading] = useState(false);
+
     const [tagInput, setTagInput] = useState('');
     const [tags, setTags] = useState([]);
     const [listFiles, setListFiles] = useState(<h1></h1>);
@@ -152,7 +154,8 @@ export default function NewResourcePage(props) {
         }).then(r =>  r.json().then(function(data) {
           setFileUrls(data['file_put_urls'][0])
           console.log(`Urls: ${fileUrls}`)
-          return fetch(`${fileUrls}`, {
+          setLoading(true)
+          return fetch(`${data['file_put_urls'][0]}`, {
                 method: 'PUT',
                 headers: {           
                 },
@@ -162,6 +165,7 @@ export default function NewResourcePage(props) {
         ))
         .then(response => {
           console.log('File Upload Status:' + response.status)
+          setLoading(false)
           if (response.status == 200) {
             router.push(`/app/group/${id}`)
           }
@@ -169,20 +173,6 @@ export default function NewResourcePage(props) {
         .catch(err => {
           console.error('Request failed', err)
         });
-        // console.log(JSON.stringify(files))
-        // let json = res.json()
-        // setFileUrls(json['file_put_urls'])
-
-        // let upload_res = await fetch(`${fileUrls[0]}`, {
-        //     method: 'PUT',
-        //     headers: {           
-        //     },
-        //     body: fileData[0]
-        // })
-        
-        // if (upload_res.status == 200) {
-        //   router.push(`/app/group/${id}`)
-        // }
     }
 
     return (
