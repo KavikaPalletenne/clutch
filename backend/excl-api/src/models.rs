@@ -176,7 +176,7 @@ pub struct Tag {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FileReference {
-    pub id: Uuid, // This is the id the file will be stored under on the CDN
+    pub id: String, // This is the id the file will be stored under on the CDN
     pub title: String,
     pub size: i64, // Size in bytes
 }
@@ -216,6 +216,13 @@ pub struct GroupUser {
 pub struct IdResponse {
     pub resource_id: String,
     pub group_id: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
+pub struct CreatedResourceResponse {
+    pub resource_id: String,
+    pub group_id: String,
+    pub file_put_urls: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
