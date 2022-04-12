@@ -103,7 +103,7 @@ async fn main() -> Result<()> {
             .service(user::get_user_groups)
             //CDN
             .data(init_bucket())
-            //.service(cdn::download_file)
+            .service(cdn::download_file)
             .service(cdn::get_upload_url)
             .service(cdn::uploaded_file)
             // Easter Eggs
