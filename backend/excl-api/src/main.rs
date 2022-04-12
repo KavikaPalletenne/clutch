@@ -30,21 +30,21 @@ async fn main() -> Result<()> {
     // load ssl keys
     let mut config = ServerConfig::new(NoClientAuth::new());
 
-    // XPS file location
-    let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
-    let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
-
-    // PC file location
-    // let cert_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/cert.pem").unwrap());
-    // let key_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/key.pem").unwrap());
-
-    let cert_chain = certs(cert_file).unwrap();
-    let mut keys = pkcs8_private_keys(key_file).unwrap();
-    if keys.is_empty() {
-        eprintln!("Could not locate PKCS 8 private keys.");
-        std::process::exit(1);
-    }
-    config.set_single_cert(cert_chain, keys.remove(0)).unwrap();
+    // // XPS file location
+    // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
+    // let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
+    //
+    // // PC file location
+    // // let cert_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/cert.pem").unwrap());
+    // // let key_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/key.pem").unwrap());
+    //
+    // let cert_chain = certs(cert_file).unwrap();
+    // let mut keys = pkcs8_private_keys(key_file).unwrap();
+    // if keys.is_empty() {
+    //     eprintln!("Could not locate PKCS 8 private keys.");
+    //     std::process::exit(1);
+    // }
+    // config.set_single_cert(cert_chain, keys.remove(0)).unwrap();
 
     // Initialise JWT settings
     let jwt_secret = env::var("JWT_SECRET").expect("Error getting JWT_SECRET").to_string();
@@ -56,25 +56,24 @@ async fn main() -> Result<()> {
         .expect("Failed to connect to DB");
     println!("Successfully connected to database");
 
-    // Initialise S3 Bucket
-    let bucket = init_bucket();
-    println!("Successfully connected to object storage");
-
     println!("Starting server on port 443.");
     HttpServer::new(move || {
 
         let cors = Cors::default()
             .allow_any_header()
             .allow_any_method()
-            .allow_any_origin()
-            // .allowed_origin("http://localhost:3000/")
+            // .allow_any_origin()
+            .send_wildcard()
+            .supports_credentials()
+            .allowed_origin("http://localhost:3000")
+            .allowed_origin("http://localhost")
             // .allowed_origin_fn(|origin, _req_head| {
             //     origin.as_bytes().ends_with(b".localhost")
             // })
             // .allowed_methods(vec!["GET", "POST"])
             // .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
             // .allowed_header(http::header::CONTENT_TYPE)
-            .max_age(3600);
+            .max_age(None);
         App::new()
             .wrap(cors)
             // OAuth2 Service
@@ -103,7 +102,7 @@ async fn main() -> Result<()> {
             .service(user::delete_user_by_id)
             .service(user::get_user_groups)
             //CDN
-            .data(bucket.clone())
+            .data(init_bucket())
             //.service(cdn::download_file)
             .service(cdn::get_upload_url)
             .service(cdn::uploaded_file)

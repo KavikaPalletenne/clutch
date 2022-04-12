@@ -48,7 +48,7 @@ pub async fn user_registration(
         client_secret: env::var("CLIENT_SECRET").expect("Error").to_string(),
         grant_type: "authorization_code".to_string(),
         code: code.to_string(),
-        redirect_uri: "https://localhost/api/oauth2/redirect".to_string(),
+        redirect_uri: "http://localhost:443/api/oauth2/redirect".to_string(),
     };
 
     // return HttpResponse::Ok()

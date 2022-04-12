@@ -1,4 +1,4 @@
-use crate::models::{FileReference, IdResponse, NewResourceResponse, Resource, ResourceForm, Tag};
+use crate::models::{CreatedResourceResponse, FileReference, IdResponse, NewResourceResponse, Resource, ResourceForm, Tag};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use bson::oid::ObjectId;
 use chrono::{NaiveDateTime, Utc};
@@ -65,6 +65,7 @@ pub async fn create_resource(
 
     let last_edited_at = Utc::now().naive_local();
     let resource_form = resource.into_inner();
+    let files = resource_form.files.clone();
 
     let group_id = resource_form.group_id.clone();
 
@@ -77,7 +78,7 @@ pub async fn create_resource(
         resource_form.description,
         resource_form.subject,
         resource_form.tags,
-        resource_form.files,
+        files.clone(),
         last_edited_at,
     );
 
@@ -94,12 +95,27 @@ pub async fn create_resource(
         return HttpResponse::BadRequest().body("Error creating new resource.");
     }
 
-    let response = IdResponse {
+    let mut response = CreatedResourceResponse {
         resource_id: insert_result.inserted_id.to_string(),
-        group_id,
+        group_id: group_id.clone(),
+        file_put_urls: Option::None,
     };
 
-    HttpResponse::Ok().body(serde_json::to_string::<IdResponse>(&response).unwrap())
+    if let Some(f_vec) = files {
+        let mut file_put_urls = Vec::<String>::new();
+        for f in f_vec.iter() {
+            file_put_urls.push(bucket.presign_put(format!("/{}",&f.id).as_str(), 3600, None).unwrap());
+        }
+
+        response = CreatedResourceResponse {
+            resource_id: insert_result.inserted_id.to_string(),
+            group_id,
+            file_put_urls: Option::from(file_put_urls),
+        };
+    }
+
+
+    HttpResponse::Ok().body(serde_json::to_string::<CreatedResourceResponse>(&response).unwrap())
 }
 
 #[get("/resource/get/{resource_id}")]

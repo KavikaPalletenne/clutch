@@ -24,6 +24,8 @@ export default function NewResourcePage(props) {
 
     const {autologin} = router.query
 
+    const [authToken, setAuthToken] = useState('')
+
     const [tagInputPlaceHolder, setTagInputPlaceHolder] = useState('Separate by commas...')
 
     var isMounted = false
@@ -36,6 +38,8 @@ export default function NewResourcePage(props) {
     const [description, setDescription] = useState('');
     const [subject, setSubject] = useState('');
     const [files, setFiles] = useState([]);
+    const [fileData, setFileData] = useState([]);
+    const [fileUrls, setFileUrls] = useState('');
 
     const [tagInput, setTagInput] = useState('');
     const [tags, setTags] = useState([]);
@@ -51,7 +55,7 @@ export default function NewResourcePage(props) {
         }
         CheckLoggedIn()
         */
-
+        setAuthToken(localStorage.getItem('auth_token'))
     }, [])
 
     const onChange = (e) => {
@@ -94,17 +98,20 @@ export default function NewResourcePage(props) {
     }
 
     const onFileChange = (fileInput) => {
-      
+      // setFiles([])
+      // setFileData([])
       var fileArray = Array.from(fileInput.files)
       var file;
       fileArray.forEach( (f) =>
       { file = {
-        "id": crypto.randomUUID(),
-        "name": f.name,
+        "id": crypto.randomUUID()+'-'+f.name,
+        "title": f.name,
         "size": f.size,
       }
       files.push(file) }
       );
+
+      setFileData(fileArray)
       
 
       setListFiles(
@@ -123,10 +130,16 @@ export default function NewResourcePage(props) {
     const submit = async (e) => {
         e.preventDefault()
 
-        let res = await fetch(`http://localhost:443/resource/create`, {
+        if (title.length == 0 || subject.length == 0) {
+          return;
+        }
+
+        fetch(`http://localhost:443/resource/create`, {
             method: 'POST',
+            credentials: 'include',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                // 'Cookie': `auth_token=${authToken}`,
             },
             body: JSON.stringify({
                 'group_id': id,
@@ -136,9 +149,40 @@ export default function NewResourcePage(props) {
                 'tags': tags,
                 'files': files,
             })
+        }).then(r =>  r.json().then(function(data) {
+          setFileUrls(data['file_put_urls'][0])
+          console.log(`Urls: ${fileUrls}`)
+          return fetch(`${fileUrls}`, {
+                method: 'PUT',
+                headers: {           
+                },
+                body: fileData[0]
+          });
+        }
+        ))
+        .then(response => {
+          console.log('File Upload Status:' + response.status)
+          if (response.status == 200) {
+            router.push(`/app/group/${id}`)
+          }
         })
-        console.log(JSON.stringify(files))
-        let json = await res.json()
+        .catch(err => {
+          console.error('Request failed', err)
+        });
+        // console.log(JSON.stringify(files))
+        // let json = res.json()
+        // setFileUrls(json['file_put_urls'])
+
+        // let upload_res = await fetch(`${fileUrls[0]}`, {
+        //     method: 'PUT',
+        //     headers: {           
+        //     },
+        //     body: fileData[0]
+        // })
+        
+        // if (upload_res.status == 200) {
+        //   router.push(`/app/group/${id}`)
+        // }
     }
 
     return (
@@ -150,6 +194,7 @@ export default function NewResourcePage(props) {
           <meta name="description" content="Create a new resource" />
           <meta name="robots" content="none" />
           <meta name="googlebot" content="none" />
+          <meta name="referrer" content="no-referrer" />
           <title>Create New Resource - ExamClutch</title>
           <link rel="icon" href="/gradient_logo.svg" />
         </Head>

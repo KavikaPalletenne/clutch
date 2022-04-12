@@ -39,7 +39,7 @@ pub async fn update_resource_files(resource_id: String, file_name: String, file_
 
     if let Some(r) = old_resource {
         let file = FileReference {
-            id: Uuid::parse_str(file_id.as_str()).unwrap(),
+            id: file_id,
             title: file_name,
             size: file_size,
         };
