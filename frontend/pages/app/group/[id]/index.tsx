@@ -7,6 +7,7 @@ import Head from "next/head";
 import Members from "../../../../components/app/Members";
 import GroupNavigation from "../../../../components/app/GroupNavigation";
 import GroupTitle from "../../../../components/app/GroupTitle";
+import HeaderBar from "../../../../components/app/HeaderBar";
 import ResourceCard from "../../../../components/app/ResourceCard";
 import GroupName from "../../../../components/app/GroupName";
 import { GetServerSideProps } from "next";
@@ -52,12 +53,20 @@ export default function GroupPage({ group, resources }: {
 }) {
 
     const members = ["436035620905943041", "436035620905943041","436035620905943041","436035620905943041","436035620905943041"]
-
-    const listResources = resources.map((r: Resource) =>
+    const [stateResources, setStateResources] = useState([] as Resource[])
+    const listResources = stateResources.map((r: Resource) =>
             <div key={r._id.$oid} className="pb-3">
                 <ResourceCard propResource={r} />
             </div>
     );
+
+    useEffect(() => {
+        
+        fetch(`http://localhost:443/api/resource/get_all/${group._id}`)
+                        .then(r => r.json().then(function(data) {
+                            setStateResources(data as Resource[])
+            }));
+      }, [])
 
     return(
         <div>
@@ -68,6 +77,9 @@ export default function GroupPage({ group, resources }: {
                 <link rel="icon" href="/gradient_logo.svg" />
             </Head>
 
+            <div className="">
+                    <HeaderBar groupId={group._id}/>
+            </div>
             <div className="flex justify-center">
             <div className="pt-10 grid grid-flow-col auto-cols-min">
                 <div className="pr-3 row-span-3 col-span-1">

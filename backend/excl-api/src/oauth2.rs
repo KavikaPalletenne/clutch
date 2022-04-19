@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use bson::oid::ObjectId;
 use actix_web::{get, web, Responder, HttpRequest, HttpResponse};
-use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, Group, AccessTokenRequest, DiscordUser, AuthorizeResponse, PartialGuild, NewUserRequest};
+use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, AccessTokenRequest, DiscordUser, AuthorizeResponse, PartialGuild, NewUserRequest};
 use jsonwebtoken::EncodingKey;
 use std::env;
 use crate::jwt::{create_auth_token, decode_auth_token};
@@ -9,18 +9,7 @@ use actix_web::client::{Client};
 use std::str;
 use std::time::Duration;
 use mongodb::Database;
-use crate::user::{create_user_service, user_exists_service};
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct User {
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    // rename to _id and use and document id in database
-    id: Option<ObjectId>,
-    oauth2_id: String, // user id supplied from Google/Discord etc.
-    username: String,  // displayed as @<username>
-    email: String,
-    groups: Vec<Group>, // id of group that the user is a part of
-}
+use crate::user::{create_user_service, user_exists_service, User};
 
 #[get("/api/oauth2/redirect")]
 pub async fn user_registration(
