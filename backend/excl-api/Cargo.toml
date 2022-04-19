@@ -10,6 +10,7 @@ edition = "2021"
 [dependencies]
 actix-web = { version = "3.3.2", features = ["rustls"] }
 url = { version = "2.2.2", features = ["serde"] }
+nanoid = "0.4.0"
 anyhow = "1.0.51"
 form_urlencoded = "1.0.1"
 dotenv ="0.15"
@@ -31,3 +32,6 @@ actix-cors = "0.5.4"
 # File upload/download
 actix-multipart = "0.3.0"
 rust-s3 = "0.28.1"
+
+# Search
+meilisearch-sdk = "0.15.0"

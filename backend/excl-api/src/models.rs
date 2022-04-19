@@ -7,16 +7,6 @@ pub struct AuthorizationCodeGrantRedirect {
     pub code: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Group {
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    // rename to _id and use and document id in database
-    id: Option<ObjectId>,
-    name: String,
-    members: Vec<ObjectId>,        // id's of users that are members
-    administrators: Vec<ObjectId>, // id's of users that are administrators
-}
-
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AuthorizationJwtPayload {
@@ -147,7 +137,7 @@ pub struct GuildResponse {
 pub struct Resource {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     // rename to _id and use and document id in database
-    pub id: Option<ObjectId>,
+    pub id: Option<String>,
     pub user_id: String,  // owner
     pub group_id: String, // group it belongs to
     pub title: String,
