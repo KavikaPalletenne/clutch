@@ -20,8 +20,9 @@ export default function Login() {
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault();
 
-        await fetch(`http://localhost:443/api/group/join/${groupId}`, {
-            method: "GET",  
+        await fetch(`http://127.0.0.1:443/api/group/join/${groupId}`, {
+            method: "GET",
+            credentials: 'include'  
         }).then(function(response) {
             
         })

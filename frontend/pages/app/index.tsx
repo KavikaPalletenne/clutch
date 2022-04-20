@@ -11,7 +11,11 @@ export default function App() {
 
     useEffect(() => {
 
-        fetch(`http://localhost:443/api/user/get_user_groups/${userId}`)
+        setUserId(Cookies.get('user_id'))
+
+        fetch(`http://127.0.0.1:443/api/user/get_user_groups/${userId}`, {
+            credentials: 'include'
+        })
         .then((res) => res.json())
         .then((data) => {
             setGroups(data)

@@ -63,13 +63,19 @@ export default function GroupPage({ group, resources }: {
     );
 
     useEffect(() => {
-        fetch(`http://localhost:443/api/resource/get_all/${group._id}`)
+
+        setUserId(Cookies.get('user_id'))
+        fetch(`http://127.0.0.1:443/api/resource/get_all/${group._id}`, {
+            credentials: 'include'
+        })
                         .then(r => r.json().then(function(data) {
                             setStateResources(data as Resource[])
                             setFullResources(data as Resource[])
         }));
 
-        fetch(`http://localhost:443/api/user/${userId}`)
+        fetch(`http://127.0.0.1:443/api/user/${userId}`, {
+            credentials: 'include'
+        })
             .then((res) => res.json())
             .then((data) => {
             setUserName(data.username)
@@ -79,8 +85,9 @@ export default function GroupPage({ group, resources }: {
     const searchTermUpdate = async (e) => {
         e.preventDefault()
 
-        let results = await fetch(`http://localhost:443/api/search/${group._id}/${e.target.value}`, {
-            method: 'GET'
+        let results = await fetch(`http://127.0.0.1:443/api/search/${group._id}/${e.target.value}`, {
+            method: 'GET',
+            credentials: 'include'
         }).then(r => r.json().then(function(data) {
             return data as Resource[]
         }))
@@ -169,7 +176,9 @@ export default function GroupPage({ group, resources }: {
 
 export const getServerSideProps: GetServerSideProps = async (context: any) => {
     
-    const group_res = await fetch(`http://localhost:443/api/group/${context.params.id}`);
+    const group_res = await fetch(`http://127.0.0.1:443/api/group/${context.params.id}`, {
+        credentials: 'include'
+    });
     
     if (!group_res.ok) {
         return {
@@ -185,7 +194,9 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
         }
     }
     
-    const resources_res = await fetch(`http://localhost:443/api/resource/get_all/${context.params.id}`);
+    const resources_res = await fetch(`http://127.0.0.1:443/api/resource/get_all/${context.params.id}`, {
+        credentials: 'include'
+    });
     const resources = await resources_res.json() as Resource[];
 
     return {

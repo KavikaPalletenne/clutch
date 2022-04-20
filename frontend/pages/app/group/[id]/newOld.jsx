@@ -99,8 +99,9 @@ export default function NewResourcePage(props) {
     const submit = async (e) => {
         e.preventDefault()
 
-        fetch(`http://localhost:443/resource/create`, {
+        fetch(`http://127.0.0.1:443/resource/create`, {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
             },

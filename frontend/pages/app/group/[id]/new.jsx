@@ -136,7 +136,7 @@ export default function NewResourcePage(props) {
           return;
         }
 
-        fetch(`http://localhost:443/resource/create`, {
+        fetch(`http://127.0.0.1:443/resource/create`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -157,6 +157,7 @@ export default function NewResourcePage(props) {
           setLoading(true)
           return fetch(`${data['file_put_urls'][0]}`, {
                 method: 'PUT',
+                credentials: 'include',
                 headers: {           
                 },
                 body: fileData[0]
@@ -290,7 +291,7 @@ export default function NewResourcePage(props) {
                       id={'fileUpload'} type={"file"} 
                       className={styles.uploadButton}
                       onChange={e => onFileChange(e.target)} 
-                      multiple={true}
+                      multiple={false}
                       accept={"image/*, .pdf, .doc, .docx"}
                       />
                       <label for="fileUpload" className={styles.uploadButtonLabel}>Select files</label>
