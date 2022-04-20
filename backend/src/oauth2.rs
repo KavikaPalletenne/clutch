@@ -1,43 +1,50 @@
 use serde::{Deserialize, Serialize};
 use bson::oid::ObjectId;
 use actix_web::{get, web, Responder, HttpRequest, HttpResponse};
-use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, Group, AccessTokenRequest, UserExistsResponse, DiscordUser, AuthorizeResponse, GuildResponse, PartialGuild};
+use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, AccessTokenRequest, DiscordUser, AuthorizeResponse, PartialGuild, NewUserRequest};
 use jsonwebtoken::EncodingKey;
 use std::env;
 use crate::jwt::{create_auth_token, decode_auth_token};
 use actix_web::client::{Client};
 use std::str;
-use url::Url;
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct User {
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    // rename to _id and use and document id in database
-    id: Option<ObjectId>,
-    oauth2_id: String, // user id supplied from Google/Discord etc.
-    username: String,  // displayed as @<username>
-    email: String,
-    groups: Vec<Group>, // id of group that the user is a part of
-}
+use std::time::Duration;
+use mongodb::Database;
+use crate::user::{create_user_service, user_exists_service, User};
 
 #[get("/api/oauth2/redirect")]
 pub async fn user_registration(
     web::Query(info): web::Query<AuthorizationCodeGrantRedirect>,
+    database: web::Data<Database>,
     encoding_key: web::Data<EncodingKey>,
 ) -> impl Responder {
     let code = info.code;
     let encoding_key = encoding_key.get_ref();
-    let http_client = Client::default();
+    // let http_client = Client::default();
+
+    let connector = awc::Connector::new()
+        // This is the timeout setting for connector. It's 1 second by default
+        .timeout(Duration::from_secs(30))
+        .finish();
+
+    let http_client = awc::Client::builder()
+        .connector(connector)
+        // This is the timeout setting for requests. It's 5 seconds by default.
+        .timeout(Duration::from_secs(50))
+        .finish();
 
     let body = AccessTokenRequest {
         client_id: env::var("CLIENT_ID").expect("Error").to_string(),
         client_secret: env::var("CLIENT_SECRET").expect("Error").to_string(),
         grant_type: "authorization_code".to_string(),
         code: code.to_string(),
-        redirect_uri: "https://localhost/api/oauth2/redirect".to_string(),
+        redirect_uri: "http://localhost:443/api/oauth2/redirect".to_string(),
     };
 
-    //print!("Encoded Body: {:?}", encoded_body);
+    // return HttpResponse::Ok()
+    //     .header("Content-Type", "application/json")
+    //     .body(serde_json::to_string::<AccessTokenRequest>(&body).unwrap());
+
+    // println!("Encoded Body: {:?}", body);
     let response = http_client
         .post("https://discord.com/api/oauth2/token")
         .send_form::<AccessTokenRequest>(&body)
@@ -50,7 +57,7 @@ pub async fn user_registration(
     //     .send().await.expect("Error sending GET request")
     //     .json::<AuthorizationInformation>().await.expect("Error parsing JSON");
 
-    println!("Bearer token: {}", bearer_token);
+    // println!("Bearer token: {}", bearer_token);
 
     let current_user = http_client
         .get("https://discord.com/api/users/@me")
@@ -58,45 +65,47 @@ pub async fn user_registration(
         .send().await.expect("Error sending GET request")
         .json::<DiscordUser>().await.expect("Error parsing JSON");
 
-    println!("Current user: {:?}", current_user);
-    let user_id = current_user.id;
+    // println!("Current user: {:?}", current_user);
+    let user_id = current_user.id.clone();
     let username = current_user.username.clone();
     let email = current_user.email;
 
-    let exists_url = Url::parse(&*format!("http://localhost:442/api/user/protected/userExists/{}/{}", user_id.clone(), env::var("USER_SERVICE_SECRET").unwrap())).unwrap().to_string();
-
-    let user_exists = http_client
-        .get(exists_url)
-        .send().await.expect("Error sending GET request")
-        .json::<UserExistsResponse>().await.expect("Error parsing JSON");
+    let user_exists = user_exists_service(&user_id, database.get_ref()).await;
 
     // Create new user if does not exist
-    if !user_exists.exists {
-        let uri = Url::parse_with_params("http://localhost:442/api/user/protected/create",
-                                         &[
-                                             ("secret", env::var("USER_SERVICE_SECRET").unwrap()),
-                                             ("id", user_id.clone()),
-                                             ("username", username.clone()),
-                                             ("email", email.clone())
-                                         ]).expect("Error parsing URL");
+    if !user_exists {
+        // let uri = Url::parse_with_params("https://localhost/api/user/protected/create",
+        //                                  &[
+        //                                      ("secret", env::var("USER_SERVICE_SECRET").unwrap()),
+        //                                      ("id", user_id.),
+        //                                      ("username", username.clone()),
+        //                                      ("email", email.clone())
+        //                                  ]).expect("Error parsing URL");
 
-        let create_user_response = http_client
-            .get(uri.as_str())
-            .send().await.expect("Error sending GET request");
+        let user_request = NewUserRequest {
+            secret: "N/A".to_string(),
+            id: user_id.clone(),
+            username: username.clone(),
+            email
+        };
+        let create_user_response = create_user_service(user_request, &database).await;
 
 
-        if !create_user_response.status().is_success() {
+        if !create_user_response {
             return HttpResponse::BadRequest().body("Error creating user.");
         }
     }
 
-    let token = create_auth_token(user_id, username, response, encoding_key);
-    let auth_token = format!("auth_token={}; Path=/; Max-Age=604800; Secure; HttpOnly", token);
+    let token = create_auth_token(user_id.clone(), username.clone(), response, encoding_key);
+    // TODO: Add security features to this cookie before production deployment
+    let auth_token = format!("auth_token={}; Path=/api; Max-Age=604800; HttpOnly; Secure; SameSite=None; Domain=localhost; Port=443; Port=3000;", token);
+    let user_id_token = format!("user_id={}; Path=/; Max-Age=604800; Domain=localhost;", user_id);
 
-    HttpResponse::PermanentRedirect()
+    HttpResponse::Ok()
         .header("Set-Cookie", auth_token)
+        .header("Set-Cookie", user_id_token)
         // .header("Location", "https://examclutch.com/app")
-        .header("Location", "http://localhost:3000/app/group/647329273568559114")
+        // .header("Location", "http://localhost:3000/app/group/647329273568559114")
         .body(
             format!("Logged in as user {:?}", current_user.username.clone())
         )
@@ -116,6 +125,7 @@ pub async fn authorize(
             .body(serde_json::to_string(
             &AuthorizeResponse {
                 user_id: Option::from(claims.sub),
+                username: claims.username,
             }).unwrap()
         ); // Return the user id as a AuthorizeResponse JSON
     }
@@ -135,7 +145,7 @@ pub async fn get_user_guilds(
         let bearer_token = format!("Bearer {}", access_token);
 
         let http_client = Client::default();
-        let mut current_user_guilds = http_client
+        let current_user_guilds = http_client
             .get("https://discord.com/api/users/@me/guilds")
             .header("Authorization", bearer_token)
             .send().await.expect("Error sending GET request")

@@ -9,3 +9,17 @@ Open-source studying for everyone.
 - Search anyone's notes using full-text search.
 - Retrieve and search notes directly within Discord.
 - Use materials from trusted sources within your school.
+
+___
+## Architecture
+### Backend
+- Actix Web Server (CRUD, AuthZ)
+- Meilisearch Search Server
+- MongoDB Database
+- S3 Compatible Storage (Files)
+
+### Frontend
+- NextJS
+
+### Authentication
+- Discord OAuth2

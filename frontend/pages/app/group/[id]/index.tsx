@@ -2,11 +2,13 @@ import { useRouter } from "next/router";
 import {SyntheticEvent, useEffect, useState} from  'react';
 import Link from "next/link";
 import { AiOutlinePlus } from "react-icons/ai"
+import Cookies from 'js-cookie';
 
 import Head from "next/head";
 import Members from "../../../../components/app/Members";
 import GroupNavigation from "../../../../components/app/GroupNavigation";
 import GroupTitle from "../../../../components/app/GroupTitle";
+import HeaderBar from "../../../../components/app/HeaderBar";
 import ResourceCard from "../../../../components/app/ResourceCard";
 import GroupName from "../../../../components/app/GroupName";
 import { GetServerSideProps } from "next";
@@ -50,14 +52,45 @@ export default function GroupPage({ group, resources }: {
     group: Group;
     resources: Resource[];
 }) {
-
-    const members = ["436035620905943041", "436035620905943041","436035620905943041","436035620905943041","436035620905943041"]
-
-    const listResources = resources.map((r: Resource) =>
+    const [userId, setUserId] = useState(Cookies.get("user_id"))
+    const [userName, setUserName] = useState('')
+    const [fullResources, setFullResources] = useState([] as Resource[])
+    const [stateResources, setStateResources] = useState([] as Resource[])
+    const listResources = stateResources.map((r: Resource) =>
             <div key={r._id.$oid} className="pb-3">
                 <ResourceCard propResource={r} />
             </div>
     );
+
+    useEffect(() => {
+        fetch(`http://localhost:443/api/resource/get_all/${group._id}`)
+                        .then(r => r.json().then(function(data) {
+                            setStateResources(data as Resource[])
+                            setFullResources(data as Resource[])
+        }));
+
+        fetch(`http://localhost:443/api/user/${userId}`)
+            .then((res) => res.json())
+            .then((data) => {
+            setUserName(data.username)
+        })
+      }, [])
+
+    const searchTermUpdate = async (e) => {
+        e.preventDefault()
+
+        let results = await fetch(`http://localhost:443/api/search/${group._id}/${e.target.value}`, {
+            method: 'GET'
+        }).then(r => r.json().then(function(data) {
+            return data as Resource[]
+        }))
+        
+        
+        setStateResources(results)
+        if (((e.target.value) == '')) {
+            setStateResources(fullResources)
+        }
+    }
 
     return(
         <div>
@@ -68,6 +101,30 @@ export default function GroupPage({ group, resources }: {
                 <link rel="icon" href="/gradient_logo.svg" />
             </Head>
 
+            <div className="pt-10 grid justify-items-center">
+                {/* Header Bar */}
+                <div>
+                <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white duration-150 grid" style={{fontFamily: "Roboto Mono", backgroundImage: "linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%)"}}>
+                
+                    <div className="inline-block flex align-items-center">
+                        <h1 style={{fontFamily: "Roboto Mono"}} className="font-bold text-white text-3xl pr-36">ExCl</h1>
+                        <div className="rounded-md shadow-sm pr-24">
+                                <input
+                                onChange={e => searchTermUpdate(e)}
+                                type="text"
+                                size={50}
+                                name="search_bar"
+                                id="search_bar"
+                                className="focus:ring-exclpurple focus:border-exclpurple flex-1 block rounded-l-md rounded-none rounded-r-md sm:text-sm border-gray-300"
+                                placeholder="Redox reactions..."
+                                />
+                        </div>
+                        <h1 style={{fontFamily: "Roboto Mono"}} className="text-white text-lg">Hey {userName}!</h1>
+                    </div>
+
+                </div>
+                </div>
+            </div>
             <div className="flex justify-center">
             <div className="pt-10 grid grid-flow-col auto-cols-min">
                 <div className="pr-3 row-span-3 col-span-1">
@@ -93,7 +150,10 @@ export default function GroupPage({ group, resources }: {
                 <Members admins={group.administrators} members={group.members} />
                 </div>
                 <div className="row-start-2 col-start-2 col-span-2 pt-5">
-                { listResources }
+                    { listResources }
+                    <div className="text-gray-300 text-sm grid justify-items-center align-items-center" style={{fontFamily: "Roboto Mono"}}>
+                        <div>Help {group.name} by adding more resources</div>
+                    </div>
                 </div>
             </div>
             </div>

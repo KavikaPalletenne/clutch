@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import type { Resource, Tag } from '../../pages/app/group/[id]';
 import UserName from './UserName';
+import prettyBytes from 'pretty-bytes';
 
 // type Resource = {
 //     _id: ObjectId;
@@ -55,7 +56,7 @@ export default function ResourceCard(props: {
                             
                         </li>
                         <div className="pr-5 float-right">
-                            {f.size}
+                            {prettyBytes(f.size)}
                         </div>
                     
                     </div>

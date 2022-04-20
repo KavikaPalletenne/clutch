@@ -1,14 +1,16 @@
 [package]
-name = "oauth2-service"
+name = "excl-api"
+description = "Backend API for ExamClutch.com"
+authors = ["Kavika Palletenne <kbpalletenne@gmail.com>", "ExamClutch.com"]
 version = "0.1.0"
 edition = "2021"
-authors = ["Kavika Palletenne", "ExamClutch.com"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 actix-web = { version = "3.3.2", features = ["rustls"] }
 url = { version = "2.2.2", features = ["serde"] }
+nanoid = "0.4.0"
 anyhow = "1.0.51"
 form_urlencoded = "1.0.1"
 dotenv ="0.15"
@@ -19,3 +21,17 @@ serde_json = "1.0.72"
 uuid = { version = "0.8.2", features = ["serde", "v4"] }
 jsonwebtoken = "^7.2.0"
 rustls = "0.18.0"
+
+mongodb = { version = "2.0.2", default-features = false, features = ["async-std-runtime", "bson-uuid-0_8", "bson-chrono-0_4"] }
+clap = { version = "3.0.0-beta.5", features = ["color"] }
+tokio-stream = "0.1.8"
+
+awc = "2.0.3"
+actix-cors = "0.5.4"
+
+# File upload/download
+actix-multipart = "0.3.0"
+rust-s3 = "0.28.1"
+
+# Search
+meilisearch-sdk = "0.15.0"

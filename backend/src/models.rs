@@ -7,16 +7,6 @@ pub struct AuthorizationCodeGrantRedirect {
     pub code: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Group {
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    // rename to _id and use and document id in database
-    id: Option<ObjectId>,
-    name: String,
-    members: Vec<ObjectId>,        // id's of users that are members
-    administrators: Vec<ObjectId>, // id's of users that are administrators
-}
-
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AuthorizationJwtPayload {
@@ -118,6 +108,7 @@ pub struct UserExistsResponse {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AuthorizeResponse {
     pub user_id: Option<String>,
+    pub username: String,
 }
 
 // Check user's guilds
@@ -135,4 +126,97 @@ pub struct PartialGuild {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct GuildResponse {
     pub guilds: Vec::<PartialGuild>,
+}
+
+
+
+////////////////////
+// Resource Service
+///////////////////
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Resource {
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    // rename to _id and use and document id in database
+    pub id: Option<String>,
+    pub user_id: String,  // owner
+    pub group_id: String, // group it belongs to
+    pub title: String,
+    pub description: String,
+    pub subject: String,
+    pub tags: Option<Vec<String>>, // Tags are optional
+    pub files: Option<Vec<FileReference>>, // URL to the data (stored on server or on something like AWS S3)
+    pub last_edited_at: chrono::NaiveDateTime,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ResourceForm {
+    // No need for a document Id as MongoDB generates an Id for the document when you insert it
+    pub group_id: String,
+    pub title: String,
+    pub description: String,
+    pub subject: String,
+    pub tags: Option<Vec<String>>,            // Tags are optional
+    pub files: Option<Vec<FileReference>>, // URL to the data (stored on server or on something like AWS S3)
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Tag {
+    pub name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct FileReference {
+    pub id: String, // This is the id the file will be stored under on the CDN
+    pub title: String,
+    pub size: i64, // Size in bytes
+}
+
+
+
+/////////////////
+// Group Service
+////////////////
+#[derive(Debug, Deserialize, Serialize)]
+pub struct NewGroupRequest {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub discord_link: String,
+    pub creator_id: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct User {
+    #[serde(rename = "_id")] // rename to _id and use as document id in database
+    pub id: String, // user id supplied from Discord etc.
+    pub username: String,  // displayed as @<username>
+    pub email: String,
+    pub groups: Vec<String>, // id's of groups that the user is a part of
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
+pub struct GroupUser {
+    pub id: String,
+    pub username: String,
+}
+
+
+/// Multipurpose struct to return an id for group, resource, user etc.
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
+pub struct IdResponse {
+    pub resource_id: String,
+    pub group_id: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
+pub struct CreatedResourceResponse {
+    pub resource_id: String,
+    pub group_id: String,
+    pub file_put_urls: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
+pub struct NewResourceResponse {
+    pub id: String,
+    pub upload_url: String,
 }

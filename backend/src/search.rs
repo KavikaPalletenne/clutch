@@ -1,0 +1,45 @@
+use actix_web::{web, get, Responder, HttpRequest, HttpResponse};
+use meilisearch_sdk::indexes::Index;
+use meilisearch_sdk::search::SearchResults;
+use mongodb::Database;
+use crate::models::Resource;
+
+#[get("/api/search/{group_id}/{term}")]
+pub async fn search(
+    database: web::Data<Database>,
+    index: web::Data<Index>, // Meilisearch Index
+    req: HttpRequest,
+) -> impl Responder {
+
+    let group_id = req.match_info().get("group_id").unwrap().to_string();
+    let search_term = req.match_info().get("term").unwrap().to_string();
+
+    let results: SearchResults<Resource> = index.search()
+        .with_query(&search_term)
+        .with_filter(&*format!("group_id = {}", group_id))
+        .execute()
+        .await
+        .unwrap();
+
+    let mut resources = Vec::<Resource>::new();
+
+    for hit in results.hits.iter() {
+        resources.push(hit.result.clone());
+    }
+
+
+    HttpResponse::Ok()
+        .header("Content-Type", "application/json")
+        .body(serde_json::to_string::<Vec<Resource>>(&resources).unwrap())//serde_json::to_string::<Vec<Resource>>(&hits).unwrap())
+}
+
+/// Prevents blank searches from front-end returning a 404 not found code.
+#[get("/api/search/{group_id}/")]
+pub async fn search_blank(
+    req: HttpRequest,
+) -> impl Responder {
+
+    HttpResponse::Ok()
+        .header("Content-Type", "application/json")
+        .body(serde_json::to_string::<Vec<Resource>>(&Vec::<Resource>::new()).unwrap())//serde_json::to_string::<Vec<Resource>>(&hits).unwrap())
+}

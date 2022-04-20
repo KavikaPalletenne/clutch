@@ -26,3 +26,4 @@ Cargo.lock
 **/bin/**
 frontend/package-lock.json
 backend/excl-api/docker_command.txt
+backend/docker_command.txt

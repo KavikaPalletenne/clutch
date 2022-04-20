@@ -7,6 +7,7 @@ use jsonwebtoken::EncodingKey;
 use std::env;
 use std::fs::File;
 use std::io::BufReader;
+use meilisearch_sdk::client::Client;
 use crate::storage::init_bucket;
 
 mod oauth2;
@@ -22,6 +23,7 @@ mod cdn;
 mod authz;
 mod file;
 mod storage;
+mod search;
 
 
 #[actix_web::main]
@@ -55,6 +57,11 @@ async fn main() -> Result<()> {
         .await
         .expect("Failed to connect to DB");
     println!("Successfully connected to database");
+
+    // Initialise Meilisearch Connection
+    let search_endpoint = env::var("SEARCH_ENDPOINT").expect("Error getting SEARCH_ENDPOINT").to_string();
+    let search_index = meilisearch_sdk::client::Client::new(search_endpoint, "masterKey").index("resources");
+    search_index.set_filterable_attributes(["group_id", "subject"]).await.unwrap();
 
     println!("Starting server on port 443.");
     HttpServer::new(move || {
@@ -108,6 +115,10 @@ async fn main() -> Result<()> {
             .service(cdn::uploaded_file)
             // Easter Eggs
             .service(shared::easter_egg)
+            // Search
+            .data(search_index.clone())
+            .service(search::search)
+            .service(search::search_blank)
     })
         //.bind_rustls("0.0.0.0:443", config)?
         .bind("0.0.0.0:443")?

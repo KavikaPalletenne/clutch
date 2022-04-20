@@ -5,6 +5,7 @@ use chrono::{NaiveDateTime, Utc};
 use mongodb::bson::doc;
 use mongodb::Database;
 use std::str::FromStr;
+use nanoid::nanoid;
 use s3::Bucket;
 use tokio_stream::StreamExt;
 use crate::file::direct_upload;
@@ -13,7 +14,7 @@ use crate::middleware::authorize;
 // A resource is any document or link to a website.
 impl Resource {
     pub fn new(
-        id: Option<ObjectId>,
+        id: Option<String>,
         user_id: String,
         group_id: String,
         title: String,
@@ -69,7 +70,7 @@ pub async fn create_resource(
 
     let group_id = resource_form.group_id.clone();
 
-    let id = Option::from(ObjectId::new());
+    let id: Option<String> = Option::from(nanoid!());
     let resource = Resource::new(
         id,
         authorized.user_id.unwrap(),
@@ -224,12 +225,12 @@ pub async fn update_resource(
     // TODO: Check if the user belongs to the group (later as if they have the group id, they most likely belong to the group)
     //////////////////////////////////////////////////////////////////////////
 
-    let resource_id = ObjectId::from_str(req.match_info().get("resource_id").unwrap()).unwrap();
+    let resource_id = req.match_info().get("resource_id").unwrap().to_string();
 
     let resource_form = resource_form.into_inner();
     let last_edited_at = Utc::now().naive_local();
     let query = doc! {
-      "_id": resource_id,
+      "_id": resource_id.clone(),
     };
 
     let old_resource = database
