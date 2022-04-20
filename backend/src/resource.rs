@@ -9,6 +9,7 @@ use nanoid::nanoid;
 use s3::Bucket;
 use tokio_stream::StreamExt;
 use crate::file::direct_upload;
+use crate::group::check_user_in_group;
 use crate::middleware::authorize;
 
 // A resource is any document or link to a website.
@@ -51,8 +52,6 @@ pub async fn create_resource(
     bucket: web::Data<Bucket>,
     resource: web::Json<ResourceForm>,
 ) -> impl Responder {
-    // TODO: Check whether current user (JWT) is the same as resource user id.
-    // TODO: Follow this for the CDN backend https://blog.logrocket.com/file-upload-and-download-in-rust/
 
     //////////////////////////////////////////////////////////////////////////
     // Auth //
@@ -61,7 +60,10 @@ pub async fn create_resource(
     if authorized.user_id.is_none() {
         return HttpResponse::Unauthorized().body("Not logged in.");
     }
-    // TODO: Check if the user belongs to the group (later as if they have the group id, they most likely belong to the group)
+
+    if !check_user_in_group(authorized.user_id.clone().unwrap(), resource.group_id.clone(), &database).await {
+        return HttpResponse::Unauthorized().body("Logged in user not in group.");
+    }
     //////////////////////////////////////////////////////////////////////////
 
     let last_edited_at = Utc::now().naive_local();
@@ -222,7 +224,9 @@ pub async fn update_resource(
         return HttpResponse::Unauthorized().body("Not logged in.");
     }
 
-    // TODO: Check if the user belongs to the group (later as if they have the group id, they most likely belong to the group)
+    if !check_user_in_group(authorized.user_id.clone().unwrap(), resource_form.group_id.clone(), &database).await {
+        return HttpResponse::Unauthorized().body("Logged in user not in group.");
+    }
     //////////////////////////////////////////////////////////////////////////
 
     let resource_id = req.match_info().get("resource_id").unwrap().to_string();
@@ -280,6 +284,29 @@ pub async fn delete_resource(database: web::Data<Database>, req: HttpRequest) ->
     let filter = doc! {
         "_id": resource_id,
     };
+
+    let resource = database
+        .collection::<Resource>("notes")
+        .find_one(filter.clone(), None)
+        .await
+        .expect("Error getting document");
+
+    if resource.is_none() {
+        return HttpResponse::BadRequest().body("No such resource.");
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    // Auth //
+    let authorized = authorize(&req).await;
+
+    if authorized.user_id.is_none() {
+        return HttpResponse::Unauthorized().body("Not logged in.");
+    }
+
+    if authorized.user_id.unwrap().ne(&resource.unwrap().user_id) {
+        return HttpResponse::Unauthorized().body("Logged in user not owner of resource.");
+    }
+    //////////////////////////////////////////////////////////////////////////
 
     let result = database
         .collection::<Resource>("notes")
