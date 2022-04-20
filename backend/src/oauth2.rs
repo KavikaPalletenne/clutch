@@ -3,11 +3,11 @@ use bson::oid::ObjectId;
 use actix_web::{get, web, Responder, HttpRequest, HttpResponse};
 use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, AccessTokenRequest, DiscordUser, AuthorizeResponse, PartialGuild, NewUserRequest};
 use jsonwebtoken::EncodingKey;
-use std::env;
+use std::{env, time};
 use crate::jwt::{create_auth_token, decode_auth_token};
 use actix_web::client::{Client};
 use std::str;
-use std::time::Duration;
+use cookie::{Cookie, SameSite};
 use mongodb::Database;
 use crate::user::{create_user_service, user_exists_service, User};
 
@@ -23,13 +23,13 @@ pub async fn user_registration(
 
     let connector = awc::Connector::new()
         // This is the timeout setting for connector. It's 1 second by default
-        .timeout(Duration::from_secs(30))
+        .timeout(time::Duration::from_secs(30))
         .finish();
 
     let http_client = awc::Client::builder()
         .connector(connector)
         // This is the timeout setting for requests. It's 5 seconds by default.
-        .timeout(Duration::from_secs(50))
+        .timeout(time::Duration::from_secs(50))
         .finish();
 
     let body = AccessTokenRequest {
@@ -37,7 +37,7 @@ pub async fn user_registration(
         client_secret: env::var("CLIENT_SECRET").expect("Error").to_string(),
         grant_type: "authorization_code".to_string(),
         code: code.to_string(),
-        redirect_uri: "http://localhost:443/api/oauth2/redirect".to_string(),
+        redirect_uri: "http://127.0.0.1:443/api/oauth2/redirect".to_string(),
     };
 
     // return HttpResponse::Ok()
@@ -98,14 +98,32 @@ pub async fn user_registration(
 
     let token = create_auth_token(user_id.clone(), username.clone(), response, encoding_key);
     // TODO: Add security features to this cookie before production deployment
-    let auth_token = format!("auth_token={}; Path=/api; Max-Age=604800; HttpOnly; Secure; SameSite=None; Domain=localhost; Port=443; Port=3000;", token);
-    let user_id_token = format!("user_id={}; Path=/; Max-Age=604800; Domain=localhost;", user_id);
+    // let auth_token = format!("auth_token={}; Path=/api; Max-Age=604800; HttpOnly; Secure; SameSite=None; Domain=127.0.0.1; Port=443; Port=3000;", token);
+    // let user_id_token = format!("user_id={}; Path=/; Max-Age=604800; Domain=127.0.0.1; Port=443; Port=3000", user_id);
+    let auth_cookie = Cookie::build("auth_token", token)
+        .domain("127.0.0.1")
+        .path("/")
+        .secure(false)
+        .http_only(true)
+        // .same_site(SameSite::Strict)
+        .max_age(cookie::time::Duration::new(604800, 0))
+        .finish();
+    let user_id_cookie = Cookie::build("user_id", user_id)
+        .domain("127.0.0.1")
+        .path("/")
+        .secure(false)
+        .http_only(false)
+        // .same_site(SameSite::None)
+        .max_age(cookie::time::Duration::new(604800, 0))
+        .finish();
 
-    HttpResponse::Ok()
-        .header("Set-Cookie", auth_token)
-        .header("Set-Cookie", user_id_token)
+
+
+    HttpResponse::PermanentRedirect()
+        .header("Set-Cookie", auth_cookie.to_string())
+        .header("Set-Cookie", user_id_cookie.to_string())
         // .header("Location", "https://examclutch.com/app")
-        // .header("Location", "http://localhost:3000/app/group/647329273568559114")
+        .header("Location", "http://localhost:3000/app")
         .body(
             format!("Logged in as user {:?}", current_user.username.clone())
         )
