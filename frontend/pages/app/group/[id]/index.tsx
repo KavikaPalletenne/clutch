@@ -48,10 +48,11 @@ export type FileReference = {
     size: number;
 }
 
-export default function GroupPage({ group, resources }: {
+export default function GroupPage({ group }: {
     group: Group;
-    resources: Resource[];
+    // resources: Resource[];
 }) {
+    const router = useRouter();
     const [userId, setUserId] = useState(Cookies.get("user_id"))
     const [userName, setUserName] = useState('')
     const [fullResources, setFullResources] = useState([] as Resource[])
@@ -65,13 +66,17 @@ export default function GroupPage({ group, resources }: {
     useEffect(() => {
 
         setUserId(Cookies.get('user_id'))
+        
         fetch(`http://127.0.0.1:443/api/resource/get_all/${group._id}`, {
             credentials: 'include'
-        })
-                        .then(r => r.json().then(function(data) {
-                            setStateResources(data as Resource[])
-                            setFullResources(data as Resource[])
-        }));
+        }).then(r => {
+            if (r.status == 401) {
+                router.push(`/api/login`)
+            }
+            r.json().then(function(data) {
+            setStateResources(data as Resource[])
+            setFullResources(data as Resource[])
+        })});
 
         fetch(`http://127.0.0.1:443/api/user/${userId}`, {
             credentials: 'include'
@@ -177,12 +182,24 @@ export default function GroupPage({ group, resources }: {
 export const getServerSideProps: GetServerSideProps = async (context: any) => {
     
     const group_res = await fetch(`http://127.0.0.1:443/api/group/${context.params.id}`, {
-        credentials: 'include'
+        credentials: 'include',
+        headers: context.req ? {cookie: context.req.headers.cookie} : undefined
     });
     
     if (!group_res.ok) {
-        return {
-            notFound: true,
+        if (group_res.status == 401) {
+            return {
+                redirect: {
+                    destination: '/app',
+                    permanent: false,
+                }
+            }
+        }
+        
+        if (group_res.status != 401) {
+            return {
+                notFound: true,
+            }
         }
     }
     
@@ -194,15 +211,15 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
         }
     }
     
-    const resources_res = await fetch(`http://127.0.0.1:443/api/resource/get_all/${context.params.id}`, {
-        credentials: 'include'
-    });
-    const resources = await resources_res.json() as Resource[];
+    // const resources_res = await fetch(`http://127.0.0.1:443/api/resource/get_all/${context.params.id}`, {
+    //     credentials: 'include'
+    // });
+    // const resources = await resources_res.json() as Resource[];
 
     return {
         props: {
-            group,
-            resources
+            group
+            // resources
         }
     }
 }

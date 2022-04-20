@@ -6,15 +6,10 @@ import {SyntheticEvent, useEffect, useState} from  'react'
 
 export default function Login() {
     
+    const router = useRouter()
     const [errorMessage, setErrorMessage] = useState('')
-
     const [groupId, setGroupId] = useState('');
     
-    useEffect(() => {
-       
-        
-
-    }, [])
 
     
     const submit = async (e: SyntheticEvent) => {
@@ -24,7 +19,12 @@ export default function Login() {
             method: "GET",
             credentials: 'include'  
         }).then(function(response) {
-            
+            if (response.status == 200 || response.status == 400) {
+                router.push(`/app/group/${groupId}`)
+            }
+            if (response.status == 401) {
+                router.push(`/api/login`)
+            }
         })
     }
     

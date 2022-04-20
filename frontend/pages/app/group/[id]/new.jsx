@@ -170,6 +170,9 @@ export default function NewResourcePage(props) {
           if (response.status == 200) {
             router.push(`/app/group/${id}`)
           }
+          if (response.status == 401) {
+            router.push(`/api/login`)
+          }
         })
         .catch(err => {
           console.error('Request failed', err)
