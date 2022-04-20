@@ -19,9 +19,16 @@ export default function App() {
         .then((res) => res.json())
         .then((data) => {
             setGroups(data)
+            if (data.length == 0) {
+                router.push("/app/join")
+            }
+    
+            if (data.length != 0) {
+                router.push(`/app/group/${groups[0]}`)
+            }
         })
 
-        router.push(`/app/group/${groups[0]}`)
+        
     })
 
 
@@ -35,7 +42,6 @@ export default function App() {
             </Head>
 
             <div className="flex items-start justify-center pt-10">
-                
             </div>
 
             <div className="flex inline-grid">
