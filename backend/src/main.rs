@@ -74,6 +74,12 @@ async fn main() -> Result<()> {
             .supports_credentials()
             .allowed_origin("http://localhost:3000")
             .allowed_origin("http://localhost")
+            .allowed_origin("http://127.0.0.1:3000")
+            .allowed_origin("http://127.0.0.1")
+            .allowed_origin("http://examclutch.com")
+            .allowed_origin("http://www.examclutch.com")
+            .allowed_origin("https://examclutch.com")
+            .allowed_origin("https://www.examclutch.com")
             // .allowed_origin_fn(|origin, _req_head| {
             //     origin.as_bytes().ends_with(b".localhost")
             // })
