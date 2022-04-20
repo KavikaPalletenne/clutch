@@ -133,7 +133,7 @@ pub struct GuildResponse {
 ////////////////////
 // Resource Service
 ///////////////////
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Resource {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     // rename to _id and use and document id in database

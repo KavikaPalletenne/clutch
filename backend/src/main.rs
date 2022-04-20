@@ -61,7 +61,7 @@ async fn main() -> Result<()> {
     // Initialise Meilisearch Connection
     let search_endpoint = env::var("SEARCH_ENDPOINT").expect("Error getting SEARCH_ENDPOINT").to_string();
     let search_index = meilisearch_sdk::client::Client::new(search_endpoint, "masterKey").index("resources");
-    search_index.set_filterable_attributes(["group_id"]).await.unwrap();
+    search_index.set_filterable_attributes(["group_id", "subject"]).await.unwrap();
 
     println!("Starting server on port 443.");
     HttpServer::new(move || {
@@ -118,6 +118,7 @@ async fn main() -> Result<()> {
             // Search
             .data(search_index.clone())
             .service(search::search)
+            .service(search::search_blank)
     })
         //.bind_rustls("0.0.0.0:443", config)?
         .bind("0.0.0.0:443")?

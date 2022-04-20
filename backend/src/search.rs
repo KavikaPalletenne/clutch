@@ -20,11 +20,26 @@ pub async fn search(
         .execute()
         .await
         .unwrap();
-    // let hits: Vec<Resource> = results.hits.into();
 
-    // println!("Results: {:?}", results.hits);
+    let mut resources = Vec::<Resource>::new();
+
+    for hit in results.hits.iter() {
+        resources.push(hit.result.clone());
+    }
+
 
     HttpResponse::Ok()
         .header("Content-Type", "application/json")
-        .body(format!("Results {:?}", results))//serde_json::to_string::<Vec<Resource>>(&hits).unwrap())
+        .body(serde_json::to_string::<Vec<Resource>>(&resources).unwrap())//serde_json::to_string::<Vec<Resource>>(&hits).unwrap())
+}
+
+/// Prevents blank searches from front-end returning a 404 not found code.
+#[get("/api/search/{group_id}/")]
+pub async fn search_blank(
+    req: HttpRequest,
+) -> impl Responder {
+
+    HttpResponse::Ok()
+        .header("Content-Type", "application/json")
+        .body(serde_json::to_string::<Vec<Resource>>(&Vec::<Resource>::new()).unwrap())//serde_json::to_string::<Vec<Resource>>(&hits).unwrap())
 }
