@@ -293,3 +293,42 @@ pub async fn leave_group(database: web::Data<Database>, req: HttpRequest) -> imp
 }
 
 // TODO: Function to check whether user belongs to group
+/// Returns true if user is in group, otherwise returns false
+pub async fn check_user_in_group(user_id: String, group_id: String, database: &web::Data<Database>) -> bool {
+    let query = doc! {
+        "_id": group_id,
+    };
+
+    let result: Option<Group> = database
+        .collection("groups")
+        .find_one(query, None)
+        .await
+        .expect("Could not fetch group with provided id");
+
+    if let Some(group) = result {
+        if group.members.contains(&user_id) || group.administrators.contains(&user_id) {
+            return true;
+        }
+    }
+    false
+}
+
+/// Returns true if user is admin of group, otherwise returns false
+pub async fn check_user_is_group_admin(user_id: String, group_id: String, database: &web::Data<Database>) -> bool {
+    let query = doc! {
+        "_id": group_id,
+    };
+
+    let result: Option<Group> = database
+        .collection("groups")
+        .find_one(query, None)
+        .await
+        .expect("Could not fetch group with provided id");
+
+    if let Some(group) = result {
+        if group.administrators.contains(&user_id) {
+            return true;
+        }
+    }
+    false
+}
