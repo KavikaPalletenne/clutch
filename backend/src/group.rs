@@ -105,6 +105,19 @@ pub async fn get_group_by_id(
     // TODO: Maybe implement auth to check if the user can access this group using Discord API.
     let group_id = req.match_info().get("id").unwrap().to_string();
 
+    //////////////////////////////////////////////////////////////////////////
+    // Auth //
+    let authorized = authorize(&req).await;
+
+    if authorized.user_id.is_none() {
+        return HttpResponse::Unauthorized().body("Not logged in.");
+    }
+
+    if !check_user_in_group(authorized.user_id.clone().unwrap(), group_id.to_string().clone(), &database).await {
+        return HttpResponse::Unauthorized().body("Logged in user not in group.");
+    }
+    //////////////////////////////////////////////////////////////////////////
+
     let query = doc! {
         "_id": group_id,
     };
