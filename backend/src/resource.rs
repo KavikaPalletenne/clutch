@@ -154,6 +154,20 @@ pub async fn fetch_resource_by_group_id(
 ) -> impl Responder {
     let group_id = req.match_info().get("group_id").unwrap();
 
+    //////////////////////////////////////////////////////////////////////////
+    // Auth //
+    let authorized = authorize(&req).await;
+
+    if authorized.user_id.is_none() {
+        return HttpResponse::Unauthorized().body("Not logged in.");
+    }
+
+    if !check_user_in_group(authorized.user_id.clone().unwrap(), group_id.to_string().clone(), &database).await {
+        return HttpResponse::Unauthorized().body("Logged in user not in group.");
+    }
+    //////////////////////////////////////////////////////////////////////////
+
+
     let query = doc! {
         "group_id": group_id,
     };
