@@ -1,3 +1,4 @@
+import { Resource } from "@pages/app/group/[id]";
 import Link from "next/link";
 import { useState } from 'react';
 
@@ -20,7 +21,6 @@ export default function HeaderBar(props: {
     groupId: string;
     }) {
     
-    const groupTitle = props.groupId;
     const [searchTerm, setSearchTerm] = useState('')
 
 
@@ -29,32 +29,19 @@ export default function HeaderBar(props: {
         
         setSearchTerm(e.target.value)
 
-        let results = await fetch(`http://localhost:7700/indexes/resources/search`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                'attributesToHighlight' : [
-                    '*'
-                ],
-                'limit': 50,
-                'filter': [
-                    {'group_id': props.groupId}
-                ],
-                'q': searchTerm
-            })
+        let results = await fetch(`http://localhost:443/api/search/${props.groupId}/${e.target.value}`, {
+            method: 'GET'
         }).then(r => r.json().then(function(data) {
-            return data['hits']
+            return data as Resource[]
         }))
 
-        console.log(results[0].title)
+        console.log(results)
     }
 
 
 
     return(
-        
+        // Header Bar
         <div>
         <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", minWidth: "750px", backgroundImage: "linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%)"}}>
         
