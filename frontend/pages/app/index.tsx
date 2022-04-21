@@ -13,7 +13,7 @@ export default function App() {
 
         setUserId(Cookies.get('user_id'))
 
-        fetch(`http://api.examclutch.com/api/user/get_user_groups/${userId}`, {
+        fetch(`https://api.examclutch.com/api/user/get_user_groups/${userId}`, {
             credentials: 'include'
         })
         .then((res) => res.json())

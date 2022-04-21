@@ -45,7 +45,7 @@ export default function ResourceCard(props: {
     const listFiles = resource.files.map((f) => 
         <div className="px-4 py-1" key={f.name}>
             {/* <Link href={ "https://examclutch.com/cdn/file/" + f.id }> */}
-            <Link href={ "http://api.examclutch.com/cdn/file/" + resource.id + '/' + f.name }> 
+            <Link href={ "https://api.examclutch.com/cdn/file/" + resource.id + '/' + f.name }> 
                 <a>
                     <div className="py-4 px-4 shadow-sm hover:shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", minWidth: "675px", maxWidth: "750px"}}>
                         

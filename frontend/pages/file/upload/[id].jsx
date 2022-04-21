@@ -96,7 +96,7 @@ export default function NewResourcePage(props) {
     const submit = async (e) => {
         e.preventDefault()
 
-        fetch(`http://api.examclutch.com/resource/create`, {
+        fetch(`https://api.examclutch.com/resource/create`, {
             method: 'POST',
             credentials: 'include',
             headers: {

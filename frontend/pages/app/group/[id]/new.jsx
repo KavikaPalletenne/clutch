@@ -136,7 +136,7 @@ export default function NewResourcePage(props) {
           return;
         }
 
-        fetch(`http://api.examclutch.com/resource/create`, {
+        fetch(`https://api.examclutch.com/resource/create`, {
             method: 'POST',
             credentials: 'include',
             headers: {
