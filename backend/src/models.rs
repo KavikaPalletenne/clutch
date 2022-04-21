@@ -135,9 +135,9 @@ pub struct GuildResponse {
 ///////////////////
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Resource {
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "_id", skip_serializing_if = "String::is_empty")]
     // rename to _id and use and document id in database
-    pub id: Option<String>,
+    pub id: String,
     pub user_id: String,  // owner
     pub group_id: String, // group it belongs to
     pub title: String,

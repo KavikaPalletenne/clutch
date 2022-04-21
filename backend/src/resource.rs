@@ -5,6 +5,8 @@ use chrono::{NaiveDateTime, Utc};
 use mongodb::bson::doc;
 use mongodb::Database;
 use std::str::FromStr;
+use meilisearch_sdk::document::Document;
+use meilisearch_sdk::indexes::Index;
 use nanoid::nanoid;
 use s3::Bucket;
 use tokio_stream::StreamExt;
@@ -15,7 +17,7 @@ use crate::middleware::authorize;
 // A resource is any document or link to a website.
 impl Resource {
     pub fn new(
-        id: Option<String>,
+        id: String,
         user_id: String,
         group_id: String,
         title: String,
@@ -39,6 +41,11 @@ impl Resource {
     }
 }
 
+impl Document for Resource {
+    type UIDType = String;
+    fn get_uid(&self) -> &Self::UIDType { &self.id }
+}
+
 /////////////////
 // CRUD Functions
 /////////////////
@@ -50,6 +57,7 @@ pub async fn create_resource(
     req: HttpRequest,
     database: web::Data<Database>,
     bucket: web::Data<Bucket>,
+    index: web::Data<Index>,
     resource: web::Json<ResourceForm>,
 ) -> impl Responder {
 
@@ -72,7 +80,7 @@ pub async fn create_resource(
 
     let group_id = resource_form.group_id.clone();
 
-    let id: Option<String> = Option::from(nanoid!());
+    let id: String = nanoid!();
     let resource = Resource::new(
         id,
         authorized.user_id.unwrap(),
@@ -117,6 +125,7 @@ pub async fn create_resource(
         };
     }
 
+    index.add_documents(&[resource], Some("_id")).await.unwrap();
 
     HttpResponse::Ok().body(serde_json::to_string::<CreatedResourceResponse>(&response).unwrap())
 }
@@ -262,9 +271,8 @@ pub async fn update_resource(
             return HttpResponse::Unauthorized().body("Unauthorized to edit resource.");
         }
 
-        let id = Option::from(resource_id);
         let resource = Resource::new(
-            id,
+            resource_id,
             authorized.user_id.unwrap(),
             resource_form.group_id,
             resource_form.title.clone(),
