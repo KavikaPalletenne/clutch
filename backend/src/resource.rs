@@ -276,12 +276,12 @@ pub async fn update_resource(
         let resource = Resource::new(
             resource_id,
             authorized.user_id.unwrap(),
-            resource_form.group_id,
+            r.group_id, // Keep resource in same group
             resource_form.title.clone(),
             resource_form.description.clone(),
             resource_form.subject.clone(),
             resource_form.tags.clone(),
-            resource_form.files.clone(),
+            r.files, // Keep old resource's files
             last_edited_at,
         );
 
@@ -305,7 +305,12 @@ pub async fn update_resource(
 }
 
 #[get("/resource/delete/{resource_id}")]
-pub async fn delete_resource(database: web::Data<Database>, index: web::Data<Index>, req: HttpRequest) -> impl Responder {
+pub async fn delete_resource(
+    database: web::Data<Database>,
+    index: web::Data<Index>,
+    bucket: web::Data<Bucket>,
+    req: HttpRequest
+) -> impl Responder {
     let resource_id = ObjectId::from_str(req.match_info().get("resource_id").unwrap()).unwrap();
 
     let filter = doc! {
@@ -346,7 +351,10 @@ pub async fn delete_resource(database: web::Data<Database>, index: web::Data<Ind
     }
 
     // Remove deleted resource from search index
-    index.delete_documents(&[resource_id]).await.unwrap();
+    index.delete_documents(&[resource_id.clone()]).await.unwrap();
+
+    // Remove deleted resource's files from index
+    bucket.delete_object(format!("/{}", resource_id));
 
     HttpResponse::Ok().body("Successfully deleted resource.")
 }
