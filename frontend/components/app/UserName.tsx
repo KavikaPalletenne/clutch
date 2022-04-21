@@ -39,7 +39,7 @@ export default function UserName(props: {
   
     useEffect(() => {
       setLoading(true)
-      fetch(`https://api.examclutch.com/api/user/${props.userId}`, {
+      fetch(`https://api.examclutch.com/api/user/username/${props.userId}`, {
         credentials: 'include'
       })
         .then((res) => res.json())

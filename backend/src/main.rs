@@ -29,24 +29,24 @@ mod search;
 #[actix_web::main]
 async fn main() -> Result<()> {
 
-    // // load ssl keys
-    // let mut config = ServerConfig::new(NoClientAuth::new());
+    // load ssl keys
+    let mut config = ServerConfig::new(NoClientAuth::new());
+
+    // // XPS file location
+    // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
+    // let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
     //
-    // // // XPS file location
-    // // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
-    // // let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
-    // //
-    // // PC file location
-    // let cert_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/cert.pem").unwrap());
-    // let key_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/key.pem").unwrap());
-    //
-    // let cert_chain = certs(cert_file).unwrap();
-    // let mut keys = pkcs8_private_keys(key_file).unwrap();
-    // if keys.is_empty() {
-    //     eprintln!("Could not locate PKCS 8 private keys.");
-    //     std::process::exit(1);
-    // }
-    // config.set_single_cert(cert_chain, keys.remove(0)).unwrap();
+    // PC file location
+    let cert_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/cert.pem").unwrap());
+    let key_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/key.pem").unwrap());
+
+    let cert_chain = certs(cert_file).unwrap();
+    let mut keys = pkcs8_private_keys(key_file).unwrap();
+    if keys.is_empty() {
+        eprintln!("Could not locate PKCS 8 private keys.");
+        std::process::exit(1);
+    }
+    config.set_single_cert(cert_chain, keys.remove(0)).unwrap();
 
     // Initialise JWT settings
     let jwt_secret = env::var("JWT_SECRET").expect("Error getting JWT_SECRET").to_string();
@@ -112,6 +112,7 @@ async fn main() -> Result<()> {
             // User Service
             .service(user::create_user)
             .service(user::get_user_by_id)
+            .service(user::get_username_by_id)
             .service(user::user_exists)
             .service(user::update_username_by_user_id)
             .service(user::update_email_by_user_id)
@@ -129,8 +130,8 @@ async fn main() -> Result<()> {
             .service(search::search)
             .service(search::search_blank)
     })
-        // .bind_rustls("0.0.0.0:443", config)?
-        .bind("0.0.0.0:6000")?
+        .bind_rustls("0.0.0.0:443", config)?
+        // .bind("0.0.0.0:6000")?
         .run()
         .await?;
 

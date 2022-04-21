@@ -102,6 +102,34 @@ pub async fn get_user_by_id(database: web::Data<Database>, req: HttpRequest) -> 
     HttpResponse::BadRequest().body("Invalid user id provided.")
 }
 
+#[get("/api/user/username/{id}")]
+pub async fn get_username_by_id(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
+    let user_id = req.match_info().get("id").unwrap().to_string();
+
+    let query = doc! {
+        "_id": user_id,
+    };
+
+    let result: Option<User> = database
+        .collection("users")
+        .find_one(query, None)
+        .await
+        .expect("Could not fetch user with provided id");
+
+    if let Some(user) = result {
+        return HttpResponse::Ok()
+            .header("Content-Type", "application/json")
+            .body(format!(
+                "{{
+                    username: \"{}\"
+                }}", user.username
+            ));
+    }
+
+    HttpResponse::BadRequest().body("Invalid user id provided.")
+}
+
+
 // Read
 #[get("/api/user/protected/userExists/{id}/{secret}")]
 pub async fn user_exists(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
