@@ -31,7 +31,7 @@ export default function ResourceCard(props: {
 }) {
 
     const resource = {
-        "id": props.propResource._id.$oid,
+        "id": props.propResource._id,
         "group_id": props.propResource.group_id,
         "author": props.propResource.user_id,
         "title": props.propResource.title,
@@ -43,9 +43,9 @@ export default function ResourceCard(props: {
     
     
     const listFiles = resource.files.map((f) => 
-        <div className="px-4 py-1" key={f.id}>
+        <div className="px-4 py-1" key={f.name}>
             {/* <Link href={ "https://examclutch.com/cdn/file/" + f.id }> */}
-            <Link href={ "http://127.0.0.1:443/cdn/file/" + f.id }> 
+            <Link href={ "http://api.examclutch.com/cdn/file/" + resource.id + '/' + f.name }> 
                 <a>
                     <div className="py-4 px-4 shadow-sm hover:shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", minWidth: "675px", maxWidth: "750px"}}>
                         

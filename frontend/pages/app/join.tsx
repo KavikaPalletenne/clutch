@@ -15,7 +15,7 @@ export default function Login() {
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault();
 
-        await fetch(`http://127.0.0.1:443/api/group/join/${groupId}`, {
+        await fetch(`http://api.scantag.com/api/group/join/${groupId}`, {
             method: "GET",
             credentials: 'include'  
         }).then(function(response) {

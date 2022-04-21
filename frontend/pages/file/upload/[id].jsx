@@ -96,7 +96,7 @@ export default function NewResourcePage(props) {
     const submit = async (e) => {
         e.preventDefault()
 
-        fetch(`http://127.0.0.1:443/resource/create`, {
+        fetch(`http://api.scantag.com/resource/create`, {
             method: 'POST',
             credentials: 'include',
             headers: {

@@ -48,7 +48,7 @@ export default function UserName(props: {
   
     useEffect(() => {
       setLoading(true)
-      fetch(`http://127.0.0.1:443/api/group/${props.groupId}`, {
+      fetch(`http://api.examclutch.com/api/group/${props.groupId}`, {
         credentials: 'include'
       })
         .then((res) => res.json())

@@ -106,7 +106,7 @@ export default function NewResourcePage(props) {
       var file;
       fileArray.forEach( (f) =>
       { file = {
-        "id": crypto.randomUUID()+'-'+f.name,
+        "name": f.name,
         "title": f.name,
         "size": f.size,
       }
@@ -136,7 +136,7 @@ export default function NewResourcePage(props) {
           return;
         }
 
-        fetch(`http://127.0.0.1:443/resource/create`, {
+        fetch(`http://api.scantag.com/resource/create`, {
             method: 'POST',
             credentials: 'include',
             headers: {

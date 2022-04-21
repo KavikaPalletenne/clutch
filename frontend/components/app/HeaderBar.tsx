@@ -24,12 +24,12 @@ export default function HeaderBar(props: {
     const [searchTerm, setSearchTerm] = useState('')
 
 
-    const searchTermUpdate = async (e) => {
+    const searchTermUpdate = async (e: React.ChangeEvent<any>) => {
         e.preventDefault()
         
         setSearchTerm(e.target.value)
 
-        let results = await fetch(`http://127.0.0.1:443/api/search/${props.groupId}/${e.target.value}`, {
+        let results = await fetch(`http://api.scantag.com/api/search/${props.groupId}/${e.target.value}`, {
             method: 'GET',
             credentials: 'include'
         }).then(r => r.json().then(function(data) {
