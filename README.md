@@ -23,3 +23,11 @@ ___
 
 ### Authentication
 - Discord OAuth2
+
+## Infrastructure
+### Backend
+- Server, Meilisearch, MongoDB - AWS Sydney (14.65 USD/month)
+- Object Storage - Linode Sydney (5 USD/month)
+
+### Frontend
+- Vercel (Free Tier)
