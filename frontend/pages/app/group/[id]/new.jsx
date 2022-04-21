@@ -40,8 +40,9 @@ export default function NewResourcePage(props) {
     const [files, setFiles] = useState([]);
     const [fileData, setFileData] = useState([]);
     const [fileUrls, setFileUrls] = useState('');
-
+    
     const [loading, setLoading] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
 
     const [tagInput, setTagInput] = useState('');
     const [tags, setTags] = useState([]);
@@ -131,7 +132,9 @@ export default function NewResourcePage(props) {
 
     const submit = async (e) => {
         e.preventDefault()
-
+        
+      if(!submitted) {
+        setSubmitted(true) 
         if (title.length == 0 || subject.length == 0) {
           return;
         }
@@ -177,6 +180,7 @@ export default function NewResourcePage(props) {
         .catch(err => {
           console.error('Request failed', err)
         });
+      }
     }
 
     return (
@@ -316,8 +320,8 @@ export default function NewResourcePage(props) {
                   
                   <button
                     type="submit"
-                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-exclpurple hover:shadow-md duration-150"
-                  >
+                    disabled={submitted}
+                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-exclpurple hover:shadow-md duration-150">
                     Create
                   </button>
                 </div>
