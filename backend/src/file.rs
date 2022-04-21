@@ -39,7 +39,7 @@ pub async fn update_resource_files(resource_id: String, file_name: String, file_
 
     if let Some(r) = old_resource {
         let file = FileReference {
-            id: file_id,
+            name: file_id,
             title: file_name,
             size: file_size,
         };
