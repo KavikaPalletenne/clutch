@@ -118,7 +118,7 @@ export default function NewResourcePage(props) {
 
       setListFiles(
       fileArray.map((f) => 
-      <div className={"pt-3"}>
+      <div key={f.name} className={"pt-3"}>
         <a className={"rounded-lg bg-white shadow-md py-1 px-1 text-black"}>{f.name}</a>
       </div>
       ))
@@ -297,7 +297,7 @@ export default function NewResourcePage(props) {
                       multiple={false}
                       accept={"image/*, .pdf, .doc, .docx"}
                       />
-                      <label for="fileUpload" className={styles.uploadButtonLabel}>Select files</label>
+                      <label htmlFor="fileUpload" className={styles.uploadButtonLabel}>Select files</label>
                       {listFiles}
                     </div>
                   </div>
