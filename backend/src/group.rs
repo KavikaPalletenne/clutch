@@ -138,6 +138,38 @@ pub async fn get_group_by_id(
     HttpResponse::BadRequest().body("Invalid group id provided.")
 }
 
+#[get("/api/group/name/{id}")]
+pub async fn get_group_name_by_id(
+    database: web::Data<Database>,
+    req: HttpRequest,
+) -> impl Responder {
+    // TODO: Maybe implement auth to check if the user can access this group using Discord API.
+    let group_id = req.match_info().get("id").unwrap().to_string();
+
+    let query = doc! {
+        "_id": group_id,
+    };
+
+    let result: Option<Group> = database
+        .collection("groups")
+        .find_one(query, None)
+        .await
+        .expect("Could not fetch group with provided id");
+
+    if let Some(group) = result {
+        return HttpResponse::Ok()
+            .header("Content-Type", "application/json")
+            .header("Access-Control-Allow-Origin", "*")
+            .body(format!(
+                "{{
+                    \"name\": \"{}\"
+                }}", group.name
+            ));
+    }
+
+    HttpResponse::BadRequest().body("Invalid group id provided.")
+}
+
 #[get("/api/group/join/{id}")]
 pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
     let group_id = req.match_info().get("id").unwrap().to_string();

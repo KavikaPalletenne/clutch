@@ -107,6 +107,7 @@ async fn main() -> Result<()> {
             // Group Service
             .service(group::create_group)
             .service(group::get_group_by_id)
+            .service(group::get_group_name_by_id)
             .service(group::join_group)
             .service(group::leave_group)
             // User Service
