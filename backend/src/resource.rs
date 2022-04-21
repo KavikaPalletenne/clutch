@@ -82,7 +82,7 @@ pub async fn create_resource(
 
     let id: String = nanoid!();
     let resource = Resource::new(
-        id,
+        id.clone(),
         authorized.user_id.unwrap(),
         resource_form.group_id,
         resource_form.title,
@@ -115,7 +115,7 @@ pub async fn create_resource(
     if let Some(f_vec) = files {
         let mut file_put_urls = Vec::<String>::new();
         for f in f_vec.iter() {
-            file_put_urls.push(bucket.presign_put(format!("/{}",&f.id).as_str(), 3600, None).unwrap());
+            file_put_urls.push(bucket.presign_put(format!("/{}/{}",id, &f.name).as_str(), 3600, None).unwrap());
         }
 
         response = CreatedResourceResponse {
@@ -125,6 +125,7 @@ pub async fn create_resource(
         };
     }
 
+    // Add created resource to search index
     index.add_documents(&[resource], Some("_id")).await.unwrap();
 
     HttpResponse::Ok().body(serde_json::to_string::<CreatedResourceResponse>(&response).unwrap())
@@ -235,6 +236,7 @@ pub async fn fetch_resource_by_user_id(
 #[post("/resource/update/{resource_id}")]
 pub async fn update_resource(
     database: web::Data<Database>,
+    index: web::Data<Index>,
     req: HttpRequest,
     resource_form: web::Json<ResourceForm>,
 ) -> impl Responder {
@@ -285,13 +287,16 @@ pub async fn update_resource(
 
         let result = database
             .collection::<Resource>("notes")
-            .replace_one(query, resource, None)
+            .replace_one(query, resource.clone(), None)
             .await
             .expect("Error updating document");
 
         if result.modified_count == 0 {
             return HttpResponse::BadRequest().body("No such resource exists.");
         }
+
+        // Add updated resource to search index (will auto update as id is same)
+        index.add_documents(&[resource], Some("_id")).await.unwrap();
 
         return HttpResponse::Ok().body("Successfully updated resource.");
     }
@@ -300,11 +305,11 @@ pub async fn update_resource(
 }
 
 #[get("/resource/delete/{resource_id}")]
-pub async fn delete_resource(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
+pub async fn delete_resource(database: web::Data<Database>, index: web::Data<Index>, req: HttpRequest) -> impl Responder {
     let resource_id = ObjectId::from_str(req.match_info().get("resource_id").unwrap()).unwrap();
 
     let filter = doc! {
-        "_id": resource_id,
+        "_id": resource_id.clone(),
     };
 
     let resource = database
@@ -339,6 +344,9 @@ pub async fn delete_resource(database: web::Data<Database>, req: HttpRequest) ->
     if result.deleted_count == 0 {
         return HttpResponse::BadRequest().body("No such resource exists.");
     }
+
+    // Remove deleted resource from search index
+    index.delete_documents(&[resource_id]).await.unwrap();
 
     HttpResponse::Ok().body("Successfully deleted resource.")
 }
