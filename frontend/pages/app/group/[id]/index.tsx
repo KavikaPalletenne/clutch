@@ -67,7 +67,7 @@ export default function GroupPage({ group }: {
 
         setUserId(Cookies.get('user_id'))
         
-        fetch(`http://api.scantag.com/api/resource/get_all/${group._id}`, {
+        fetch(`http://api.examclutch.com/api/resource/get_all/${group._id}`, {
             credentials: 'include'
         }).then(r => {
             if (r.status == 401) {
@@ -78,7 +78,7 @@ export default function GroupPage({ group }: {
             setFullResources(data as Resource[])
         })});
 
-        fetch(`http://api.scantag.com/api/user/${userId}`, {
+        fetch(`http://api.examclutch.com/api/user/${userId}`, {
             credentials: 'include'
         })
             .then((res) => res.json())
@@ -90,7 +90,7 @@ export default function GroupPage({ group }: {
     const searchTermUpdate = async (e: React.ChangeEvent<any>) => {
         e.preventDefault()
 
-        let results = await fetch(`http://api.scantag.com/api/search/${group._id}/${e.target.value}`, {
+        let results = await fetch(`http://api.examclutch.com/api/search/${group._id}/${e.target.value}`, {
             method: 'GET',
             credentials: 'include'
         }).then(r => r.json().then(function(data) {
@@ -181,7 +181,7 @@ export default function GroupPage({ group }: {
 
 export const getServerSideProps: GetServerSideProps = async (context: any) => {
     
-    const group_res = await fetch(`http://api.scantag.com/api/group/${context.params.id}`, {
+    const group_res = await fetch(`http://api.examclutch.com/api/group/${context.params.id}`, {
         credentials: 'include',
         headers: context.req ? {cookie: context.req.headers.cookie} : undefined
     });
@@ -211,7 +211,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
         }
     }
     
-    // const resources_res = await fetch(`http://api.scantag.com/api/resource/get_all/${context.params.id}`, {
+    // const resources_res = await fetch(`http://api.examclutch.com/api/resource/get_all/${context.params.id}`, {
     //     credentials: 'include'
     // });
     // const resources = await resources_res.json() as Resource[];

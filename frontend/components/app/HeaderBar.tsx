@@ -29,7 +29,7 @@ export default function HeaderBar(props: {
         
         setSearchTerm(e.target.value)
 
-        let results = await fetch(`http://api.scantag.com/api/search/${props.groupId}/${e.target.value}`, {
+        let results = await fetch(`http://api.examclutch.com/api/search/${props.groupId}/${e.target.value}`, {
             method: 'GET',
             credentials: 'include'
         }).then(r => r.json().then(function(data) {
