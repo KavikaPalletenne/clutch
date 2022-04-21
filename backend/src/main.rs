@@ -29,16 +29,16 @@ mod search;
 #[actix_web::main]
 async fn main() -> Result<()> {
 
-    // load ssl keys
-    let mut config = ServerConfig::new(NoClientAuth::new());
-
-    // // XPS file location
-    // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
-    // let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
+    // // load ssl keys
+    // let mut config = ServerConfig::new(NoClientAuth::new());
     //
+    // // // XPS file location
+    // // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
+    // // let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
+    // //
     // // PC file location
-    // // let cert_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/cert.pem").unwrap());
-    // // let key_file = &mut BufReader::new(File::open("C:/Development/Rust/clutch/backend/excl-api/keys/key.pem").unwrap());
+    // let cert_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/cert.pem").unwrap());
+    // let key_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/key.pem").unwrap());
     //
     // let cert_chain = certs(cert_file).unwrap();
     // let mut keys = pkcs8_private_keys(key_file).unwrap();
@@ -62,7 +62,9 @@ async fn main() -> Result<()> {
     let search_endpoint = env::var("SEARCH_ENDPOINT").expect("Error getting SEARCH_ENDPOINT").to_string();
     let search_index = meilisearch_sdk::client::Client::new(search_endpoint, "masterKey").index("resources");
     search_index.set_filterable_attributes(["group_id", "subject", "tags"]).await.unwrap();
-    search_index.set_primary_key("_id").await.unwrap();
+
+    // Initialise S3 Bucket
+    let bucket = init_bucket();
 
     println!("Starting server on port 443.");
     HttpServer::new(move || {
@@ -116,7 +118,7 @@ async fn main() -> Result<()> {
             .service(user::delete_user_by_id)
             .service(user::get_user_groups)
             //CDN
-            .data(init_bucket())
+            .data(bucket.clone())
             .service(cdn::download_file)
             .service(cdn::get_upload_url)
             .service(cdn::uploaded_file)
@@ -127,8 +129,8 @@ async fn main() -> Result<()> {
             .service(search::search)
             .service(search::search_blank)
     })
-        //.bind_rustls("0.0.0.0:443", config)?
-        .bind("0.0.0.0:443")?
+        // .bind_rustls("0.0.0.0:443", config)?
+        .bind("0.0.0.0:6000")?
         .run()
         .await?;
 
