@@ -27,8 +27,9 @@ pub fn init_bucket() -> Bucket {
     ).unwrap();
 
     let region_name = "dev".to_string();
-    let endpoint = "http://localhost:9000".to_string();
+    let endpoint = "http://api.examclutch.com:8080".to_string();
     let region = Region::Custom { region: region_name, endpoint };
 
+    println!("Bucket initialised");
     Bucket::new_with_path_style(bucket_name, region, credentials).unwrap()
 }
