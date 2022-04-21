@@ -121,7 +121,7 @@ pub async fn get_username_by_id(database: web::Data<Database>, req: HttpRequest)
             .header("Content-Type", "application/json")
             .body(format!(
                 "{{
-                    username: \"{}\"
+                    \"username\": \"{}\"
                 }}", user.username
             ));
     }
