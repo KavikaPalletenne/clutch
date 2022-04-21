@@ -164,12 +164,10 @@ pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl
             ) {
                 return HttpResponse::BadRequest().body("Already joined group.")
             }
-
-
+            
             group.members.push(
                 id.clone()
             );
-
 
             let update_result = database
                 .collection::<Group>("groups")

@@ -37,7 +37,7 @@ pub async fn user_registration(
         client_secret: env::var("CLIENT_SECRET").expect("Error").to_string(),
         grant_type: "authorization_code".to_string(),
         code: code.to_string(),
-        redirect_uri: "http://127.0.0.1:443/api/oauth2/redirect".to_string(),
+        redirect_uri: "https://api.examclutch.com/api/oauth2/redirect".to_string(),
     };
 
     // return HttpResponse::Ok()
@@ -101,29 +101,38 @@ pub async fn user_registration(
     // let auth_token = format!("auth_token={}; Path=/api; Max-Age=604800; HttpOnly; Secure; SameSite=None; Domain=127.0.0.1; Port=443; Port=3000;", token);
     // let user_id_token = format!("user_id={}; Path=/; Max-Age=604800; Domain=127.0.0.1; Port=443; Port=3000", user_id);
     let auth_cookie = Cookie::build("auth_token", token)
-        .domain("127.0.0.1")
+        .domain("examclutch.com")
         .path("/")
-        .secure(false)
+        .secure(true)
         .http_only(true)
         // .same_site(SameSite::Strict)
         .max_age(cookie::time::Duration::new(604800, 0))
         .finish();
-    let user_id_cookie = Cookie::build("user_id", user_id)
-        .domain("127.0.0.1")
+    let user_id_cookie = Cookie::build("user_id", user_id.clone())
+        .domain("examclutch.com")
         .path("/")
-        .secure(false)
+        .secure(true)
         .http_only(false)
         // .same_site(SameSite::None)
         .max_age(cookie::time::Duration::new(604800, 0))
         .finish();
+    // let client_user_id_cookie = Cookie::build("user_id", user_id)
+    //     .domain("examclutch.com")
+    //     .path("/")
+    //     .secure(false)
+    //     .http_only(false)
+    //     // .same_site(SameSite::None)
+    //     .max_age(cookie::time::Duration::new(604800, 0))
+    //     .finish();
 
 
 
     HttpResponse::PermanentRedirect()
         .header("Set-Cookie", auth_cookie.to_string())
         .header("Set-Cookie", user_id_cookie.to_string())
-        // .header("Location", "https://examclutch.com/app")
-        .header("Location", "http://localhost:3000/app")
+        // .header("Set-Cookie", client_user_id_cookie.to_string())
+        .header("Location", "https://examclutch.com/app")
+        //.header("Location", "http://127.0.0.1:3000/app")
         .body(
             format!("Logged in as user {:?}", current_user.username.clone())
         )
@@ -175,4 +184,22 @@ pub async fn get_user_guilds(
     }
 
     HttpResponse::BadRequest().body("Invalid token provided.")
+}
+
+pub fn authorize_local(
+    token: String,
+) -> AuthorizeResponse {
+    let decoded_claims = decode_auth_token(token);
+
+    if let Some(claims) = decoded_claims {
+        return AuthorizeResponse {
+            user_id: Option::from(claims.sub),
+            username: claims.username,
+        };
+    }
+
+    AuthorizeResponse {
+        user_id: Option::None,
+        username: String::new(),
+    }
 }
