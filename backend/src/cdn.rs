@@ -25,12 +25,13 @@ pub struct FileUploadRequest {
 }
 
 
-#[get("/cdn/file/{id}")]
+#[get("/cdn/file/{resource_id}/{id}")]
 pub async fn download_file(req: HttpRequest, bucket: web::Data<Bucket>) -> impl Responder {
     // TODO: Think of a way to add authentication - maybe with a data struct that has user id or group id
+    let resource_id = req.match_info().get("resource_id").unwrap();
     let id = req.match_info().get("id").unwrap();
 
-    let file_download_url = bucket.presign_get(format!("/{}", id), 3600).unwrap(); // 1 hour expiry
+    let file_download_url = bucket.presign_get(format!("/{}/{}", resource_id, id), 3600).unwrap(); // 1 hour expiry
     HttpResponse::PermanentRedirect()
         .header("Location", file_download_url)
         .body("Unable to find file.")
