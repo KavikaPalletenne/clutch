@@ -32,7 +32,7 @@ pub async fn update_resource_files(resource_id: String, file_name: String, file_
     };
 
     let old_resource = database
-        .collection::<Resource>("notes")
+        .collection::<Resource>("resources")
         .find_one(query.clone(), None)
         .await
         .expect("Error fetching resource from database");
@@ -60,7 +60,7 @@ pub async fn update_resource_files(resource_id: String, file_name: String, file_
         };
 
         let _ = database
-            .collection::<Resource>("notes")
+            .collection::<Resource>("resources")
             .replace_one(query, new_resource, None)
             .await
             .expect("Error updating document");
