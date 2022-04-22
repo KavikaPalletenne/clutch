@@ -132,6 +132,11 @@ export default function GroupPage({ group }: {
                                 />
                         </div>
                         <h1 style={{fontFamily: "Roboto Mono"}} className="text-white text-lg">Hey {userName}!</h1>
+                        <Link href="/api/logout">
+                            <a>
+                                <h1 style={{fontFamily: "Roboto Mono"}} className="text-white text-lg">Logout</h1>
+                            </a>
+                        </Link>
                     </div>
 
                 </div>
