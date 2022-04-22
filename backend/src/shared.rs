@@ -4,7 +4,7 @@ use actix_web::{HttpResponse, Responder, get};
 /// Returns a web page indicating this is the API hostname.
 pub async fn easter_egg() -> impl Responder {
     HttpResponse::Ok()
-        .header("Content-Type", "text/html")
+        .append_header(("Content-Type", "text/html"))
         .body("
 
         <!DOCTYPE html>

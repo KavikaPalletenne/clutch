@@ -1,5 +1,4 @@
 use uuid::Uuid;
-use bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]

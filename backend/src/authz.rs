@@ -1,4 +1,4 @@
-use actix_web::{HttpRequest, Responder, web, get, HttpResponse};
+use actix_web::{HttpRequest, Responder, web, HttpResponse};
 use bson::doc;
 use mongodb::Database;
 use crate::middleware::authorize;
@@ -16,6 +16,6 @@ pub async fn check_user_group_viewing_perms(req: HttpRequest, database: web::Dat
     }
 
     HttpResponse::BadRequest()
-        .header("Content-Type", "text/plain")
+        .append_header(("Content-Type", "text/plain"))
         .body("Not logged in.")
 }

@@ -1,15 +1,12 @@
-use serde::{Deserialize, Serialize};
-use bson::oid::ObjectId;
 use actix_web::{get, web, Responder, HttpRequest, HttpResponse};
 use crate::models::{AuthorizationCodeGrantRedirect, AccessTokenResponse, AccessTokenRequest, DiscordUser, AuthorizeResponse, PartialGuild, NewUserRequest};
 use jsonwebtoken::EncodingKey;
 use std::{env, time};
 use crate::jwt::{create_auth_token, decode_auth_token};
-use actix_web::client::{Client};
-use std::str;
-use cookie::{Cookie, SameSite};
+use awc::{Client, Connector};
+use cookie::{Cookie};
 use mongodb::Database;
-use crate::user::{create_user_service, user_exists_service, User};
+use crate::user::{create_user_service, user_exists_service};
 
 #[get("/api/oauth2/redirect")]
 pub async fn user_registration(
@@ -21,7 +18,7 @@ pub async fn user_registration(
     let encoding_key = encoding_key.get_ref();
     // let http_client = Client::default();
 
-    let connector = awc::Connector::new()
+    let connector = Connector::new()
         // This is the timeout setting for connector. It's 1 second by default
         .timeout(time::Duration::from_secs(30))
         .finish();
@@ -41,7 +38,7 @@ pub async fn user_registration(
     };
 
     // return HttpResponse::Ok()
-    //     .header("Content-Type", "application/json")
+    //     .append_header("Content-Type", "application/json")
     //     .body(serde_json::to_string::<AccessTokenRequest>(&body).unwrap());
 
     // println!("Encoded Body: {:?}", body);
@@ -53,7 +50,7 @@ pub async fn user_registration(
     let bearer_token = format!("Bearer {}", response.access_token);
     // let current_user = http_client
     //     .get("https://discord.com/api/oauth2/@me")
-    //     .header("Authorization", bearer_token)
+    //     .append_header("Authorization", bearer_token)
     //     .send().await.expect("Error sending GET request")
     //     .json::<AuthorizationInformation>().await.expect("Error parsing JSON");
 
@@ -128,11 +125,11 @@ pub async fn user_registration(
 
 
     HttpResponse::PermanentRedirect()
-        .header("Set-Cookie", auth_cookie.to_string())
-        .header("Set-Cookie", user_id_cookie.to_string())
-        // .header("Set-Cookie", client_user_id_cookie.to_string())
-        .header("Location", "https://examclutch.com/app")
-        //.header("Location", "http://127.0.0.1:3000/app")
+        .append_header(("Set-Cookie", auth_cookie.to_string()))
+        .append_header(("Set-Cookie", user_id_cookie.to_string()))
+        // .append_header("Set-Cookie", client_user_id_cookie.to_string())
+        .append_header(("Location", "https://examclutch.com/app"))
+        //.append_header("Location", "http://127.0.0.1:3000/app")
         .body(
             format!("Logged in as user {:?}", current_user.username.clone())
         )
@@ -148,7 +145,7 @@ pub async fn authorize(
 
     if let Some(claims) = decoded_claims {
         return HttpResponse::Ok()
-            .header("Content-Type", "application/json")
+            .append_header(("Content-Type", "application/json"))
             .body(serde_json::to_string(
             &AuthorizeResponse {
                 user_id: Option::from(claims.sub),
@@ -179,7 +176,7 @@ pub async fn get_user_guilds(
             .json::<Vec::<PartialGuild>>().await.expect("Error parsing JSON");
 
         return HttpResponse::Ok()
-            .header("Content-Type", "application/json")
+            .append_header(("Content-Type", "application/json"))
             .body(serde_json::to_string(&current_user_guilds).unwrap());
     }
 

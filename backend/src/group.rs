@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 use actix_web::{HttpRequest, web, Responder, HttpResponse, post, get};
 use mongodb::Database;
 use mongodb::bson::doc;
-use crate::models::{NewGroupRequest, User, GroupUser};
-use crate::middleware::{authorize, find_and_remove_string_from_vector, find_and_remove_user_from_vector};
+use crate::models::{NewGroupRequest, User};
+use crate::middleware::{authorize, find_and_remove_string_from_vector};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Group {
@@ -130,8 +130,8 @@ pub async fn get_group_by_id(
 
     if let Some(group) = result {
         return HttpResponse::Ok()
-            .header("Content-Type", "application/json")
-            .header("Access-Control-Allow-Origin", "*")
+            .append_header(("Content-Type", "application/json"))
+            .append_header(("Access-Control-Allow-Origin", "*"))
             .body(serde_json::to_string(&group).unwrap());
     }
 
@@ -158,8 +158,8 @@ pub async fn get_group_name_by_id(
 
     if let Some(group) = result {
         return HttpResponse::Ok()
-            .header("Content-Type", "application/json")
-            .header("Access-Control-Allow-Origin", "*")
+            .append_header(("Content-Type", "application/json"))
+            .append_header(("Access-Control-Allow-Origin", "*"))
             .body(format!(
                 "{{
                     \"name\": \"{}\"
@@ -210,7 +210,7 @@ pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl
 
             if update_result.modified_count == 0 {
                 return HttpResponse::BadRequest()
-                    .header("Content-Type", "text/plain")
+                    .append_header(("Content-Type", "text/plain"))
                     .body("Error joining group.");
             }
 
@@ -233,17 +233,17 @@ pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl
 
             if user_update_response.modified_count == 0 {
                 return HttpResponse::BadRequest()
-                    .header("Content-Type", "text/plain")
+                    .append_header(("Content-Type", "text/plain"))
                     .body("Error joining group.");
             }
 
             return HttpResponse::Ok()
-                .header("Content-Type", "text/plain")
+                .append_header(("Content-Type", "text/plain"))
                 .body("Successfully joined group")
         }
     }
     HttpResponse::Unauthorized()
-        .header("Content-Type", "text/plain")
+        .append_header(("Content-Type", "text/plain"))
         .body("Not logged in.")
 }
 
@@ -291,7 +291,7 @@ pub async fn leave_group(database: web::Data<Database>, req: HttpRequest) -> imp
 
             if update_result.modified_count == 0 {
                 return HttpResponse::BadRequest()
-                    .header("Content-Type", "text/plain")
+                    .append_header(("Content-Type", "text/plain"))
                     .body("Error leaving group.");
             }
 
@@ -317,21 +317,21 @@ pub async fn leave_group(database: web::Data<Database>, req: HttpRequest) -> imp
 
             if user_update_response.modified_count == 0 {
                 return HttpResponse::BadRequest()
-                    .header("Content-Type", "text/plain")
+                    .append_header(("Content-Type", "text/plain"))
                     .body("Error leaving group.");
             }
 
 
             return HttpResponse::Ok()
-                .header("Content-Type", "text/plain")
+                .append_header(("Content-Type", "text/plain"))
                 .body("Successfully left group.");
         }
         return HttpResponse::BadRequest()
-            .header("Content-Type", "text/plain")
+            .append_header(("Content-Type", "text/plain"))
             .body("Could not find group.");
     }
     HttpResponse::Unauthorized()
-        .header("Content-Type", "text/plain")
+        .append_header(("Content-Type", "text/plain"))
         .body("Not logged in.")
 }
 

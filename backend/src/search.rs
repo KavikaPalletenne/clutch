@@ -29,7 +29,7 @@ pub async fn search(
 
 
     HttpResponse::Ok()
-        .header("Content-Type", "application/json")
+        .append_header(("Content-Type", "application/json"))
         .body(serde_json::to_string::<Vec<Resource>>(&resources).unwrap())//serde_json::to_string::<Vec<Resource>>(&hits).unwrap())
 }
 
@@ -40,6 +40,6 @@ pub async fn search_blank(
 ) -> impl Responder {
 
     HttpResponse::Ok()
-        .header("Content-Type", "application/json")
+        .append_header(("Content-Type", "application/json"))
         .body(serde_json::to_string::<Vec<Resource>>(&Vec::<Resource>::new()).unwrap())//serde_json::to_string::<Vec<Resource>>(&hits).unwrap())
 }

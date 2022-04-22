@@ -1,4 +1,4 @@
-use crate::models::{CreatedResourceResponse, FileReference, IdResponse, NewResourceResponse, Resource, ResourceForm, Tag};
+use crate::models::{CreatedResourceResponse, FileReference, Resource, ResourceForm};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use bson::oid::ObjectId;
 use chrono::{NaiveDateTime, Utc};
@@ -10,7 +10,6 @@ use meilisearch_sdk::indexes::Index;
 use nanoid::nanoid;
 use s3::Bucket;
 use tokio_stream::StreamExt;
-use crate::file::direct_upload;
 use crate::group::check_user_in_group;
 use crate::middleware::authorize;
 
@@ -150,7 +149,7 @@ pub async fn fetch_resource_by_id(
 
     if let Some(resource) = result {
         return HttpResponse::Ok()
-            .header("Content-Type", "application/json")
+            .append_header(("Content-Type", "application/json"))
             .body(serde_json::to_string(&resource).unwrap());
     }
 
@@ -198,7 +197,7 @@ pub async fn fetch_resource_by_group_id(
     }
 
     HttpResponse::Ok()
-        .header("Content-Type", "application/json")
+        .append_header(("Content-Type", "application/json"))
         .body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
 }
 
@@ -229,7 +228,7 @@ pub async fn fetch_resource_by_user_id(
     }
 
     HttpResponse::Ok()
-        .header("Content-Type", "application/json")
+        .append_header(("Content-Type", "application/json"))
         .body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
 }
 

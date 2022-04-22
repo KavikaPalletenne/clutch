@@ -109,7 +109,7 @@ pub async fn get_user_by_id(database: web::Data<Database>, req: HttpRequest) -> 
 
     if let Some(user) = result {
         return HttpResponse::Ok()
-            .header("Content-Type", "application/json")
+            .append_header(("Content-Type", "application/json"))
             .body(serde_json::to_string(&user).unwrap());
     }
 
@@ -132,7 +132,7 @@ pub async fn get_username_by_id(database: web::Data<Database>, req: HttpRequest)
 
     if let Some(user) = result {
         return HttpResponse::Ok()
-            .header("Content-Type", "application/json")
+            .append_header(("Content-Type", "application/json"))
             .body(format!(
                 "{{
                     \"username\": \"{}\"
@@ -167,7 +167,7 @@ pub async fn user_exists(database: web::Data<Database>, req: HttpRequest) -> imp
 
     if let Some(_) = result {
         return HttpResponse::Ok()
-            .header("Content-Type", "application/json")
+            .append_header(("Content-Type", "application/json"))
             .body(serde_json::to_string(
             &UserExistsResponse {
                 exists: true,
@@ -176,7 +176,7 @@ pub async fn user_exists(database: web::Data<Database>, req: HttpRequest) -> imp
     }
 
     HttpResponse::Ok()
-        .header("Content-Type", "application/json")
+        .append_header(("Content-Type", "application/json"))
         .body(serde_json::to_string(
         &UserExistsResponse {
             exists: false,
@@ -367,11 +367,11 @@ pub async fn get_user_groups(database: web::Data<Database>, req: HttpRequest) ->
 
     if let Some(u) = user {
         return HttpResponse::Ok()
-            .header("Content-Type", "application/json")
+            .append_header(("Content-Type", "application/json"))
             .body(serde_json::to_string::<Vec<String>>(&u.groups).unwrap());
     }
 
     HttpResponse::BadRequest()
-        .header("Content-Type", "text/plain")
+        .append_header(("Content-Type", "text/plain"))
         .body("User does not exist.")
 }

@@ -1,11 +1,11 @@
-use actix_web::{HttpRequest, HttpMessage};
-use actix_web::client::Client;
+use actix_web::{HttpRequest};
+use awc::Client;
 use crate::models::{AuthorizeResponse, GroupUser};
 use crate::oauth2::authorize_local;
 
 // returns user id if authorized or None user id if invalid
 pub async fn authorize(req: &HttpRequest) -> AuthorizeResponse {
-    let http_client = Client::default();
+
     let auth_token = req.cookie("auth_token");
 
     if let Some(token) = auth_token {

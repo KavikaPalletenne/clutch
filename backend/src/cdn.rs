@@ -1,11 +1,10 @@
 use std::str::FromStr;
-use actix_web::{HttpRequest, Responder, get, post, HttpResponse, web};
+use actix_web::{HttpRequest, Responder, get, HttpResponse, web};
 use mongodb::Database;
 use s3::Bucket;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use crate::file::{direct_upload, DirectUploadResponse, update_resource_files};
-use crate::middleware::authorize;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CdnFile {
@@ -27,13 +26,13 @@ pub struct FileUploadRequest {
 
 #[get("/cdn/file/{resource_id}/{id}")]
 pub async fn download_file(req: HttpRequest, bucket: web::Data<Bucket>) -> impl Responder {
-    // TODO: Think of a way to add authentication - maybe with a data struct that has user id or group id
+    // TODO: Check user is in group
     let resource_id = req.match_info().get("resource_id").unwrap();
     let id = req.match_info().get("id").unwrap();
 
-    let file_download_url = bucket.presign_get(format!("/{}/{}", resource_id, id), 3600).unwrap(); // 1 hour expiry
+    let file_download_url = bucket.presign_get(format!("/{}/{}", resource_id, id), 3600, None).unwrap(); // 1 hour expiry
     HttpResponse::PermanentRedirect()
-        .header("Location", file_download_url)
+        .append_header(("Location", file_download_url))
         .body("Unable to find file.")
 }
 
@@ -51,7 +50,7 @@ pub async fn get_upload_url(
     let response = direct_upload(group_id, &bucket);
 
     HttpResponse::Ok()
-        .header("Content-Type", "application/json")
+        .append_header(("Content-Type", "application/json"))
         .body(serde_json::to_string::<DirectUploadResponse>(&response).unwrap())
 }
 

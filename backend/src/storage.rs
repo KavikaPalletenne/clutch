@@ -31,5 +31,6 @@ pub fn init_bucket() -> Bucket {
     let region = Region::Custom { region: region_name, endpoint };
 
     println!("Bucket initialised");
-    Bucket::new_with_path_style(bucket_name, region, credentials).unwrap()
+    //Bucket::new_with_path_style(bucket_name, region, credentials).unwrap()
+    Bucket::new(bucket_name, region, credentials).unwrap().with_path_style()
 }
