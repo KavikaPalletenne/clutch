@@ -31,6 +31,16 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     
     
     let cookies = new Cookies(req, res)
+
+    if (cookies.get("user_id") == undefined) {
+        return {
+            redirect: {
+                destination: '/api/login',
+                permanent: false,
+            }
+        }
+    }
+
     const groups = await fetch(`https://api.examclutch.com/api/user/get_user_groups/${cookies.get("user_id")}`, {
         credentials: 'include',
         headers: req ? {cookie: req.cookies.value } : undefined
