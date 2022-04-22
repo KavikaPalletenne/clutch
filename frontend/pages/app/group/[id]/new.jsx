@@ -32,6 +32,7 @@ export default function NewResourcePage(props) {
     var isMounted = false
     var userIdLoaded = false
     var loggedIn = false
+    var url = `/app/group/${id}`
 
     const [isKeyReleased, setIsKeyReleased] = useState(false);
 
@@ -62,6 +63,7 @@ export default function NewResourcePage(props) {
         }
         CheckLoggedIn()
         */
+        
         setAuthToken(localStorage.getItem('auth_token'))
     }, [])
 
@@ -164,6 +166,7 @@ export default function NewResourcePage(props) {
           console.log(`Urls: ${fileUrls}`)
           setLoading(true)
           setCancelUrl(`/api/resource/cancel/${data.group_id}/${data['resource_id'].replace(/^"(.*)"$/, '$1')}/delete`)
+          url = `/api/resource/cancel/${data.group_id}/${data['resource_id'].replace(/^"(.*)"$/, '$1')}/delete`
 
           return await axios.request({
           method: "put", 
@@ -328,7 +331,7 @@ export default function NewResourcePage(props) {
                 </div>
                 
                 <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                  <Link href={cancelUrl}>
+                  <Link href={url}>
                   <a className="pr-1">
                   <button
                     className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:shadow-md duration-150"
