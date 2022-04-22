@@ -1,41 +1,18 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
+import Cookies from 'cookies'
+import { GetServerSideProps } from "next";
+import { NextResponse } from 'next/server';
+import { ServerResponse } from 'http';
 
 export default function App() {
-
-    const router = useRouter()
-    const [groups, setGroups] = useState([])
-    const [userId, setUserId] = useState(Cookies.get('user_id'))
-
-    useEffect(() => {
-
-        setUserId(Cookies.get('user_id'))
-
-        fetch(`https://api.examclutch.com/api/user/get_user_groups/${userId}`, {
-            credentials: 'include'
-        })
-        .then((res) => res.json())
-        .then((data) => {
-            setGroups(data)
-            if (data.length == 0) {
-                router.push("/app/join")
-            }
-    
-            if (data.length != 0) {
-                router.push(`/app/group/${groups[0]}`)
-            }
-        })
-
-        
-    })
 
 
     return(
         <div className="bg-bg-gray-50">
             <Head>
-                <title>Dashboard - ExamClutch</title>
+                <title>Redirecting... - ExamClutch</title>
                 <meta name="description" content="Exam Clutch Dashboard" />
                 <meta name="robots" content="noindex" />
         <       link rel="icon" href="/favicon.png" />
@@ -50,4 +27,44 @@ export default function App() {
 
         </div>
     )
+}
+
+export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
+    
+    
+    let cookies = new Cookies(req, res)
+    const groups = await fetch(`https://api.examclutch.com/api/user/get_user_groups/${cookies.get("user_id")}`, {
+        credentials: 'include',
+        headers: req ? {cookie: req.cookies.value } : undefined
+    });
+    
+    if (!groups.ok) {
+        if (groups.status == 401) {
+            return {
+                redirect: {
+                    destination: '/api/login',
+                    permanent: false,
+                }
+            }
+        }
+    }
+    
+    const user_groups = await groups.json() as string[];
+
+    if (!user_groups) {
+        return {
+            redirect: {
+                destination: '/api/login',
+                permanent: false,
+            }
+        }
+    }
+    
+
+    return {
+        redirect: {
+            destination: `/app/group/${user_groups[0]}`,
+            permanent: false,
+        }
+    }
 }
