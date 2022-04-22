@@ -83,6 +83,20 @@ pub async fn create_user_service(user_request : NewUserRequest, database: &Datab
 pub async fn get_user_by_id(database: web::Data<Database>, req: HttpRequest) -> impl Responder {
     let user_id = req.match_info().get("id").unwrap().to_string();
 
+    //////////////////////////////////////////////////////////////////////////
+    // Auth //
+    let authorized = authorize(&req).await;
+
+    if authorized.user_id.is_none() {
+        return HttpResponse::Unauthorized().body("Not logged in.");
+    }
+
+    if authorized.user_id.unwrap().ne(&user_id) {
+        return HttpResponse::Unauthorized().body("Logged in user does not have permission to view requested user.");
+    }
+    //////////////////////////////////////////////////////////////////////////
+
+
     let query = doc! {
         "_id": user_id,
     };
