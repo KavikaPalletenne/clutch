@@ -3,8 +3,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Cookies from 'cookies'
 import { GetServerSideProps } from "next";
-import { NextResponse } from 'next/server';
-import { ServerResponse } from 'http';
 
 export default function App() {
 
