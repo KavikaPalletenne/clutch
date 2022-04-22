@@ -8,6 +8,7 @@ import { FileReference } from "./index"
 import FileRender from "../../../../components/app/FileRender"
 import { AiOutlineClose } from "react-icons/ai"
 import { randomUUID } from 'crypto';
+import axios from 'axios';
 
 export default function NewResourcePage(props) {
     
@@ -40,6 +41,8 @@ export default function NewResourcePage(props) {
     const [files, setFiles] = useState([]);
     const [fileData, setFileData] = useState([]);
     const [fileUrls, setFileUrls] = useState('');
+
+    const [cancelUrl, setCancelUrl] = useState(`/app/group/${id}`)
     
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -47,6 +50,7 @@ export default function NewResourcePage(props) {
     const [tagInput, setTagInput] = useState('');
     const [tags, setTags] = useState([]);
     const [listFiles, setListFiles] = useState(<h1></h1>);
+    const [fileProgress, setFileProgress] = useState(0.0);
 
     useEffect(() => {
         /**
@@ -134,12 +138,13 @@ export default function NewResourcePage(props) {
         e.preventDefault()
         
       if(!submitted) {
-        setSubmitted(true) 
+        setSubmitted(true)
+        setFileProgress(0.0) 
         if (title.length == 0 || subject.length == 0) {
           return;
         }
 
-        fetch(`https://api.examclutch.com/resource/create`, {
+        fetch(`https://api.examclutch.com/api/resource/create`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -154,23 +159,35 @@ export default function NewResourcePage(props) {
                 'tags': tags,
                 'files': files,
             })
-        }).then(r =>  r.json().then(function(data) {
+        }).then(r =>  r.json().then(async function(data) {
           setFileUrls(data['file_put_urls'][0])
           console.log(`Urls: ${fileUrls}`)
           setLoading(true)
-          return fetch(`${data['file_put_urls'][0]}`, {
-                method: 'PUT',
-                credentials: 'include',
-                headers: {           
-                },
-                body: fileData[0]
-          });
+          setCancelUrl(`/api/resource/cancel/${data.group_id}/${data['resource_id'].replace(/^"(.*)"$/, '$1')}/delete`)
+
+          return await axios.request({
+          method: "put", 
+          url: `${data['file_put_urls'][0]}`, 
+          data: fileData[0],
+          onUploadProgress: (p) => {
+            console.log(p); 
+            setFileProgress(p.loaded/p.total);
+          }
+          })
+          // return fetch(`${data['file_put_urls'][0]}`, {
+          //       method: 'PUT',
+          //       credentials: 'include',
+          //       headers: {           
+          //       },
+          //       body: fileData[0]
+          // });
         }
         ))
         .then(response => {
           console.log('File Upload Status:' + response.status)
           setLoading(false)
           if (response.status == 200) {
+            setFileProgress(1.0)
             router.push(`/app/group/${id}`)
           }
           if (response.status == 401) {
@@ -303,12 +320,15 @@ export default function NewResourcePage(props) {
                       />
                       <label htmlFor="fileUpload" className={styles.uploadButtonLabel}>Select files</label>
                       {listFiles}
+                      <div>
+                        Upload Progress: {fileProgress *100 + "%"}
+                      </div>
                     </div>
                   </div>
                 </div>
                 
                 <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                  <Link href={`/app/group/${id}`}>
+                  <Link href={cancelUrl}>
                   <a className="pr-1">
                   <button
                     className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:shadow-md duration-150"
