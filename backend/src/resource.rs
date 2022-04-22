@@ -126,7 +126,7 @@ pub async fn create_resource(
     }
 
     // Add created resource to search index
-    index.add_documents(&[resource], Some("_id")).await.unwrap();
+    let _meili_result = index.add_documents(&[resource], Some("_id")).await.unwrap();
 
     HttpResponse::Ok().body(serde_json::to_string::<CreatedResourceResponse>(&response).unwrap())
 }
@@ -296,7 +296,7 @@ pub async fn update_resource(
         }
 
         // Add updated resource to search index (will auto update as id is same)
-        index.add_documents(&[resource], Some("_id")).await.unwrap();
+        let _meili_result = index.add_documents(&[resource], Some("_id")).await.unwrap();
 
         return HttpResponse::Ok().body("Successfully updated resource.");
     }
@@ -351,10 +351,10 @@ pub async fn delete_resource(
     }
 
     // Remove deleted resource from search index
-    index.delete_documents(&[resource_id.clone()]).await.unwrap();
+    let _meili_result= index.delete_documents(&[resource_id.clone()]).await.unwrap();
 
     // Remove deleted resource's files from index
-    bucket.delete_object(format!("/{}", resource_id)).await;
+    let _bucket_result = bucket.delete_object(format!("/{}", resource_id)).await;
 
     HttpResponse::Ok().body("Successfully deleted resource.")
 }
