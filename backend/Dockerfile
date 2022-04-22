@@ -1,12 +1,38 @@
 FROM rust:1.58 as builder
 
-RUN cargo new --bin excl-api
+RUN USER=root cargo new --bin excl-api
 WORKDIR ./excl-api
 COPY ./Cargo.toml ./Cargo.toml
-COPY ./src ./src
+RUN cargo build --release
+RUN rm src/*.rs
+
+ADD . ./
+
+RUN rm ./target/release/deps/excl_api*
 RUN cargo build --release
 
 
-FROM centos:latest
-COPY --from=builder /excl-api/target/release/excl-api ./excl-api
+FROM debian:buster-slim
+ARG APP=/usr/src/app
+
+RUN apt-get update \
+    && apt-get install -y ca-certificates tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+EXPOSE 8000
+
+ENV TZ=Etc/UTC \
+    APP_USER=appuser
+
+RUN groupadd $APP_USER \
+    && useradd -g $APP_USER $APP_USER \
+    && mkdir -p ${APP}
+
+COPY --from=builder /excl-api/target/release/excl-api ${APP}/excl-api
+
+RUN chown -R $APP_USER:$APP_USER ${APP}
+
+USER $APP_USER
+WORKDIR ${APP}
+
 CMD ["./excl-api"]
