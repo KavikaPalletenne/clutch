@@ -11,7 +11,7 @@ export default function handler(
 ) {
   res.status(301)
     .setHeader("Location", "https://examclutch.com/")
-    .setHeader("Cookie", "auth_token=; path=/")
-    .setHeader("Cookie", "user_id=; path=/")
-    .json({ message: 'Discord Login' })
+    .setHeader("Set-Cookie", "auth_token=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT")
+    .setHeader("Set-Cookie", "user_id=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT")
+    .json({ message: 'Logged Out' })
 }
