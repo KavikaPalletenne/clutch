@@ -78,7 +78,7 @@ export default function GroupPage({ group }: {
             setFullResources(data as Resource[])
         })});
 
-        fetch(`https://api.examclutch.com/api/user/${userId}`, {
+        fetch(`https://api.examclutch.com/api/user/username/${userId}`, {
             credentials: 'include'
         })
             .then((res) => res.json())
