@@ -19,12 +19,15 @@ export default async function handler(
     })
 
     if (response.status == 200) {
-    res.status(301)
+      res.status(301)
         .setHeader("Location", `https://examclutch.com/app/${group_id}`)
         .json({ message: 'Deleted resource' })
+      return;
     }
 
-    res.status(301)
+    if (response.status != 200) {
+      res.status(301)
         .setHeader("Location", `https://examclutch.com/`)
         .json({ message: 'Could not delete resource' })
+    }
 }
