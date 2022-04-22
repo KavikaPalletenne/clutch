@@ -174,7 +174,7 @@ export default function NewResourcePage(props) {
             router.push(`/app/group/${id}`)
           }
           if (response.status == 401) {
-            router.push(`/api/login`)
+            router.push(`/app`)
           }
         })
         .catch(err => {

@@ -32,7 +32,19 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     
     let cookies = new Cookies(req, res)
 
-    if (cookies.get("user_id") == undefined) {
+    if (cookies.get("user_id") == undefined || cookies.get("auth_token") == undefined) {
+        return {
+            redirect: {
+                destination: '/api/login',
+                permanent: false,
+            }
+        }
+    }
+
+    let check_login = await fetch(`https://api.examclutch.com/api/oauth2/authorize/${cookies.get("auth_token")}`)
+
+    // If not valid auth_token, then prompt to login
+    if (check_login.status != 200) {
         return {
             redirect: {
                 destination: '/api/login',
@@ -53,6 +65,12 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
                     destination: '/api/login',
                     permanent: false,
                 }
+            }
+        }
+        return {
+            redirect: {
+                destination: '/api/login',
+                permanent: false,
             }
         }
     }

@@ -23,7 +23,7 @@ export default function Login() {
                 router.push(`/app/group/${groupId}`)
             }
             if (response.status == 401) {
-                router.push(`/api/login`)
+                router.push(`/app`)
             }
         })
     }
