@@ -52,7 +52,7 @@ impl Document for Resource {
 
 //TODO: Add Authorization checks (using authorization service) for all crud functions (check if the user has authorization to create/read/update/delete the resources)
 
-#[post("/resource/create")]
+#[post("/api/resource/create")]
 pub async fn create_resource(
     req: HttpRequest,
     database: web::Data<Database>,
@@ -131,7 +131,7 @@ pub async fn create_resource(
     HttpResponse::Ok().body(serde_json::to_string::<CreatedResourceResponse>(&response).unwrap())
 }
 
-#[get("/resource/get/{resource_id}")]
+#[get("/api/resource/get/{resource_id}")]
 pub async fn fetch_resource_by_id(
     database: web::Data<Database>,
     req: HttpRequest,
@@ -202,7 +202,7 @@ pub async fn fetch_resource_by_group_id(
         .body(serde_json::to_string::<Vec<Resource>>(&results).unwrap())
 }
 
-#[get("/resource/getByUserId/{user_id}")]
+#[get("/api/resource/getByUserId/{user_id}")]
 pub async fn fetch_resource_by_user_id(
     database: web::Data<Database>,
     req: HttpRequest,
@@ -263,7 +263,7 @@ pub async fn update_resource(
     };
 
     let old_resource = database
-        .collection::<Resource>("notes")
+        .collection::<Resource>("resources")
         .find_one(query.clone(), None)
         .await
         .expect("Error fetching resource from database");
@@ -286,7 +286,7 @@ pub async fn update_resource(
         );
 
         let result = database
-            .collection::<Resource>("notes")
+            .collection::<Resource>("resources")
             .replace_one(query, resource.clone(), None)
             .await
             .expect("Error updating document");
@@ -304,21 +304,21 @@ pub async fn update_resource(
     HttpResponse::BadRequest().body("No such resource exists.")
 }
 
-#[get("/resource/delete/{resource_id}")]
+#[get("/api/resource/delete/{resource_id}")]
 pub async fn delete_resource(
     database: web::Data<Database>,
     index: web::Data<Index>,
     bucket: web::Data<Bucket>,
     req: HttpRequest
 ) -> impl Responder {
-    let resource_id = ObjectId::from_str(req.match_info().get("resource_id").unwrap()).unwrap();
+    let resource_id = req.match_info().get("resource_id").unwrap().to_string();
 
     let filter = doc! {
         "_id": resource_id.clone(),
     };
 
     let resource = database
-        .collection::<Resource>("notes")
+        .collection::<Resource>("resources")
         .find_one(filter.clone(), None)
         .await
         .expect("Error getting document");
@@ -341,7 +341,7 @@ pub async fn delete_resource(
     //////////////////////////////////////////////////////////////////////////
 
     let result = database
-        .collection::<Resource>("notes")
+        .collection::<Resource>("resources")
         .delete_one(filter, None)
         .await
         .expect("Error deleting document");
@@ -354,7 +354,7 @@ pub async fn delete_resource(
     index.delete_documents(&[resource_id.clone()]).await.unwrap();
 
     // Remove deleted resource's files from index
-    bucket.delete_object(format!("/{}", resource_id));
+    bucket.delete_object(format!("/{}", resource_id)).await;
 
     HttpResponse::Ok().body("Successfully deleted resource.")
 }
