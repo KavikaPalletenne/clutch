@@ -27,7 +27,7 @@ mod search;
 
 #[actix_web::main]
 async fn main() -> Result<()> {
-
+    let actix_port = std::env::var("ACTIX_PORT").unwrap();
 
     // // // XPS file location
     // // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
@@ -141,7 +141,7 @@ async fn main() -> Result<()> {
             .service(search::search_blank)
     })
         // .bind_openssl("0.0.0.0:443", builder)?
-        .bind("0.0.0.0:443")?
+        .bind(format!("0.0.0.0:{}", actix_port))?
         .run()
         .await?;
 
