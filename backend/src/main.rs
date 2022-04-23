@@ -77,7 +77,7 @@ async fn main() -> Result<()> {
     // Initialise S3 Bucket
     let bucket = init_bucket();
 
-    println!("Starting server on port 443.");
+    println!("Starting server on port {}.", actix_port.clone());
     HttpServer::new(move || {
 
         let cors = Cors::default()
