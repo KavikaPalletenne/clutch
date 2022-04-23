@@ -1,4 +1,4 @@
-FROM rust:1.58 as builder
+FROM rust:1.60 as builder
 
 RUN USER=root cargo new --bin excl-api
 WORKDIR ./excl-api
