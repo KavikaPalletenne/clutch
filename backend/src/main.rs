@@ -5,6 +5,7 @@ use actix_cors::Cors;
 use anyhow::Result;
 use jsonwebtoken::EncodingKey;
 use std::env;
+use actix_web::middleware::Logger;
 // use std::fs::File;
 // use std::io::BufReader;
 use actix_web::web::Data;
@@ -28,6 +29,8 @@ mod search;
 #[actix_web::main]
 async fn main() -> Result<()> {
     let actix_port = std::env::var("ACTIX_PORT").expect("Error getting ACTIX_PORT").to_string();
+
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
     // // // XPS file location
     // // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
@@ -103,6 +106,7 @@ async fn main() -> Result<()> {
             .max_age(None);
         App::new()
             .wrap(cors)
+            .wrap(Logger::default())
             // OAuth2 Service
             .app_data(Data::new(jwt_encoding_key.clone()))
             .service(oauth2::user_registration)
