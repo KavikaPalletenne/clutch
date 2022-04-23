@@ -7,9 +7,6 @@ use crate::models::{AuthorizationJwtPayload, AccessTokenResponse};
 
 
 pub fn create_auth_token(user_id: String, username: String, access_token: AccessTokenResponse, encoding_key: &EncodingKey) -> String {
-
-    // TODO: Choose a JWT signing algorithm and look into signing and encrypting (nested JWTs). Make a custom header with this.
-
     let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     let expiry = i64::try_from((current_time + Duration::from_secs(access_token.expires_in)).as_secs()).unwrap(); // Expiry according to Discord response
     let claims = AuthorizationJwtPayload {

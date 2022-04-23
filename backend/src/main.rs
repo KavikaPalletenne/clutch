@@ -1,13 +1,13 @@
-use actix_web::{App, http, HttpServer};
+use actix_web::{App, HttpServer};
 use actix_cors::Cors;
-use rustls::internal::pemfile::{certs, pkcs8_private_keys};
-use rustls::{NoClientAuth, ServerConfig};
+// use rustls::internal::pemfile::{certs, pkcs8_private_keys};
+// use rustls::{ServerConfig};
 use anyhow::Result;
 use jsonwebtoken::EncodingKey;
 use std::env;
-use std::fs::File;
-use std::io::BufReader;
-use meilisearch_sdk::client::Client;
+// use std::fs::File;
+// use std::io::BufReader;
+use actix_web::web::Data;
 use crate::storage::init_bucket;
 
 mod oauth2;
@@ -20,7 +20,6 @@ mod group;
 mod user;
 mod shared;
 mod cdn;
-mod authz;
 mod file;
 mod storage;
 mod search;
@@ -29,24 +28,36 @@ mod search;
 #[actix_web::main]
 async fn main() -> Result<()> {
 
-    // load ssl keys
-    let mut config = ServerConfig::new(NoClientAuth::new());
 
-    // // XPS file location
-    // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
-    // let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
+    // // // XPS file location
+    // // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
+    // // let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
+    // //
+    // // PC file location
+    // let cert_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/cert.pem").unwrap());
+    // let key_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/key.pem").unwrap());
     //
-    // PC file location
-    let cert_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/cert.pem").unwrap());
-    let key_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/key.pem").unwrap());
+    // let cert_chain = certs(cert_file).unwrap();
+    // let mut keys = pkcs8_private_keys(key_file).unwrap();
+    // if keys.is_empty() {
+    //     eprintln!("Could not locate PKCS 8 private keys.");
+    //     std::process::exit(1);
+    // }
+    //
+    // // load ssl keys
+    // let mut config = ServerConfig::builder()
+    //     .with_safe_defaults()
+    //     .with_no_client_auth()
+    //     .with_single_cert(cert_chain, keys.remove(0))
+    //     .expect("bad certificate/key");
+    // // ServerConfig::new(NoClientAuth::new());
 
-    let cert_chain = certs(cert_file).unwrap();
-    let mut keys = pkcs8_private_keys(key_file).unwrap();
-    if keys.is_empty() {
-        eprintln!("Could not locate PKCS 8 private keys.");
-        std::process::exit(1);
-    }
-    config.set_single_cert(cert_chain, keys.remove(0)).unwrap();
+
+    // let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+    // builder
+    //     .set_private_key("./keys/key.pem")
+    //     .unwrap();
+    // builder.set_certificate("./keys/cert.pem").unwrap();
 
     // Initialise JWT settings
     let jwt_secret = env::var("JWT_SECRET").expect("Error getting JWT_SECRET").to_string();
@@ -93,12 +104,12 @@ async fn main() -> Result<()> {
         App::new()
             .wrap(cors)
             // OAuth2 Service
-            .data(jwt_encoding_key.clone())
+            .app_data(Data::new(jwt_encoding_key.clone()))
             .service(oauth2::user_registration)
             .service(oauth2::authorize)
             .service(oauth2::get_user_guilds)
             // Resource Service
-            .data(database.clone())
+            .app_data(Data::new(database.clone()))
             .service(resource::create_resource)
             .service(resource::fetch_resource_by_id)
             .service(resource::fetch_resource_by_group_id)
@@ -120,19 +131,17 @@ async fn main() -> Result<()> {
             .service(user::delete_user_by_id)
             .service(user::get_user_groups)
             //CDN
-            .data(bucket.clone())
+            .app_data(Data::new(bucket.clone()))
             .service(cdn::download_file)
-            .service(cdn::get_upload_url)
-            .service(cdn::uploaded_file)
             // Easter Eggs
             .service(shared::easter_egg)
             // Search
-            .data(search_index.clone())
+            .app_data(Data::new(search_index.clone()))
             .service(search::search)
             .service(search::search_blank)
     })
-        .bind_rustls("0.0.0.0:443", config)?
-        // .bind("0.0.0.0:6000")?
+        // .bind_openssl("0.0.0.0:443", builder)?
+        .bind("0.0.0.0:443")?
         .run()
         .await?;
 

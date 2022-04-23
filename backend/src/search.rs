@@ -1,12 +1,10 @@
 use actix_web::{web, get, Responder, HttpRequest, HttpResponse};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::search::SearchResults;
-use mongodb::Database;
 use crate::models::Resource;
 
 #[get("/api/search/{group_id}/{term}")]
 pub async fn search(
-    database: web::Data<Database>,
     index: web::Data<Index>, // Meilisearch Index
     req: HttpRequest,
 ) -> impl Responder {
@@ -36,7 +34,7 @@ pub async fn search(
 /// Prevents blank searches from front-end returning a 404 not found code.
 #[get("/api/search/{group_id}/")]
 pub async fn search_blank(
-    req: HttpRequest,
+    _req: HttpRequest,
 ) -> impl Responder {
 
     HttpResponse::Ok()

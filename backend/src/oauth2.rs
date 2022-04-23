@@ -94,16 +94,14 @@ pub async fn user_registration(
     }
 
     let token = create_auth_token(user_id.clone(), username.clone(), response, encoding_key);
-    // TODO: Add security features to this cookie before production deployment
-    // let auth_token = format!("auth_token={}; Path=/api; Max-Age=604800; HttpOnly; Secure; SameSite=None; Domain=127.0.0.1; Port=443; Port=3000;", token);
-    // let user_id_token = format!("user_id={}; Path=/; Max-Age=604800; Domain=127.0.0.1; Port=443; Port=3000", user_id);
+
     let auth_cookie = Cookie::build("auth_token", token)
         .domain("examclutch.com")
         .path("/")
         .secure(true)
         .http_only(true)
         // .same_site(SameSite::Strict)
-        .max_age(cookie::time::Duration::new(604800, 0))
+        .max_age(cookie::time::Duration::new(604800, 0)) // 7 days expiry
         .finish();
     let user_id_cookie = Cookie::build("user_id", user_id.clone())
         .domain("examclutch.com")
@@ -111,7 +109,7 @@ pub async fn user_registration(
         .secure(true)
         .http_only(false)
         // .same_site(SameSite::None)
-        .max_age(cookie::time::Duration::new(604800, 0))
+        .max_age(cookie::time::Duration::new(604800, 0)) // 7 days expiry
         .finish();
     // let client_user_id_cookie = Cookie::build("user_id", user_id)
     //     .domain("examclutch.com")

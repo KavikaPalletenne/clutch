@@ -49,8 +49,6 @@ impl Document for Resource {
 // CRUD Functions
 /////////////////
 
-//TODO: Add Authorization checks (using authorization service) for all crud functions (check if the user has authorization to create/read/update/delete the resources)
-
 #[post("/api/resource/create")]
 pub async fn create_resource(
     req: HttpRequest,
@@ -114,7 +112,7 @@ pub async fn create_resource(
     if let Some(f_vec) = files {
         let mut file_put_urls = Vec::<String>::new();
         for f in f_vec.iter() {
-            file_put_urls.push(bucket.presign_put(format!("/{}/{}",id, &f.name).as_str(), 3600, None).unwrap());
+            file_put_urls.push(bucket.presign_put(format!("/{}/{}/{}", group_id, id, &f.name).as_str(), 3600, None).unwrap()); // Add file to folder for group
         }
 
         response = CreatedResourceResponse {

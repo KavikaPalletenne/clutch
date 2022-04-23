@@ -1,6 +1,5 @@
 use actix_web::{HttpRequest};
-use awc::Client;
-use crate::models::{AuthorizeResponse, GroupUser};
+use crate::models::{AuthorizeResponse};
 use crate::oauth2::authorize_local;
 
 // returns user id if authorized or None user id if invalid
@@ -31,12 +30,6 @@ pub async fn authorize(req: &HttpRequest) -> AuthorizeResponse {
 //         vector.remove(index);
 //     }
 // }
-
-pub fn find_and_remove_user_from_vector(vector: &mut Vec<GroupUser>, user: GroupUser) {
-    if let Some(index) = vector.iter().position(|value| *value == user) {
-        vector.remove(index);
-    }
-}
 
 pub fn find_and_remove_string_from_vector(vector: &mut Vec<String>, string: String) {
     if let Some(index) = vector.iter().position(|value| *value == string) {

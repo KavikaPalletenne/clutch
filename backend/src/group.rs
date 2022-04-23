@@ -41,7 +41,7 @@ impl Group {
 }
 
 
-// Create
+//
 #[post("/api/group/create")]
 pub async fn create_group(
     database: web::Data<Database>,
@@ -61,7 +61,6 @@ pub async fn create_group(
         return  HttpResponse::Unauthorized().body("Incorrect user id supplied.");
     }
     //////////////////////////////////////////////////////////////////////////
-    // TODO: Check the current user is a part of the guild with provided id using Discord API [Optional](and check they are the owner).
 
     let user_query = doc! {
         "_id": group.creator_id.clone(),
@@ -102,7 +101,7 @@ pub async fn get_group_by_id(
     database: web::Data<Database>,
     req: HttpRequest,
 ) -> impl Responder {
-    // TODO: Maybe implement auth to check if the user can access this group using Discord API.
+
     let group_id = req.match_info().get("id").unwrap().to_string();
 
     //////////////////////////////////////////////////////////////////////////
@@ -143,7 +142,7 @@ pub async fn get_group_name_by_id(
     database: web::Data<Database>,
     req: HttpRequest,
 ) -> impl Responder {
-    // TODO: Maybe implement auth to check if the user can access this group using Discord API.
+
     let group_id = req.match_info().get("id").unwrap().to_string();
 
     let query = doc! {
@@ -187,7 +186,6 @@ pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl
             .expect("Could not fetch group with provided id");
 
         if let Some(mut group) = result {
-            // TODO: Add the logged in user to the group if they don't already exist.
             if group.members.contains(
                 &id.clone()
             ) ||
@@ -335,7 +333,6 @@ pub async fn leave_group(database: web::Data<Database>, req: HttpRequest) -> imp
         .body("Not logged in.")
 }
 
-// TODO: Function to check whether user belongs to group
 /// Returns true if user is in group, otherwise returns false
 pub async fn check_user_in_group(user_id: String, group_id: String, database: &web::Data<Database>) -> bool {
     let query = doc! {
@@ -356,22 +353,22 @@ pub async fn check_user_in_group(user_id: String, group_id: String, database: &w
     false
 }
 
-/// Returns true if user is admin of group, otherwise returns false
-pub async fn check_user_is_group_admin(user_id: String, group_id: String, database: &web::Data<Database>) -> bool {
-    let query = doc! {
-        "_id": group_id,
-    };
-
-    let result: Option<Group> = database
-        .collection("groups")
-        .find_one(query, None)
-        .await
-        .expect("Could not fetch group with provided id");
-
-    if let Some(group) = result {
-        if group.administrators.contains(&user_id) {
-            return true;
-        }
-    }
-    false
-}
+// /// Returns true if user is admin of group, otherwise returns false
+// pub async fn check_user_is_group_admin(user_id: String, group_id: String, database: &web::Data<Database>) -> bool {
+//     let query = doc! {
+//         "_id": group_id,
+//     };
+//
+//     let result: Option<Group> = database
+//         .collection("groups")
+//         .find_one(query, None)
+//         .await
+//         .expect("Could not fetch group with provided id");
+//
+//     if let Some(group) = result {
+//         if group.administrators.contains(&user_id) {
+//             return true;
+//         }
+//     }
+//     false
+// }
