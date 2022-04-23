@@ -27,7 +27,7 @@ mod search;
 
 #[actix_web::main]
 async fn main() -> Result<()> {
-    let actix_port = std::env::var("ACTIX_PORT").unwrap();
+    let actix_port = std::env::var("ACTIX_PORT").expect("Error getting ACTIX_PORT").to_string();
 
     // // // XPS file location
     // // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
