@@ -3,9 +3,6 @@ FROM rust:1.60 as builder
 # Install cmake (for prost) \
 RUN USER=root apt update
 RUN USER=root apt install -y build-essential git cmake
-#RUN USER=root git clone https://github.com/Kitware/CMake/; cd CMake
-#RUN USER=root ./bootstrap && make && make install
-#RUN cd ../
 
 RUN USER=root cargo new --bin user-service
 WORKDIR ./user-service
