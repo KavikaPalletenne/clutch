@@ -10,7 +10,7 @@ use meilisearch_sdk::indexes::Index;
 use nanoid::nanoid;
 use s3::Bucket;
 use tokio_stream::StreamExt;
-use crate::group::check_user_in_group;
+use crate::group::check_user_in_group; // TODO: Create endpoint in grpc
 use crate::middleware::authorize;
 
 // A resource is any document or link to a website.

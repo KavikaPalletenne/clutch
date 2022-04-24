@@ -21,7 +21,7 @@ mod group;
 mod user;
 mod shared;
 mod cdn;
-mod file;
+// mod file;
 mod storage;
 mod search;
 

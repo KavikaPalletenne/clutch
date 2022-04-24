@@ -8,7 +8,7 @@ pub async fn search(
     index: web::Data<Index>, // Meilisearch Index
     req: HttpRequest,
 ) -> impl Responder {
-
+    // TODO: Add auth to check if user is in group - also handle unauthorized response on frontend
     let group_id = req.match_info().get("group_id").unwrap().to_string();
     let search_term = req.match_info().get("term").unwrap().to_string();
 

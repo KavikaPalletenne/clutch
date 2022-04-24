@@ -65,7 +65,7 @@ pub async fn create_group(
     let user_query = doc! {
         "_id": group.creator_id.clone(),
     };
-
+     // TODO: Don't fetch user - instead use the id of the authorized user
     let creator: User = database
         .collection("users")
         .find_one(user_query, None)
@@ -218,7 +218,7 @@ pub async fn join_group(database: web::Data<Database>, req: HttpRequest) -> impl
             };
 
             let mut user: User = database
-                .collection("users")
+                .collection("users") // TODO: Create endpoint in user service for this and use grpc
                 .find_one(user_query.clone(), None)
                 .await.expect("Error finding user").unwrap();
 
@@ -299,7 +299,7 @@ pub async fn leave_group(database: web::Data<Database>, req: HttpRequest) -> imp
             };
 
             let mut user: User = database
-                .collection("users")
+                .collection("users") // TODO: Use endpoint in user service and use grpc
                 .find_one(user_query.clone(), None)
                 .await.expect("Error finding user").unwrap();
 
