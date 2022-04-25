@@ -6,7 +6,7 @@ use crate::group::check_user_in_group;
 use crate::middleware::authorize;
 
 
-#[get("/cdn/file/{group_id}/{resource_id}/{id}")]
+#[get("/cdn/file/{group_id}/{resource_id}/{name}")]
 pub async fn download_file(
     req: HttpRequest,
     bucket: web::Data<Bucket>,
@@ -16,7 +16,7 @@ pub async fn download_file(
 
     let group_id = req.match_info().get("group_id").unwrap().to_string();
     let resource_id = req.match_info().get("resource_id").unwrap().to_string();
-    let id = req.match_info().get("id").unwrap();
+    let name = req.match_info().get("name").unwrap();
 
     //////////////////////////////////////////////////////////////////////////
     // Auth //
@@ -31,7 +31,7 @@ pub async fn download_file(
     }
     //////////////////////////////////////////////////////////////////////////
 
-    let file_download_url = bucket.presign_get(format!("/{}/{}/{}", group_id, resource_id, id), 3600, None).unwrap(); // 1 hour expiry
+    let file_download_url = bucket.presign_get(format!("/{}/{}/{}", group_id, resource_id, name), 3600, None).unwrap(); // 1 hour expiry
     HttpResponse::PermanentRedirect()
         .append_header(("Location", file_download_url))
         .body("Unable to find file.")
