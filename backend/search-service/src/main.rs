@@ -3,10 +3,15 @@ use actix_web::{ HttpServer, App };
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::web::Data;
-use jsonwebtoken::EncodingKey;
+use jsonwebtoken::{DecodingKey, EncodingKey};
+use crate::persistence::create_mongodb_client;
 
 mod search;
 mod models;
+mod persistence;
+mod group;
+mod jwt;
+mod middleware;
 
 #[actix_web::main]
 async fn main() -> Result<()> {
@@ -18,15 +23,15 @@ async fn main() -> Result<()> {
 
     // Initialise JWT settings
     let jwt_secret = std::env::var("JWT_SECRET").expect("Error getting JWT_SECRET").to_string();
+    let jwt_decoding_key = DecodingKey::from_secret(jwt_secret.as_bytes());
     let jwt_encoding_key = EncodingKey::from_secret(jwt_secret.as_bytes());
     println!("Initialised JWT settings");
 
-    // Initialise Meilisearch Connection
+    // Initialise Meilisearch connection
     let search_endpoint = std::env::var("SEARCH_ENDPOINT").expect("Error getting SEARCH_ENDPOINT").to_string();
     let search_api_key = std::env::var("SEARCH_API_KEY").expect("Error getting SEARCH_API_KEY").to_string();
     let search_index = meilisearch_sdk::client::Client::new(search_endpoint, search_api_key).index("resources");
     println!("Initialised Meilisearch connection");
-
     let search_attributes = vec![
         "group_id",
         "subject",
@@ -35,8 +40,14 @@ async fn main() -> Result<()> {
     search_index.set_filterable_attributes(search_attributes.clone()).await.unwrap();
     println!("Added search filterable attributes: {:?}", search_attributes);
 
-    println!("Starting actix_web server on port {}", actix_port.clone());
+    // Initialise MongoDB connection
+    let database = create_mongodb_client()
+        .await
+        .expect("Failed to connect to DB");
+    println!("Successfully connected to database");
 
+    // Start Http server
+    println!("Starting actix_web server on port {}", actix_port.clone());
     HttpServer::new(move || {
 
         let cors = Cors::default()
@@ -51,8 +62,10 @@ async fn main() -> Result<()> {
         App::new()
             .wrap(cors)
             .wrap(Logger::default())
+            .app_data(Data::new(database.clone()))
             // JWT service
             .app_data(Data::new(jwt_encoding_key.clone()))
+            .app_data(Data::new(jwt_decoding_key.clone()))
             // Search service
             .app_data(Data::new(search_index.clone()))
             .service(search::search)

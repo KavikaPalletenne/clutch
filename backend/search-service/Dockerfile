@@ -9,15 +9,18 @@ RUN rm src/*.rs
 ADD . ./
 
 RUN rm ./target/release/deps/search_service*
+
+
 RUN cargo build --release
 
 
 FROM debian:buster-slim
 ARG APP=/usr/src/app
 
-RUN apt-get update \
-    && apt-get install -y ca-certificates tzdata \
+RUN apt update \
+    && apt install -y ca-certificates tzdata \
     && rm -rf /var/lib/apt/lists/*
+
 
 EXPOSE 8000
 
