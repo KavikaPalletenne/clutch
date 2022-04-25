@@ -15,7 +15,7 @@ JWT_SECRET - Secret for signing JWTs
 `GET /api/user/{id}`
 ```json
 {
-    "id": "V1StGXR8_Z5jdHi6B-myT",
+    "_id": "V1StGXR8_Z5jdHi6B-myT",
     "username": "Endveous",
     "email": "me@domain.com",
     "groups": [
