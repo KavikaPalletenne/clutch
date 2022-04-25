@@ -235,6 +235,8 @@ pub async fn update_username_by_user_id(
         if insert_result.inserted_id.to_string().is_empty() {
             return HttpResponse::BadRequest().body("Error updating username.");
         }
+
+        return HttpResponse::Ok().body("Successfully updated username.");
     }
 
     HttpResponse::BadRequest().body("Could not update username.")
@@ -294,6 +296,8 @@ pub async fn update_email_by_user_id(
         if insert_result.inserted_id.to_string().is_empty() {
             return HttpResponse::BadRequest().body("Error updating username.");
         }
+
+        return HttpResponse::Ok().body("Successfully updated email.");
     }
 
     HttpResponse::BadRequest().body("Could not update user.")
