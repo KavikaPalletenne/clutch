@@ -40,8 +40,7 @@ pub struct Tag {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FileReference {
-    pub name: String, // This is the name the file will be stored under on the CDN
-    pub title: String,
+    pub name: String, // Name of the file
     pub size: i64, // Size in bytes
 }
 

@@ -49,9 +49,9 @@ export default function ResourceCard(props: {
                 <a target={"_blank"} rel="noopener noreferrer">
                     <div className="py-4 px-4 shadow-sm hover:shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", minWidth: "675px", maxWidth: "750px"}}>
                         
-                        <li className="justify-center float-left flex" style={{listStyle: 'none'}} key={f.title}>
+                        <li className="justify-center float-left flex" style={{listStyle: 'none'}} key={f.name}>
                             <div className="pl-5 font-bold">
-                                {f.title}
+                                {f.name}
                             </div>
                             
                         </li>

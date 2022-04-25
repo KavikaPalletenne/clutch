@@ -44,7 +44,6 @@ export type ObjectId = {
 
 export type FileReference = {
     name: string;
-    title: string;
     size: number;
 }
 
