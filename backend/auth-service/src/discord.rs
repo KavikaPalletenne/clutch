@@ -55,26 +55,19 @@ pub async fn redirect(
     let user_id = current_user.id.clone();
     let username = current_user.username.clone();
     let email = current_user.email;
-    // TODO: Switch over to using grpc
+
     let user_exists = user_exists_service(&user_id).await;
 
     // Create new user if does not exist
     if !user_exists {
-        // let uri = Url::parse_with_params("https://localhost/api/user/protected/create",
-        //                                  &[
-        //                                      ("secret", env::var("USER_SERVICE_SECRET").unwrap()),
-        //                                      ("id", user_id.),
-        //                                      ("username", username.clone()),
-        //                                      ("email", email.clone())
-        //                                  ]).expect("Error parsing URL");
 
         let user_request = NewUserRequest {
             secret: "N/A".to_string(),
             id: user_id.clone(),
             username: username.clone(),
             email
-        }; // TODO: Switch over to using grpc
-        let create_user_response = create_user_service(user_request).await; // TODO: Need endpoint for this from user service
+        };
+        let create_user_response = create_user_service(user_request).await;
 
 
         if !create_user_response {

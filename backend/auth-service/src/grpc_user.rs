@@ -41,5 +41,3 @@ pub async fn create_user_service(user_request: NewUserRequest) -> bool {
     response.success
 }
 
-// TODO: Create user service
-
