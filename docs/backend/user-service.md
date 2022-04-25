@@ -25,6 +25,45 @@ JWT_SECRET - Secret for signing JWTs
 }
 ```
 
+`GET /api/user/username/{id}`
+```json
+{
+    "username": "Endveous"
+}
+```
+
+`POST /api/user/updateUsername/{id}/{username}`
+```text
+200 Ok
+or
+400 Bad Request
+```
+
+`POST /api/user/updateEmail/{id}/{email}`
+```text
+200 Ok
+or
+400 Bad Request
+```
+
+`GET /api/user/delete/{id}`
+```text
+200 Ok
+or
+400 Bad Request
+```
+
+`GET /api/user/get_user_groups/{id}`
+```json
+{
+    [
+        "65432839356685232649",
+        "62843245932068783983"
+    ]
+}
+```
+
+
 ### gRPC
 ```proto
 service UserService {
