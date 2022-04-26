@@ -1,5 +1,6 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
+import Link from 'next/link';
 
 import Router from 'next/router';
 import axios from 'axios'
@@ -18,7 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <link rel="preconnect" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" />
 
     <div style={{fontFamily: 'Roboto Mono'}} className="bg-gradient-to-r from-exclpurple to-exclpurple-dark text-center text-white text-sm md:text-md">
-        <h1>This is a beta version of ExamClutch not for public use (v.DEV.0.1.0). <a href="/beta" style={{textDecorationLine:'underline'}}>Learn More</a> </h1> 
+        <h1>This is a beta version of ExamClutch not for public use (v.DEV.0.1.0). <Link href="/beta"><a style={{textDecorationLine:'underline'}}>Learn More</a></Link></h1> 
     </div>
 
     <Component {...pageProps} />
