@@ -3,22 +3,22 @@ import Link from 'next/link'
 
 export default function Custom404() {
     return (
-        <div style={{backgroundImage: "linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%)"}}>
+        <div style={{backgroundImage: `url(/hero_background.png)`}}>
 
         <Head>
           <meta charSet="utf-8"/>
           <meta name="description" content="404 Error - Page not found." />
           <meta name="robots" content="all" />
           <meta name="googlebot" content="all" />
-          <title>Page not Found - ScanTag</title>
-          <link rel="icon" href="https://raw.githubusercontent.com/KavikaPalletenne/scantag-assets/main/scantag-logo.svg" />
+          <title>Page not Found - ExamClutch</title>
+          <link rel="icon" href="/gradient_logo.svg" />
         </Head>
 
         
         <body className="h-screen min-h-screen overflow-hidden">
             
             <div className="lg:pt-10 lg:pl-32 text-white lg:pr-32 pt-10 pl-5 pr-5">
-                <Link href="/">
+                <Link href="/app">
                 <a>
                     <img className="float-left lg:w-96 w-12" src="logo_white.svg"/>
                 </a>
