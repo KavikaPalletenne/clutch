@@ -16,7 +16,8 @@ const Home: NextPage = () => {
         <meta name="googlebot" content="index" />
         <link rel="icon" href="/gradient_logo.svg" />
       </Head>
-      <div style={{backgroundImage: "linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%)"}}>
+
+      <div style={{backgroundImage: `url(/hero_background.png)`}}>
         <div>
           <section className="lg:pl-20 lg:pt-12 pl-5 pt-10 lg:pr-20 pr-5">
             <Link href="/">
@@ -37,7 +38,6 @@ const Home: NextPage = () => {
             </nav>
           </section>
         </div>
-        
         <div className={styles.heroSection}>
             <h1 className={styles.heroSectionH1}>Study together.</h1>
             <h2 className={styles.heroSectionH2}>Clutch your exams.</h2>
