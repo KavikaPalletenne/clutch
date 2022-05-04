@@ -7,9 +7,9 @@ use chrono::NaiveDateTime;
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    pub id: i64,
+    pub id: i32,
     pub name: String, // Name of the file
-    pub size: i64, // Size in bytes
+    pub size: i32, // Size in bytes
     pub resource_id: String,
 }
 
