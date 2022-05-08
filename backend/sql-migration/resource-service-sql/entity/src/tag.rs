@@ -1,13 +1,12 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
-use chrono::NaiveDateTime;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
 #[sea_orm(table_name = "resource_tags")]
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    pub id: i64,
+    pub id: i32,
     pub text: String, // Text of the tag
     pub resource_id: String,
 }
