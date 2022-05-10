@@ -88,7 +88,7 @@ pub async fn read(
         .await?;
 
     if response.len() == 0 {
-        return bail!(MyDbError::NoSuchRow { id: resource_id});
+        return bail!(MyDbError::NoSuchRow { id: resource_id });
     }
 
     let (resource, files) = response.remove(0);
@@ -136,7 +136,7 @@ pub async fn delete(
         .await?;
 
     if res.rows_affected == 0 {
-        return bail!(MyDbError::NoSuchRow { id: resource_id});
+        return bail!(MyDbError::NoSuchRow { id: resource_id });
     }
 
     Ok(())
