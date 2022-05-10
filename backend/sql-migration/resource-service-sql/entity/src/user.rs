@@ -1,5 +1,6 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+use sea_orm::DeleteMany;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
 #[sea_orm(table_name = "users")]
@@ -12,6 +13,7 @@ pub struct Model {
     pub discord_id: Option<String>,
 }
 
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(has_many = "super::resource::Entity")]
     Resource,
@@ -44,7 +46,7 @@ impl Entity {
         Self::find().filter(Column::DiscordId.eq(group_id))
     }
 
-    pub fn delete_by_id(id: String) -> Select<Entity> {
+    pub fn delete_by_id(id: String) -> DeleteMany<Entity> {
         Self::delete_many().filter(Column::Id.eq(id))
     }
 }

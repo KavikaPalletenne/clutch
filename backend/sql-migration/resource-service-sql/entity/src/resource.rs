@@ -1,6 +1,7 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+use sea_orm::DeleteMany;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
 #[sea_orm(table_name = "resources")]
@@ -27,7 +28,7 @@ impl Entity {
         Self::find().filter(Column::GroupId.eq(group_id))
     }
 
-    pub fn delete_by_id(id: String) -> Select<Entity> {
+    pub fn delete_by_id(id: String) -> DeleteMany<Entity> {
         Self::delete_many().filter(Column::Id.eq(id))
     }
 }
