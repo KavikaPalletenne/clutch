@@ -1,6 +1,8 @@
 use anyhow::Result;
 
-mod resource;
+mod models;
+mod errors;
+mod service;
 
 #[tokio::main]
 async fn main() -> Result<()> {

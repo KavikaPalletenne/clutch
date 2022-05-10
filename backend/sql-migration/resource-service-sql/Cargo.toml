@@ -21,9 +21,14 @@ env_logger = "0.9"
 # Database
 sea-orm = { version = "0.7", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
 
+# Hashing
+argon2 = "0.4"
+rand_core = { version = "0.6", features = ["std"] }
+
 # Other dependencies
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 chrono = { version = "0.4", features = ["serde"] }
 nanoid = "0.4"
+thiserror = "1.0"
