@@ -44,7 +44,7 @@ pub struct User {
     pub id: String,
     pub username: String,
     pub email: String,
-    pub password: String, // Hashed (argon2 hashing)
+    // pub password: String, (DO NOT RETURN PASSWORD) // Hashed (argon2 hashing)
     pub discord_id: Option<String>,
 }
 
@@ -54,8 +54,13 @@ pub struct FileReference {
     pub size: i32,
 }
 
-pub struct UserForm {
+pub struct NewUserForm {
     pub username: String,
     pub email: String,
     pub password: String,
+}
+
+pub struct UpdateUserForm {
+    pub username: String,
+    pub email: String,
 }
