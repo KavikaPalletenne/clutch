@@ -22,8 +22,7 @@ env_logger = "0.9"
 sea-orm = { version = "0.7", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
 
 # Hashing
-argon2 = "0.4"
-rand_core = { version = "0.6", features = ["std"] }
+rust-argon2 = "1.0"
 
 # Other dependencies
 anyhow = "1"
