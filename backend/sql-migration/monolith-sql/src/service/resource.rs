@@ -9,7 +9,7 @@ use entity::tag;
 use entity::sea_orm;
 use nanoid::nanoid;
 use sea_orm::{DatabaseConnection, DeleteResult, Set};
-use sea_orm::{EntityTrait, ActiveModelTrait};
+use sea_orm::{EntityTrait, ActiveModelTrait, QueryFilter, ColumnTrait, PaginatorTrait};
 use crate::models::{FileReference, Resource, ResourceForm};
 use crate::errors::MyDbError;
 use crate::service::id::generate_snowflake;
@@ -82,6 +82,7 @@ pub async fn read(
     resource_id: i64,
     conn: &Data<DatabaseConnection>
 ) -> Result<Resource> {
+    //TODO: Use custom joins to also include tags - https://www.sea-ql.org/SeaORM/docs/advanced-query/custom-joins
     let mut response: Vec<(resource::Model, Vec<file_reference::Model>)>
     = resource::Entity::find_by_id(resource_id.clone())
         .find_with_related(file_reference::Entity)
@@ -143,3 +144,101 @@ pub async fn delete(
     Ok(())
 }
 
+///////////////////////
+// Utility Functions //
+///////////////////////
+pub async fn get_resource_by_group(
+    group_id: String,
+    per_page: i32,
+    page_num: i32,
+    conn: &Data<DatabaseConnection>
+) -> Result<Vec<Resource>> {
+    let mut response: Vec<(resource::Model, Vec<file_reference::Model>)>
+        = resource::Entity::find()
+        .filter(resource::Column::GroupId.contains(group_id.as_str()))
+        // .paginate(conn.get_ref(), per_page.try_into().unwrap())
+        // .fetch_page(page_num.try_into().unwrap()) //TODO: Find out how to paginate and join
+        .find_with_related(file_reference::Entity)
+        .all(conn.get_ref())
+        .await?;
+
+    if response.len() == 0 {
+        return bail!(MyDbError::NoSuchRow { id: group_id.to_string() });
+    }
+
+    let mut resources = Vec::<Resource>::new();
+    for i in 0..response.len() {
+        let (resource, files) = response.remove(i);
+        let mut res_files = Vec::<FileReference>::new();
+        for f in files {
+            res_files.push(
+                FileReference {
+                    name: f.name,
+                    size: f.size,
+                }
+            );
+        }
+
+        resources.push(Resource {
+            id: resource.id,
+            user_id: resource.user_id,
+            group_id: resource.group_id,
+            title: resource.title,
+            description: resource.description,
+            subject: resource.subject,
+            tags: Option::None,
+            files: Option::from(res_files),
+            last_edited_at: resource.last_edited_at,
+        })
+    }
+
+    Ok(resources)
+}
+
+pub async fn get_resource_by_user(
+    user_id: String,
+    per_page: i32,
+    page_num: i32,
+    conn: &Data<DatabaseConnection>
+) -> Result<Vec<Resource>> {
+    let mut response: Vec<(resource::Model, Vec<file_reference::Model>)>
+        = resource::Entity::find()
+        .filter(resource::Column::UserId.contains(user_id.as_str()))
+        .find_with_related(file_reference::Entity)
+        .all(conn.get_ref())
+        // .paginate(conn.get_ref(), per_page.try_into().unwrap())
+        // .fetch_page(page_num.try_into().unwrap()) //TODO: Find out how to paginate and join
+        .await?;
+
+    if response.len() == 0 {
+        return bail!(MyDbError::NoSuchRow { id: user_id.to_string() });
+    }
+
+    let mut resources = Vec::<Resource>::new();
+    for i in 0..response.len() {
+        let (resource, files) = response.remove(i);
+        let mut res_files = Vec::<FileReference>::new();
+        for f in files {
+            res_files.push(
+                FileReference {
+                    name: f.name,
+                    size: f.size,
+                }
+            );
+        }
+
+        resources.push(Resource {
+            id: resource.id,
+            user_id: resource.user_id,
+            group_id: resource.group_id,
+            title: resource.title,
+            description: resource.description,
+            subject: resource.subject,
+            tags: Option::None,
+            files: Option::from(res_files),
+            last_edited_at: resource.last_edited_at,
+        })
+    }
+
+    Ok(resources)
+}
