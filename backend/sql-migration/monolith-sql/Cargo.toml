@@ -24,6 +24,9 @@ sea-orm = { version = "0.7", features = ["sqlx-postgres", "runtime-tokio-rustls"
 # Hashing
 rust-argon2 = "1.0"
 
+# Id
+rs-snowflake = "0.6"
+
 # Other dependencies
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }

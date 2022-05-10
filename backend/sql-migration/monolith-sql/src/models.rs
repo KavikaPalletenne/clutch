@@ -64,3 +64,16 @@ pub struct UpdateUserForm {
     pub username: String,
     pub email: String,
 }
+
+pub struct Group {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub discord_id: String,
+}
+
+pub struct NewGroupForm {
+    pub name: String,
+    pub description: String,
+    pub discord_id: String,
+}

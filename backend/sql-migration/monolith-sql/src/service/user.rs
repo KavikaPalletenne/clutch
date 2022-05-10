@@ -9,7 +9,8 @@ use crate::service::hashing::hash;
 use crate::models::{User, NewUserForm, UpdateUserForm};
 use crate::errors::MyDbError;
 
-
+/// Create new user from form.
+/// Returns created user's id.
 pub async fn create(
     user: NewUserForm,
     conn: &Data<DatabaseConnection>
@@ -29,7 +30,7 @@ pub async fn create(
     Ok(user_id)
 }
 
-/// Get user by id
+/// Get user by id.
 pub async fn read(
     user_id: String,
     conn: &Data<DatabaseConnection>
