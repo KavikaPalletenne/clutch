@@ -2,9 +2,9 @@ use anyhow::{Result, bail};
 use actix_web::web::Data;
 
 use entity::group;
-use entity::user;
+use entity::group_user;
 use nanoid::nanoid;
-use sea_orm::{DatabaseConnection, Set, ActiveModelTrait, EntityTrait, DeleteResult};
+use sea_orm::{DatabaseConnection, Set, ActiveModelTrait, EntityTrait, QueryFilter, ColumnTrait, DeleteResult};
 use crate::service::hashing::hash;
 use crate::errors::MyDbError;
 use crate::models::{Group, NewGroupForm};
@@ -68,6 +68,43 @@ pub async fn delete(
 
     if res.rows_affected == 0 {
         return bail!(MyDbError::NoSuchRow { id: group_id });
+    }
+
+    Ok(())
+}
+
+///////////////////////
+// Utility Functions //
+///////////////////////
+pub async fn join_group(
+    group_id: String,
+    user_id: String,
+    conn: &Data<DatabaseConnection>,
+) -> Result<()> {
+    group_user::ActiveModel {
+        user_id: Set(user_id),
+        group_id: Set(group_id),
+        ..Default::default()
+    }.insert(conn.get_ref())
+        .await
+        .expect("Could not insert group_user");
+
+    Ok(())
+}
+
+pub async fn leave_group(
+    user_id: String,
+    group_id: String,
+    conn: &Data<DatabaseConnection>,
+) -> Result<()> {
+    let res: DeleteResult = group_user::Entity::delete_many()
+        .filter(group_user::Column::UserId.contains(user_id.as_str()))
+        .filter(group_user::Column::GroupId.contains(group_id.clone().as_str()))
+        .exec(conn.get_ref())
+        .await?;
+
+    if res.rows_affected == 0 {
+        return bail!(MyDbError::NoSuchRow { id: group_id.to_string() });
     }
 
     Ok(())
