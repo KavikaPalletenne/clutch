@@ -7,7 +7,7 @@ use sea_orm::DeleteMany;
 #[sea_orm(table_name = "resources")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: String,
+    pub id: i64,
     pub user_id: String,  // owner
     pub group_id: String, // group it belongs to
     pub title: String,
@@ -20,7 +20,7 @@ pub struct Model {
 }
 
 impl Entity {
-    pub fn find_by_id(id: String) -> Select<Entity> {
+    pub fn find_by_id(id: i64) -> Select<Entity> {
         Self::find().filter(Column::Id.eq(id))
     }
 
@@ -28,7 +28,7 @@ impl Entity {
         Self::find().filter(Column::GroupId.eq(group_id))
     }
 
-    pub fn delete_by_id(id: String) -> DeleteMany<Entity> {
+    pub fn delete_by_id(id: i64) -> DeleteMany<Entity> {
         Self::delete_many().filter(Column::Id.eq(id))
     }
 }

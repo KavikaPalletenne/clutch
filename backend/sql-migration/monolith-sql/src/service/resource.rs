@@ -12,6 +12,7 @@ use sea_orm::{DatabaseConnection, DeleteResult, Set};
 use sea_orm::{EntityTrait, ActiveModelTrait};
 use crate::models::{FileReference, Resource, ResourceForm};
 use crate::errors::MyDbError;
+use crate::service::id::generate_snowflake;
 
 /// Inserts a new resource in the DB, along with files and tags.
 /// Returns created resource's id (nanoid)
@@ -22,7 +23,7 @@ pub async fn create(
     // let conn = sea_orm::Database::connect("postgres://jcgvqsxa:lk0y4RIhtAFb4hu87EGSRxCnD_EDeBo7@rosie.db.elephantsql.com/jcgvqsxa")
     //     .await.unwrap();
 
-    let resource_id = nanoid!().to_string();
+    let resource_id = generate_snowflake();
     resource::ActiveModel {
         id: Set(resource_id.clone()),
         user_id: Set(resource.user_id),
@@ -78,7 +79,7 @@ pub async fn create(
 
 /// Read a resource by id.
 pub async fn read(
-    resource_id: String,
+    resource_id: i64,
     conn: &Data<DatabaseConnection>
 ) -> Result<Resource> {
     let mut response: Vec<(resource::Model, Vec<file_reference::Model>)>
@@ -103,7 +104,7 @@ pub async fn read(
     }
 
     Ok(Resource {
-        id: resource.id,
+        id: i64,
         user_id: resource.user_id,
         group_id: resource.group_id,
         title: resource.title,
@@ -128,7 +129,7 @@ pub async fn update(
 
 /// Deletes a resource by id.
 pub async fn delete(
-    resource_id: String,
+    resource_id: i64,
     conn: &Data<DatabaseConnection>,
 ) -> Result<()> {
     let res: DeleteResult = resource::Entity::delete_by_id(resource_id.clone())

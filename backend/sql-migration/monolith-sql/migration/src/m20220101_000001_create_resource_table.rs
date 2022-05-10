@@ -21,7 +21,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(resource::Column::Id)
-                            .string()
+                            .big_unsigned()
                             .not_null()
                             .primary_key()
                     )
