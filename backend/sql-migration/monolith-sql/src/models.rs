@@ -7,7 +7,7 @@ use sea_orm::{
 
 #[derive(Deserialize, Serialize)]
 pub struct Resource {
-    pub id: String,
+    pub id: i64,
     pub user_id: String,
     pub group_id: String,
     pub title: String,

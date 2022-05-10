@@ -8,7 +8,7 @@ pub struct Model {
     #[serde(skip_deserializing)]
     pub id: i32,
     pub text: String, // Text of the tag
-    pub resource_id: String,
+    pub resource_id: i64,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

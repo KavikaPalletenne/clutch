@@ -26,7 +26,7 @@ impl MigrationTrait for Migration {
                             .primary_key()
                     )
                     .col(ColumnDef::new(tag::Column::Text).string().not_null())
-                    .col(ColumnDef::new(tag::Column::ResourceId).string().not_null())
+                    .col(ColumnDef::new(tag::Column::ResourceId).big_unsigned().not_null())
                     .to_owned()
             ).await;
         manager

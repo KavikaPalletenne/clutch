@@ -19,7 +19,7 @@ use crate::service::id::generate_snowflake;
 pub async fn create(
     resource: ResourceForm,
     conn: &Data<DatabaseConnection>
-) -> Result<String> {
+) -> Result<i64> {
     // let conn = sea_orm::Database::connect("postgres://jcgvqsxa:lk0y4RIhtAFb4hu87EGSRxCnD_EDeBo7@rosie.db.elephantsql.com/jcgvqsxa")
     //     .await.unwrap();
 
@@ -89,7 +89,7 @@ pub async fn read(
         .await?;
 
     if response.len() == 0 {
-        return bail!(MyDbError::NoSuchRow { id: resource_id });
+        return bail!(MyDbError::NoSuchRow { id: resource_id.to_string() });
     }
 
     let (resource, files) = response.remove(0);
@@ -104,7 +104,7 @@ pub async fn read(
     }
 
     Ok(Resource {
-        id: i64,
+        id: resource.id,
         user_id: resource.user_id,
         group_id: resource.group_id,
         title: resource.title,
@@ -137,7 +137,7 @@ pub async fn delete(
         .await?;
 
     if res.rows_affected == 0 {
-        return bail!(MyDbError::NoSuchRow { id: resource_id });
+        return bail!(MyDbError::NoSuchRow { id: resource_id.to_string() });
     }
 
     Ok(())

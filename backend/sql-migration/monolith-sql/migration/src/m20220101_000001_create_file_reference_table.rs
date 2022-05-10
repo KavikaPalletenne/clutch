@@ -27,7 +27,7 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(file_reference::Column::Name).string().not_null())
                     .col(ColumnDef::new(file_reference::Column::Size).integer().not_null())
-                    .col(ColumnDef::new(file_reference::Column::ResourceId).string().not_null())
+                    .col(ColumnDef::new(file_reference::Column::ResourceId).big_unsigned().not_null())
                     .to_owned()
             )
             .await;
