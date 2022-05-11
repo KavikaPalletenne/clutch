@@ -12,6 +12,7 @@ use sea_orm::{DatabaseConnection, DeleteResult, Set};
 use sea_orm::{EntityTrait, ActiveModelTrait, QueryFilter, ColumnTrait, PaginatorTrait};
 use crate::models::{FileReference, Resource, ResourceForm};
 use crate::errors::MyDbError;
+use crate::service::group;
 use crate::service::id::generate_snowflake;
 
 /// Inserts a new resource in the DB, along with files and tags.
@@ -241,4 +242,23 @@ pub async fn get_resource_by_user(
     }
 
     Ok(resources)
+}
+
+pub async fn user_can_view_resource(
+    user_id: String,
+    resource_id: i64,
+    conn: &Data<DatabaseConnection>,
+) -> Result<bool> {
+    let res: Option<resource::Model> = resource::Entity::find_by_id(resource_id.clone())
+        .filter(resource::Column::UserId.contains(&user_id.clone()))
+        .one(conn.get_ref())
+        .await?;
+
+    if let Some(record) = res {
+        if group::user_in_group(user_id.clone(), record.group_id, conn).await? {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
 }

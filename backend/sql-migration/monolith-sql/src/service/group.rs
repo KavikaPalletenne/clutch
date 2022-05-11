@@ -109,3 +109,23 @@ pub async fn leave_group(
 
     Ok(())
 }
+
+/// Checks if a given user is in the group.
+/// Returns true if they are, otherwise false.
+pub async fn user_in_group(
+    user_id: String,
+    group_id: String,
+    conn: &Data<DatabaseConnection>,
+) -> Result<bool> {
+    let res: Option<group_user::Model> = group_user::Entity::find()
+        .filter(group_user::Column::GroupId.contains(&group_id.clone()))
+        .filter(group_user::Column::UserId.contains(&user_id.clone()))
+        .one(conn.get_ref())
+        .await?;
+
+    if let Some(record) = res {
+        return Ok(true);
+    }
+
+    Ok(false)
+}
