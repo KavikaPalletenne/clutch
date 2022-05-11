@@ -68,6 +68,7 @@ pub struct UpdateUserForm {
     pub email: String,
 }
 
+#[derive(Deserialize, Serialize)]
 pub struct Group {
     pub id: String,
     pub name: String,
@@ -75,6 +76,7 @@ pub struct Group {
     pub discord_id: String,
 }
 
+#[derive(Deserialize, Serialize)]
 pub struct NewGroupForm {
     pub name: String,
     pub description: String,

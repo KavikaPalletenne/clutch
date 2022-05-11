@@ -18,7 +18,7 @@ pub async fn get(
     if !is_logged_in(&req, &dk) {
         return HttpResponse::TemporaryRedirect()
             .append_header(("Location", "https://examclutch.com/login")).finish() // Redirect to login
-    } else if !has_group_viewing_permission(group_id.clone(), &req, &conn, &dk) {
+    } else if !has_group_viewing_permission(group_id.clone(), &req, &conn, &dk).await.expect("Error") {
         return HttpResponse::Unauthorized().finish();
     }
 
@@ -59,6 +59,7 @@ pub async fn get_name(
 
 #[post("/api/group/create")]
 pub async fn create_group(
+    req: HttpRequest,
     form: web::Json<NewGroupForm>,
     conn: web::Data<DatabaseConnection>,
     dk: web::Data<DecodingKey>
@@ -98,7 +99,7 @@ pub async fn join_group(
     let principal = get_user_id(&req, &dk);
 
     if let Some(user_id) = principal {
-        if user_in_group(user_id.clone, group_id.clone(), &conn).await? {
+        if user_in_group(user_id.clone(), group_id.clone(), &conn).await.expect("Error") {
             return HttpResponse::BadRequest().body("Already joined group");
         }
         let res = crate::service::group::join_group(group_id, user_id, &conn).await;
@@ -127,12 +128,12 @@ pub async fn leave_group(
     let principal = get_user_id(&req, &dk);
 
     if let Some(user_id) = principal {
-        if !user_in_group(user_id.clone(), group_id.clone(), &conn).await? {
+        if !user_in_group(user_id.clone(), group_id.clone(), &conn).await.expect("Error") {
             return HttpResponse::BadRequest().body("Not in group");
         }
         let res = crate::service::group::leave_group(group_id.clone(), user_id.clone(), &conn).await;
         if let Ok(_) = res {
-            if user_in_group(user_id.clone(), group_id.clone(), &conn).await? {
+            if user_in_group(user_id.clone(), group_id.clone(), &conn).await.expect("Error") {
                 return HttpResponse::BadRequest().body("Could not leave group");
             }
             return HttpResponse::Ok().body("Successfully left group");
