@@ -27,10 +27,15 @@ rust-argon2 = "1.0"
 # Id
 rs-snowflake = "0.6"
 
+# Middleware (AuthZ & AuthN)
+actix-web-lab = "0.16"
+
 # Other dependencies
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 chrono = { version = "0.4", features = ["serde"] }
 nanoid = "0.4"
-thiserror = "1.0"
+thiserror = "1"
+jsonwebtoken = "8"
+uuid = { version = "1", features = ["serde"] }

@@ -12,3 +12,11 @@ pub enum MyDbError {
         table_name: String,
     }
 }
+
+#[derive(Error, Debug)]
+pub enum MyAuthError {
+    #[error("Request contains no JWT")]
+    NoJwt,
+    #[error("Jwt is invalid")]
+    InvalidJwt
+}
