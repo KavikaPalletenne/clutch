@@ -98,3 +98,36 @@ pub async fn delete(
     Ok(())
 }
 
+///////////////////////
+// Utility Functions //
+///////////////////////
+pub async fn username_exists(
+    username: String,
+    conn: &Data<DatabaseConnection>
+) -> Result<bool> {
+    let res: Option<user::Model> = user::Entity::find_by_username(username.clone())
+        .one(conn.get_ref())
+        .await?;
+
+    if let Some(user) = res {
+        return Ok(true)
+    }
+
+    Ok(false)
+}
+
+pub async fn email_exists(
+    email: String,
+    conn: &Data<DatabaseConnection>
+) -> Result<bool> {
+    let res: Option<user::Model> = user::Entity::find_by_email(email.clone())
+        .one(conn.get_ref())
+        .await?;
+
+    if let Some(user) = res {
+        return Ok(true)
+    }
+
+    Ok(false)
+}
+

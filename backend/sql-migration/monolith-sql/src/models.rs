@@ -40,6 +40,7 @@ pub struct DbResource {
     pub last_edited_at: DateTime<Utc>,
 }
 
+#[derive(Deserialize, Serialize)]
 pub struct User {
     pub id: String,
     pub username: String,
@@ -54,12 +55,14 @@ pub struct FileReference {
     pub size: i32,
 }
 
+#[derive(Deserialize, Serialize)]
 pub struct NewUserForm {
     pub username: String,
     pub email: String,
     pub password: String,
 }
 
+#[derive(Deserialize, Serialize)]
 pub struct UpdateUserForm {
     pub username: String,
     pub email: String,

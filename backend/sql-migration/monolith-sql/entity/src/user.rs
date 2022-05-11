@@ -42,8 +42,12 @@ impl Entity {
         Self::find().filter(Column::Username.eq(username))
     }
 
-    pub fn find_by_discord_id(group_id: String) -> Select<Entity> {
-        Self::find().filter(Column::DiscordId.eq(group_id))
+    pub fn find_by_discord_id(discord_id: String) -> Select<Entity> {
+        Self::find().filter(Column::DiscordId.eq(discord_id))
+    }
+
+    pub fn find_by_email(email: String) -> Select<Entity> {
+        Self::find().filter(Column::Email.eq(email))
     }
 
     pub fn delete_by_id(id: String) -> DeleteMany<Entity> {
