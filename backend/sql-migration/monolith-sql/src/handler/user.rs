@@ -59,7 +59,6 @@ pub async fn get_username(
 #[post("/api/user/create")]
 pub async fn create_user(
     form: web::Json<NewUserForm>,
-    req: HttpRequest,
     conn: web::Data<DatabaseConnection>
 ) -> impl Responder {
     if crate::service::user::username_exists(form.username.clone(), &conn).await.expect("Error") {
@@ -128,4 +127,32 @@ pub async fn delete(
     }
 
     HttpResponse::BadRequest().body("Could not delete user or user does not exist")
+}
+
+#[get("/api/user/check_username/{username}")]
+pub async fn check_userame(
+    path: web::Path<String>,
+    conn: web::Data<DatabaseConnection>,
+) -> impl Responder {
+    let username = path.into_inner();
+
+    if crate::service::user::username_exists(username, &conn).await.expect("Error") {
+        return HttpResponse::BadRequest().body("Username exists");
+    }
+
+    HttpResponse::Ok().body("Username is available")
+}
+
+#[get("/api/user/check_email/{email}")]
+pub async fn check_email(
+    path: web::Path<String>,
+    conn: web::Data<DatabaseConnection>,
+) -> impl Responder {
+    let email = path.into_inner();
+
+    if crate::service::user::email_exists(email, &conn).await.expect("Error") {
+        return HttpResponse::BadRequest().body("Email exists");
+    }
+
+    HttpResponse::Ok().body("Email is available")
 }
