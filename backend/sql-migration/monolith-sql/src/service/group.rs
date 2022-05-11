@@ -10,7 +10,7 @@ use crate::errors::MyDbError;
 use crate::models::{Group, NewGroupForm};
 
 /// Create new group from form.
-/// Returns created user's id.
+/// Returns created group's id.
 pub async fn create(
     group: NewGroupForm,
     creator: String, // user_id of creator
@@ -27,7 +27,10 @@ pub async fn create(
         .await
         .expect("Could not insert group");
 
-    // TODO: Join creator to group
+    join_group(group_id.clone(), creator, conn)
+        .await
+        .expect("Error adding creator to group");
+    // TODO: Way to add user as admin of group
 
     Ok(group_id)
 }
@@ -111,7 +114,7 @@ pub async fn leave_group(
 }
 
 /// Checks if a given user is in the group.
-/// Returns true if they are, otherwise false.
+/// Returns true if they are, otherwise returns false.
 pub async fn user_in_group(
     user_id: String,
     group_id: String,

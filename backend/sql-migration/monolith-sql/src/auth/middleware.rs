@@ -58,6 +58,24 @@ pub fn is_logged_in(req: &HttpRequest, decoding_key: &DecodingKey) -> bool {
 //     }
 // }
 
+pub fn get_user_id(req: &HttpRequest, decoding_key: &DecodingKey) -> Option<String> {
+
+    let auth_token = req.cookie("auth_token");
+
+    if let Some(token) = auth_token {
+        let token = token.value().to_string();
+
+        let possible_claims = decode_auth_token(token, decoding_key);
+
+        if let Some(claims) = possible_claims {
+            return Option::from(claims.sub)
+        }
+
+    }
+
+    None
+}
+
 pub fn has_user_viewing_permission(
     user_id: String,
     req: &HttpRequest,
