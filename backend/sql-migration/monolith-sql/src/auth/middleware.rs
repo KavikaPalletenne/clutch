@@ -1,11 +1,11 @@
-use anyhow::Result;
+use crate::auth::jwt::decode_auth_token;
 use actix_web::body::MessageBody;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::{HttpRequest, web};
+use actix_web::{web, HttpRequest};
 use actix_web_lab::middleware::Next;
+use anyhow::Result;
 use jsonwebtoken::DecodingKey;
 use sea_orm::DatabaseConnection;
-use crate::auth::jwt::decode_auth_token;
 
 // TODO: Proper middleware for authz - https://www.lpalmieri.com/posts/session-based-authentication-in-rust/#3-5-3-a-typed-interface-to-session
 // pub async fn get_principal(
@@ -59,7 +59,6 @@ pub fn is_logged_in(req: &HttpRequest, decoding_key: &DecodingKey) -> bool {
 // }
 
 pub fn get_user_id(req: &HttpRequest, decoding_key: &DecodingKey) -> Option<String> {
-
     let auth_token = req.cookie("auth_token");
 
     if let Some(token) = auth_token {
@@ -68,9 +67,8 @@ pub fn get_user_id(req: &HttpRequest, decoding_key: &DecodingKey) -> Option<Stri
         let possible_claims = decode_auth_token(token, decoding_key);
 
         if let Some(claims) = possible_claims {
-            return Option::from(claims.sub)
+            return Option::from(claims.sub);
         }
-
     }
 
     None
@@ -79,7 +77,7 @@ pub fn get_user_id(req: &HttpRequest, decoding_key: &DecodingKey) -> Option<Stri
 pub fn has_user_viewing_permission(
     user_id: String,
     req: &HttpRequest,
-    decoding_key: &DecodingKey
+    decoding_key: &DecodingKey,
 ) -> bool {
     let token = req.cookie("auth_token");
 
@@ -100,7 +98,7 @@ pub async fn has_resource_viewing_permission(
     resource_id: i64,
     req: &HttpRequest,
     conn: &web::Data<DatabaseConnection>,
-    decoding_key: &DecodingKey
+    decoding_key: &DecodingKey,
 ) -> Result<bool> {
     let token = req.cookie("auth_token");
 
@@ -109,9 +107,11 @@ pub async fn has_resource_viewing_permission(
         let possible_claims = decode_auth_token(t, decoding_key);
 
         if let Some(claims) = possible_claims {
-           if crate::service::resource::user_can_view_resource(claims.sub, resource_id, conn).await? {
-               return Ok(true);
-           }
+            if crate::service::resource::user_can_view_resource(claims.sub, resource_id, conn)
+                .await?
+            {
+                return Ok(true);
+            }
         }
     }
     Ok(false)
@@ -121,7 +121,7 @@ pub async fn has_group_viewing_permission(
     group_id: String,
     req: &HttpRequest,
     conn: &web::Data<DatabaseConnection>,
-    decoding_key: &DecodingKey
+    decoding_key: &DecodingKey,
 ) -> Result<bool> {
     let token = req.cookie("auth_token");
 

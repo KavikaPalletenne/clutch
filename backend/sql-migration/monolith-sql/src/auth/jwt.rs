@@ -1,12 +1,12 @@
-use jsonwebtoken::{decode, Algorithm, Validation, DecodingKey};
-use uuid::Uuid;
+use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AuthorizationJwtPayload {
-    pub iss: String, // issuer
-    pub sub: String, // subject (user's id)
-    pub jti: Uuid, // id
+    pub iss: String,      // issuer
+    pub sub: String,      // subject (user's id)
+    pub jti: Uuid,        // id
     pub aud: Vec<String>, // audience (uri the JWT is meant for)
 
     // Time-based validity
@@ -27,15 +27,18 @@ pub struct AccessTokenResponse {
     pub scope: String,
 }
 
-pub fn decode_auth_token(token: String, decoding_key: &DecodingKey) -> Option<AuthorizationJwtPayload> {
+pub fn decode_auth_token(
+    token: String,
+    decoding_key: &DecodingKey,
+) -> Option<AuthorizationJwtPayload> {
     let decode_token = decode::<AuthorizationJwtPayload>(
         token.as_str(),
         decoding_key,
-        &Validation::new(Algorithm::HS256)
+        &Validation::new(Algorithm::HS256),
     );
 
     return match decode_token {
-        Ok(token) => { Option::from(token.claims) },
-        Err(_err) => { None::<AuthorizationJwtPayload> },
+        Ok(token) => Option::from(token.claims),
+        Err(_err) => None::<AuthorizationJwtPayload>,
     };
 }

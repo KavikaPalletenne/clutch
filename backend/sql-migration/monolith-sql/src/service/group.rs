@@ -1,31 +1,34 @@
-use anyhow::{Result, bail};
 use actix_web::web::Data;
+use anyhow::{bail, Result};
 
+use crate::errors::MyDbError;
+use crate::models::{Group, NewGroupForm};
+use crate::service::hashing::hash;
 use entity::group;
 use entity::group_user;
 use nanoid::nanoid;
-use sea_orm::{DatabaseConnection, Set, ActiveModelTrait, EntityTrait, QueryFilter, ColumnTrait, DeleteResult};
-use crate::service::hashing::hash;
-use crate::errors::MyDbError;
-use crate::models::{Group, NewGroupForm};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, DatabaseConnection, DeleteResult, EntityTrait, QueryFilter, Set,
+};
 
 /// Create new group from form.
 /// Returns created group's id.
 pub async fn create(
     group: NewGroupForm,
     creator: String, // user_id of creator
-    conn: &Data<DatabaseConnection>
+    conn: &Data<DatabaseConnection>,
 ) -> Result<String> {
     let group_id = nanoid!().to_string();
-    group::ActiveModel{
+    group::ActiveModel {
         id: Set(group_id.clone()),
         name: Set(group.name),
         description: Set(group.description),
         discord_id: Set(group.discord_id),
         ..Default::default()
-    }.insert(conn.get_ref())
-        .await
-        .expect("Could not insert group");
+    }
+    .insert(conn.get_ref())
+    .await
+    .expect("Could not insert group");
 
     join_group(group_id.clone(), creator, conn)
         .await
@@ -36,10 +39,7 @@ pub async fn create(
 }
 
 /// Get group by id.
-pub async fn read(
-    group_id: String,
-    conn: &Data<DatabaseConnection>
-) -> Result<Group> {
+pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<Group> {
     let response: Option<group::Model> = group::Entity::find_by_id(group_id.clone())
         .one(conn.get_ref())
         .await?;
@@ -61,10 +61,7 @@ pub async fn update() {
 }
 
 /// Delete group by id.
-pub async fn delete(
-    group_id: String,
-    conn: &Data<DatabaseConnection>
-) -> Result<()> {
+pub async fn delete(group_id: String, conn: &Data<DatabaseConnection>) -> Result<()> {
     let res: DeleteResult = group::Entity::delete_by_id(group_id.clone())
         .exec(conn.get_ref())
         .await?;
@@ -88,9 +85,10 @@ pub async fn join_group(
         user_id: Set(user_id),
         group_id: Set(group_id),
         ..Default::default()
-    }.insert(conn.get_ref())
-        .await
-        .expect("Could not insert group_user");
+    }
+    .insert(conn.get_ref())
+    .await
+    .expect("Could not insert group_user");
 
     Ok(())
 }
@@ -107,7 +105,9 @@ pub async fn leave_group(
         .await?;
 
     if res.rows_affected == 0 {
-        return bail!(MyDbError::NoSuchRow { id: group_id.to_string() });
+        return bail!(MyDbError::NoSuchRow {
+            id: group_id.to_string()
+        });
     }
 
     Ok(())

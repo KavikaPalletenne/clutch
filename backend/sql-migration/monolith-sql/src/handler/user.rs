@@ -1,23 +1,24 @@
+use crate::auth::middleware::{has_user_viewing_permission, is_logged_in};
+use crate::models::{NewUserForm, UpdateUserForm};
+use crate::service::user;
+use actix_web::{get, post, web, web::Data, HttpRequest, HttpResponse, Responder};
 use anyhow::Result;
-use actix_web::{get, post, web::Data, HttpResponse, HttpRequest, Responder, web};
 use jsonwebtoken::DecodingKey;
 use sea_orm::DatabaseConnection;
-use crate::service::user;
-use crate::auth::middleware::{is_logged_in, has_user_viewing_permission};
-use crate::models::{NewUserForm, UpdateUserForm};
 
 #[get("/api/user/{user_id}")]
 pub async fn get(
     path: web::Path<String>,
     req: HttpRequest,
     conn: web::Data<DatabaseConnection>,
-    dk: web::Data<DecodingKey>
+    dk: web::Data<DecodingKey>,
 ) -> impl Responder {
     let user_id = path.into_inner();
 
     if !is_logged_in(&req, &dk) {
         return HttpResponse::TemporaryRedirect()
-            .append_header(("Location", "https://examclutch.com/login")).finish() // Redirect to login
+            .append_header(("Location", "https://examclutch.com/login"))
+            .finish(); // Redirect to login
     } else if !has_user_viewing_permission(user_id.clone(), &req, &dk) {
         return HttpResponse::Unauthorized().finish();
     }
@@ -38,13 +39,14 @@ pub async fn get_username(
     path: web::Path<String>,
     req: HttpRequest,
     conn: web::Data<DatabaseConnection>,
-    dk: web::Data<DecodingKey>
+    dk: web::Data<DecodingKey>,
 ) -> impl Responder {
     let user_id = path.into_inner();
 
     if !is_logged_in(&req, &dk) {
         return HttpResponse::TemporaryRedirect()
-            .append_header(("Location", "https://examclutch.com/login")).finish() // Redirect to login
+            .append_header(("Location", "https://examclutch.com/login"))
+            .finish(); // Redirect to login
     }
     let res = user::read(user_id, &conn).await;
 
@@ -59,11 +61,17 @@ pub async fn get_username(
 #[post("/api/user/create")]
 pub async fn create_user(
     form: web::Json<NewUserForm>,
-    conn: web::Data<DatabaseConnection>
+    conn: web::Data<DatabaseConnection>,
 ) -> impl Responder {
-    if crate::service::user::username_exists(form.username.clone(), &conn).await.expect("Error") {
+    if crate::service::user::username_exists(form.username.clone(), &conn)
+        .await
+        .expect("Error")
+    {
         return HttpResponse::BadRequest().body("Username exists");
-    } else if crate::service::user::email_exists(form.username.clone(), &conn).await.expect("Error") {
+    } else if crate::service::user::email_exists(form.username.clone(), &conn)
+        .await
+        .expect("Error")
+    {
         return HttpResponse::BadRequest().body("Email exists");
     }
 
@@ -84,13 +92,14 @@ pub async fn update(
     path: web::Path<String>,
     req: HttpRequest,
     conn: web::Data<DatabaseConnection>,
-    dk: web::Data<DecodingKey>
+    dk: web::Data<DecodingKey>,
 ) -> impl Responder {
     let user_id = path.into_inner();
 
     if !is_logged_in(&req, &dk) {
         return HttpResponse::TemporaryRedirect()
-            .append_header(("Location", "https://examclutch.com/login")).finish() // Redirect to login
+            .append_header(("Location", "https://examclutch.com/login"))
+            .finish(); // Redirect to login
     } else if !has_user_viewing_permission(user_id.clone(), &req, &dk) {
         return HttpResponse::Unauthorized().finish();
     }
@@ -109,13 +118,14 @@ pub async fn delete(
     path: web::Path<String>,
     req: HttpRequest,
     conn: web::Data<DatabaseConnection>,
-    dk: web::Data<DecodingKey>
+    dk: web::Data<DecodingKey>,
 ) -> impl Responder {
     let user_id = path.into_inner();
 
     if !is_logged_in(&req, &dk) {
         return HttpResponse::TemporaryRedirect()
-            .append_header(("Location", "https://examclutch.com/login")).finish() // Redirect to login
+            .append_header(("Location", "https://examclutch.com/login"))
+            .finish(); // Redirect to login
     } else if !has_user_viewing_permission(user_id.clone(), &req, &dk) {
         return HttpResponse::Unauthorized().finish();
     }
@@ -136,7 +146,10 @@ pub async fn check_userame(
 ) -> impl Responder {
     let username = path.into_inner();
 
-    if crate::service::user::username_exists(username, &conn).await.expect("Error") {
+    if crate::service::user::username_exists(username, &conn)
+        .await
+        .expect("Error")
+    {
         return HttpResponse::BadRequest().body("Username exists");
     }
 
@@ -150,7 +163,10 @@ pub async fn check_email(
 ) -> impl Responder {
     let email = path.into_inner();
 
-    if crate::service::user::email_exists(email, &conn).await.expect("Error") {
+    if crate::service::user::email_exists(email, &conn)
+        .await
+        .expect("Error")
+    {
         return HttpResponse::BadRequest().body("Email exists");
     }
 

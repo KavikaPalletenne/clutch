@@ -1,20 +1,17 @@
-use anyhow::{Result, bail};
 use actix_web::web::Data;
+use anyhow::{bail, Result};
 
-use entity::user;
-use entity::group;
-use nanoid::nanoid;
-use sea_orm::{DatabaseConnection, Set, ActiveModelTrait, EntityTrait, DeleteResult};
-use crate::service::hashing::hash;
-use crate::models::{User, NewUserForm, UpdateUserForm};
 use crate::errors::MyDbError;
+use crate::models::{NewUserForm, UpdateUserForm, User};
+use crate::service::hashing::hash;
+use entity::group;
+use entity::user;
+use nanoid::nanoid;
+use sea_orm::{ActiveModelTrait, DatabaseConnection, DeleteResult, EntityTrait, Set};
 
 /// Create new user from form.
 /// Returns created user's id.
-pub async fn create(
-    user: NewUserForm,
-    conn: &Data<DatabaseConnection>
-) -> Result<String> {
+pub async fn create(user: NewUserForm, conn: &Data<DatabaseConnection>) -> Result<String> {
     let user_id = nanoid!().to_string();
     user::ActiveModel {
         id: Set(user_id.clone()),
@@ -23,18 +20,16 @@ pub async fn create(
         password: Set(hash(user.password)),
         discord_id: Set(Option::None),
         ..Default::default()
-    }.insert(conn.get_ref())
-        .await
-        .expect("Could not insert user");
+    }
+    .insert(conn.get_ref())
+    .await
+    .expect("Could not insert user");
 
     Ok(user_id)
 }
 
 /// Get user by id.
-pub async fn read(
-    user_id: String,
-    conn: &Data<DatabaseConnection>
-) -> Result<User> {
+pub async fn read(user_id: String, conn: &Data<DatabaseConnection>) -> Result<User> {
     let response: Option<user::Model> = user::Entity::find_by_id(user_id.clone())
         .one(conn.get_ref())
         .await?;
@@ -44,7 +39,7 @@ pub async fn read(
             id: u.id,
             username: u.username,
             email: u.email,
-            discord_id: None
+            discord_id: None,
         });
     }
 
@@ -55,7 +50,7 @@ pub async fn read(
 pub async fn update(
     user_id: String,
     data: UpdateUserForm,
-    conn: &Data<DatabaseConnection>
+    conn: &Data<DatabaseConnection>,
 ) -> Result<()> {
     let response: Option<user::Model> = user::Entity::find_by_id(user_id.clone())
         .one(conn.get_ref())
@@ -73,7 +68,10 @@ pub async fn update(
 
         let new: user::Model = u.update(conn.get_ref()).await?;
         if new.username.ne(&data.username) || new.email.ne(&data.email) {
-            return bail!(MyDbError::BadUpdate { id: user_id, table_name: "users".to_string() });
+            return bail!(MyDbError::BadUpdate {
+                id: user_id,
+                table_name: "users".to_string()
+            });
         }
 
         return Ok(());
@@ -83,10 +81,7 @@ pub async fn update(
 }
 
 /// Delete user by id.
-pub async fn delete(
-    user_id: String,
-    conn: &Data<DatabaseConnection>
-) -> Result<()> {
+pub async fn delete(user_id: String, conn: &Data<DatabaseConnection>) -> Result<()> {
     let res: DeleteResult = user::Entity::delete_by_id(user_id.clone())
         .exec(conn.get_ref())
         .await?;
@@ -101,33 +96,26 @@ pub async fn delete(
 ///////////////////////
 // Utility Functions //
 ///////////////////////
-pub async fn username_exists(
-    username: String,
-    conn: &Data<DatabaseConnection>
-) -> Result<bool> {
+pub async fn username_exists(username: String, conn: &Data<DatabaseConnection>) -> Result<bool> {
     let res: Option<user::Model> = user::Entity::find_by_username(username.clone())
         .one(conn.get_ref())
         .await?;
 
     if let Some(user) = res {
-        return Ok(true)
+        return Ok(true);
     }
 
     Ok(false)
 }
 
-pub async fn email_exists(
-    email: String,
-    conn: &Data<DatabaseConnection>
-) -> Result<bool> {
+pub async fn email_exists(email: String, conn: &Data<DatabaseConnection>) -> Result<bool> {
     let res: Option<user::Model> = user::Entity::find_by_email(email.clone())
         .one(conn.get_ref())
         .await?;
 
     if let Some(user) = res {
-        return Ok(true)
+        return Ok(true);
     }
 
     Ok(false)
 }
-

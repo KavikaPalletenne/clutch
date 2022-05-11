@@ -1,9 +1,6 @@
 use chrono::{DateTime, Utc};
+use sea_orm::DeriveIntoActiveModel;
 use serde::{Deserialize, Serialize};
-use sea_orm::{
-    DeriveIntoActiveModel,
-};
-
 
 #[derive(Deserialize, Serialize)]
 pub struct Resource {
