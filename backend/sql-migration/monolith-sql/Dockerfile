@@ -3,6 +3,8 @@ FROM rust:1.60 as builder
 RUN USER=root cargo new --bin monolith
 WORKDIR ./monolith
 COPY ./Cargo.toml ./Cargo.toml
+COPY ./entity ./entity
+COPY ./migration ./migration
 RUN cargo build --release
 RUN rm src/*.rs
 
