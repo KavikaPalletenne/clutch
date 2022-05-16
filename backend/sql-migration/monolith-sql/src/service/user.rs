@@ -135,5 +135,5 @@ pub async fn get_by_email(email: String, conn: &Data<DatabaseConnection>) -> Res
         });
     }
 
-    bail!(MyDbError::NoSuchRow { id: group_id })
+    bail!(MyDbError::NoSuchRow { id: email })
 }
