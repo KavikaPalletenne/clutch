@@ -23,7 +23,7 @@ type Group = {
 }
 
 export type Resource = {
-    id: BigInteger;
+    id: bigint;
     user_id: string;
     group_id: string;
     title: string;
@@ -57,7 +57,7 @@ export default function GroupPage({ group }: {
     const [fullResources, setFullResources] = useState([] as Resource[])
     const [stateResources, setStateResources] = useState([] as Resource[])
     const listResources = stateResources.map((r: Resource) =>
-            <div key={r.id.$oid} className="pb-3">
+            <div key={r.title} className="pb-3">
                 <ResourceCard propResource={r} />
             </div>
     );

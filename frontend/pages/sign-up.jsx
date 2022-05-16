@@ -20,7 +20,7 @@ export default function Register() {
     const router = useRouter()
    
 
-    const submit = async (e: SyntheticEvent) => {
+    const submit = async (e) => {
         e.preventDefault()
 
         document.getElementById("confirmEmailText").className = "text-transparent text-xs float-right pr-1"

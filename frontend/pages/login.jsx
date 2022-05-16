@@ -36,7 +36,7 @@ export default function Login() {
     }, [])
 
     
-    const submit = async (e: SyntheticEvent) => {
+    const submit = async (e) => {
         e.preventDefault()
 
         await fetch("https://api.examclutch.com/api/auth/login", {
