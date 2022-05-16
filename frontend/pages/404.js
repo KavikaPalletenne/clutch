@@ -20,7 +20,7 @@ export default function Custom404() {
             <div className="lg:pt-10 lg:pl-32 text-white lg:pr-32 pt-10 pl-5 pr-5">
                 <Link href="/app">
                 <a>
-                    <img className="float-left lg:w-96 w-12" src="logo_white.svg"/>
+                    <img className="float-left lg:w-96 w-12" src="/logo_white.svg"/>
                 </a>
                 </Link>
             </div>

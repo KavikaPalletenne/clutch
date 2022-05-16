@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     if (cookies.get("user_id") == undefined || cookies.get("auth_token") == undefined) {
         return {
             redirect: {
-                destination: '/api/login',
+                destination: '/login',
                 permanent: false,
             }
         }
@@ -47,7 +47,7 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     if (check_login.status != 200) {
         return {
             redirect: {
-                destination: '/api/login',
+                destination: '/login',
                 permanent: false,
             }
         }
@@ -62,14 +62,14 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
         if (groups.status == 401) {
             return {
                 redirect: {
-                    destination: '/api/login',
+                    destination: '/login',
                     permanent: false,
                 }
             }
         }
         return {
             redirect: {
-                destination: '/api/login',
+                destination: '/login',
                 permanent: false,
             }
         }
@@ -80,7 +80,7 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     if (!user_groups) {
         return {
             redirect: {
-                destination: '/api/login',
+                destination: '/login',
                 permanent: false,
             }
         }

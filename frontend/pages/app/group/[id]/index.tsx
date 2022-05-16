@@ -202,7 +202,10 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
         
         if (group_res.status != 401) {
             return {
-                notFound: true,
+                redirect: {
+                    destination: '/app',
+                    permanent: false,
+                }
             }
         }
     }

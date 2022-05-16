@@ -31,7 +31,7 @@ type User = {
 }
 
 type Group = {
-    _id: string;
+    id: string;
     name: string;
     description: string;
     discord_link: string;

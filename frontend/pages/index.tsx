@@ -31,11 +31,16 @@ const Home: NextPage = () => {
             </Link>
             
             <nav>  
-                <div className={styles.headerButtonSection}>
-                    <Link href="https://discord.com/api/oauth2/authorize?client_id=917954795384500236&redirect_uri=https%3A%2F%2Fapi.examclutch.com%2Fapi%2Fauth%2Foauth2%2Fdiscord%2Fredirect&response_type=code&scope=identify%20email%20guilds">
+                <div className={"flex text-white float-right"}>
+                    <Link href="/login">
+                        <a className="pt-2 pr-3">
+                            Login
+                        </a>
+                    </Link>
+                    <Link href="/sign-up">
                         <a className={styles.headerSignUpButton}>
-                            <FaDiscord className="pr-2 lg:w-8"/>
-                            Sign in
+                            {/* <FaDiscord className="pr-2 lg:w-8"/> */}
+                            Sign Up
                         </a>
                     </Link>
                 </div>
