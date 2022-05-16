@@ -92,8 +92,12 @@ async fn main() -> Result<()> {
         App::new()
             .wrap(cors)
             .wrap(Logger::default())
+            // Auth service
+            .app_data(Data::new(jwt_encoding_key.clone()))
+            .app_data(Data::new(jwt_decoding_key.clone()))
+            .service(handler::auth::register)
+            .service(handler::auth::login)
             // OAuth2 Service
-            // .app_data(Data::new(jwt_encoding_key.clone()))
             // .service(oauth2::user_registration)
             // .service(oauth2::authorize)
             // .service(oauth2::get_user_guilds) // TODO: Oauth2 Service

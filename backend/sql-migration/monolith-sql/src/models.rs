@@ -46,6 +46,15 @@ pub struct User {
     pub discord_id: Option<String>,
 }
 
+#[derive(Deserialize, Serialize)]
+pub struct AuthUser {
+    pub id: String,
+    pub username: String,
+    pub email: String,
+    pub password: String,
+    pub discord_id: Option<String>,
+}
+
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 pub struct CreateUserForm {
     pub username: String,
@@ -80,6 +89,12 @@ pub struct SearchResource {
 #[derive(Deserialize, Serialize, Clone, PartialEq)]
 pub struct NewUserForm {
     pub username: String,
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Deserialize, Serialize, Clone, PartialEq)]
+pub struct LoginForm {
     pub email: String,
     pub password: String,
 }

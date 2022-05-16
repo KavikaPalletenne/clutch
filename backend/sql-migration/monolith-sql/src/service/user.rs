@@ -2,7 +2,7 @@ use actix_web::web::Data;
 use anyhow::{bail, Result};
 
 use crate::errors::MyDbError;
-use crate::models::{NewUserForm, UpdateUserForm, User};
+use crate::models::{AuthUser, NewUserForm, UpdateUserForm, User};
 use crate::service::hashing::hash;
 use entity::group;
 use entity::user;
@@ -118,4 +118,22 @@ pub async fn email_exists(email: String, conn: &Data<DatabaseConnection>) -> Res
     }
 
     Ok(false)
+}
+
+pub async fn get_by_email(email: String, conn: &Data<DatabaseConnection>) -> Result<AuthUser> {
+    let res: Option<user::Model> = user::Entity::find_by_email(email.clone())
+        .one(conn.get_ref())
+        .await?;
+
+    if let Some(user) = res {
+        return Ok(AuthUser {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            password: user.password,
+            discord_id: user.discord_id
+        });
+    }
+
+    bail!(MyDbError::NoSuchRow { id: group_id })
 }

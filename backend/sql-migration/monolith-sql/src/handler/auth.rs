@@ -1,6 +1,6 @@
 use crate::auth::jwt::create_auth_token;
-use crate::models::NewUserForm;
-use crate::service::user::{create, email_exists, username_exists};
+use crate::models::{LoginForm, NewUserForm};
+use crate::service::user::{create, email_exists, get_by_email, username_exists};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use cookie::Cookie;
 use jsonwebtoken::EncodingKey;
@@ -24,6 +24,24 @@ pub async fn register(
     }
 
     HttpResponse::BadRequest().body("Unable to register")
+}
+
+#[post("/api/auth/login")]
+pub async fn login(
+    req: HttpRequest,
+    form: web::Json<LoginForm>,
+    conn: web::Data<DatabaseConnection>,
+    ek: web::Data<EncodingKey>,
+) -> impl Responder {
+    if !email_exists(form.clone().email, &conn).await.expect("Error") {
+        return HttpResponse::BadRequest().body("Invalid credentials");
+    }
+
+    if let Ok(user) = get_by_email(form.clone().email, &conn).await {
+        return create_login_response(user.username, user.id, ek.get_ref());
+    }
+
+    HttpResponse::BadRequest().body("Invalid credentials")
 }
 
 pub fn create_login_response(username: String, user_id: String, ek: &EncodingKey) -> HttpResponse {
