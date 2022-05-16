@@ -115,7 +115,7 @@ pub async fn read(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result<R
         title: resource.title,
         description: resource.description,
         subject: resource.subject,
-        tags: Option::None,
+        tags: Option::from(Vec::<String>::new()),
         files: Option::from(res_files),
         last_edited_at: resource.last_edited_at,
     })
@@ -187,7 +187,7 @@ pub async fn get_resource_by_group(
             title: resource.title,
             description: resource.description,
             subject: resource.subject,
-            tags: Option::None,
+            tags: Option::from(Vec::<String>::new()),
             files: Option::from(res_files),
             last_edited_at: resource.last_edited_at,
         })
@@ -234,7 +234,7 @@ pub async fn get_resource_by_user(
             title: resource.title,
             description: resource.description,
             subject: resource.subject,
-            tags: Option::None,
+            tags: Option::from(Vec::<String>::new()),
             files: Option::from(res_files),
             last_edited_at: resource.last_edited_at,
         })
