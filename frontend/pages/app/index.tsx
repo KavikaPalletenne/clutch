@@ -53,7 +53,7 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
         }
     }
 
-    const groups = await fetch(`https://api.examclutch.com/api/user/get_user_groups/${cookies.get("user_id")}`, {
+    const groups = await fetch(`https://api.examclutch.com/api/group/user_groups/${cookies.get("user_id")}`, {
         credentials: 'include',
         headers: req ? {cookie: req.cookies.value } : undefined
     });
@@ -86,6 +86,14 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
         }
     }
     
+    if (user_groups.length == 0) {
+        return {
+            redirect: {
+                destination: '/app/join',
+                permanent: false,
+            }
+        }  
+    }    
 
     return {
         redirect: {

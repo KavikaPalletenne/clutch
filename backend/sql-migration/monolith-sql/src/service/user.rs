@@ -39,7 +39,7 @@ pub async fn read(user_id: String, conn: &Data<DatabaseConnection>) -> Result<Us
             id: u.id,
             username: u.username,
             email: u.email,
-            discord_id: None,
+            discord_id: u.discord_id,
         });
     }
 

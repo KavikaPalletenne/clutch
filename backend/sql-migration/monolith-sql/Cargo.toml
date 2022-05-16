@@ -30,6 +30,12 @@ rs-snowflake = "0.6"
 # Middleware (AuthZ & AuthN)
 actix-web-lab = "0.16"
 
+# File upload/download
+rust-s3 = "0.31"
+
+# Search
+meilisearch-sdk = "0.17"
+
 # Other dependencies
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }
@@ -38,4 +44,5 @@ chrono = { version = "0.4", features = ["serde"] }
 nanoid = "0.4"
 thiserror = "1"
 jsonwebtoken = "8"
-uuid = { version = "1", features = ["serde"] }
+uuid = { version = "1", features = ["serde", "v4"] }
+cookie = "0.16"

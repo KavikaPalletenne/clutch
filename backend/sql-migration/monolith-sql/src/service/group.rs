@@ -132,3 +132,20 @@ pub async fn user_in_group(
 
     Ok(false)
 }
+
+pub async fn get_user_groups(
+    user_id: String,
+    conn: &Data<DatabaseConnection>,
+) -> Result<Vec<String>> {
+    let res: Vec<group_user::Model> = group_user::Entity::find()
+        .filter(group_user::Column::UserId.contains(&user_id.clone()))
+        .all(conn.get_ref())
+        .await?;
+
+    let mut response = Vec::<String>::new();
+    for i in res {
+        response.push(i.group_id);
+    }
+
+    Ok(response)
+}

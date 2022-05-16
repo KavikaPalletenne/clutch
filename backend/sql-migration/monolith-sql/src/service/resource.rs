@@ -151,8 +151,8 @@ pub async fn delete(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result
 ///////////////////////
 pub async fn get_resource_by_group(
     group_id: String,
-    per_page: i32,
-    page_num: i32,
+    // per_page: i32,
+    // page_num: i32,
     conn: &Data<DatabaseConnection>,
 ) -> Result<Vec<Resource>> {
     let mut response: Vec<(resource::Model, Vec<file_reference::Model>)> = resource::Entity::find()

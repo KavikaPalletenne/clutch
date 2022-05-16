@@ -1,5 +1,8 @@
-use crate::auth::middleware::{get_user_id, has_group_viewing_permission, is_logged_in};
+use crate::auth::middleware::{
+    get_user_id, has_group_viewing_permission, has_user_viewing_permission, is_logged_in,
+};
 use crate::models::NewGroupForm;
+use crate::service;
 use crate::service::group;
 use crate::service::group::user_in_group;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
@@ -158,4 +161,32 @@ pub async fn leave_group(
     }
 
     HttpResponse::BadRequest().body("Could not leave group")
+}
+
+#[get("/api/group/user_groups/{user_id}")]
+pub async fn get_user_groups(
+    req: HttpRequest,
+    path: web::Path<String>,
+    conn: web::Data<DatabaseConnection>,
+    dk: web::Data<DecodingKey>,
+) -> impl Responder {
+    let user_id = path.into_inner();
+
+    if !is_logged_in(&req, &dk) {
+        return HttpResponse::TemporaryRedirect()
+            .append_header(("Location", "https://examclutch.com/login"))
+            .finish(); // Redirect to login
+    } else if !has_user_viewing_permission(user_id.clone(), &req, &dk) {
+        return HttpResponse::Unauthorized().finish();
+    }
+
+    let res = service::group::get_user_groups(user_id.clone(), &conn).await;
+
+    if let Ok(groups) = res {
+        return HttpResponse::Ok()
+            .append_header(("Content-Type", "application/json"))
+            .body(serde_json::to_string(&groups).unwrap());
+    }
+
+    HttpResponse::BadRequest().body("Could not find user")
 }

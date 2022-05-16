@@ -49,7 +49,7 @@ export default function GroupNavigation(props: {
         setLoading(true)
         setUserId(Cookies.get('user_id'))
         console.log("User_id: " + userId)
-        fetch(`https://api.examclutch.com/api/user/get_user_groups/${userId}`, {
+        fetch(`https://api.examclutch.com/api/group/user_groups/${userId}`, {
             credentials: 'include',
         })
         .then((res) => res.json())

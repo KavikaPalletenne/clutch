@@ -1,5 +1,6 @@
-use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use uuid::Uuid;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -15,7 +16,6 @@ pub struct AuthorizationJwtPayload {
     pub iat: i64, // issued-at (UNIX timestamp)
 
     pub username: String, // username
-    pub access_token_response: AccessTokenResponse,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -25,6 +25,23 @@ pub struct AccessTokenResponse {
     pub expires_in: u64,
     pub refresh_token: String,
     pub scope: String,
+}
+
+pub fn create_auth_token(user_id: String, username: String, encoding_key: &EncodingKey) -> String {
+    let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let expiry = i64::try_from((current_time + Duration::from_secs(604800)).as_secs()).unwrap(); // Expiry is 7 days (same as Discord)
+    let claims = AuthorizationJwtPayload {
+        iss: "examclutch".to_string(),
+        sub: user_id,
+        jti: Uuid::new_v4(),
+        aud: vec!["*.examclutch.com".to_string()],
+        exp: expiry,
+        nbf: i64::try_from(current_time.as_secs()).unwrap(),
+        iat: i64::try_from(current_time.as_secs()).unwrap(),
+        username,
+    };
+
+    encode(&Header::default(), &claims, encoding_key).unwrap()
 }
 
 pub fn decode_auth_token(

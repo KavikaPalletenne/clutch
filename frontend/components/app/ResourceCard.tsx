@@ -32,7 +32,7 @@ export default function ResourceCard(props: {
 }) {
 
     const resource = {
-        "id": props.propResource._id,
+        "id": props.propResource.id,
         "group_id": props.propResource.group_id,
         "author": props.propResource.user_id,
         "title": props.propResource.title,
