@@ -2,7 +2,7 @@ use actix_web::web::Data;
 use anyhow::{bail, Result};
 
 use crate::errors::MyDbError;
-use crate::models::{Group, NewGroupForm};
+use crate::models::{Group, GroupResponse, NewGroupForm};
 use crate::service::hashing::hash;
 use entity::group;
 use entity::group_user;
@@ -39,21 +39,33 @@ pub async fn create(
 }
 
 /// Get group by id.
-pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<Group> {
-    let response: Option<group::Model> = group::Entity::find_by_id(group_id.clone())
-        .one(conn.get_ref())
-        .await?;
+pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<GroupResponse> {
 
-    if let Some(g) = response {
-        return Ok(Group {
-            id: g.id,
-            name: g.name,
-            description: g.description,
-            discord_id: g.discord_id,
+    let response: Vec<(group::Model, Vec<group_user::Model>)> =
+        group::Entity::find_by_id(group_id.clone())
+            .find_with_related(group_user::Entity)
+            .all(conn.get_ref())
+            .await?;
+
+    if response.len() == 0 {
+        return bail!(MyDbError::NoSuchRow {
+            id: resource_id.to_string()
         });
     }
 
-    bail!(MyDbError::NoSuchRow { id: group_id })
+    let (g, u) = response[0].clone();
+    let mut users = Vec::<String>::new();
+    for user in u {
+        users.push(user.user_id);
+    }
+    Ok(GroupResponse {
+        id: g.id,
+        name: g.name,
+        description: g.description,
+        discord_link: g.discord_id,
+        members: users,
+        administrators: vec![], // TODO: Make roles in group_user table and return admins
+    })
 }
 
 pub async fn update() {

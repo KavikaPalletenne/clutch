@@ -113,6 +113,18 @@ pub struct Group {
     pub discord_id: String,
 }
 
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct GroupResponse {
+    #[serde(rename = "_id")]
+    // rename to _id and use and document id in database
+    pub id: String, // Same id as Discord guild id
+    pub name: String,
+    pub description: String,
+    pub discord_link: String,
+    pub members: Vec<String>,        // id's of users that are members
+    pub administrators: Vec<String>, // id's of users that are administrators
+}
+
 #[derive(Deserialize, Serialize, Clone)]
 pub struct NewGroupForm {
     pub name: String,
