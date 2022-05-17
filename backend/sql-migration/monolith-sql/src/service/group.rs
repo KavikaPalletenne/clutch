@@ -40,7 +40,6 @@ pub async fn create(
 
 /// Get group by id.
 pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<GroupResponse> {
-
     let response: Vec<(group::Model, Vec<group_user::Model>)> =
         group::Entity::find_by_id(group_id.clone())
             .find_with_related(group_user::Entity)
@@ -49,7 +48,7 @@ pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<G
 
     if response.len() == 0 {
         return bail!(MyDbError::NoSuchRow {
-            id: resource_id.to_string()
+            id: group_id.to_string()
         });
     }
 

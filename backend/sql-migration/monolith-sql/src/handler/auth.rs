@@ -13,9 +13,15 @@ pub async fn register(
     conn: web::Data<DatabaseConnection>,
     ek: web::Data<EncodingKey>,
 ) -> impl Responder {
-    if username_exists(form.clone().username, &conn).await.expect("Error") {
+    if username_exists(form.clone().username, &conn)
+        .await
+        .expect("Error")
+    {
         return HttpResponse::BadRequest().body("Username exists");
-    } else if email_exists(form.clone().email, &conn).await.expect("Error") {
+    } else if email_exists(form.clone().email, &conn)
+        .await
+        .expect("Error")
+    {
         return HttpResponse::BadRequest().body("Email exists");
     }
 
@@ -33,7 +39,10 @@ pub async fn login(
     conn: web::Data<DatabaseConnection>,
     ek: web::Data<EncodingKey>,
 ) -> impl Responder {
-    if !email_exists(form.clone().email, &conn).await.expect("Error") {
+    if !email_exists(form.clone().email, &conn)
+        .await
+        .expect("Error")
+    {
         return HttpResponse::BadRequest().body("Invalid credentials");
     }
 

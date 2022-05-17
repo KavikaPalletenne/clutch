@@ -131,7 +131,7 @@ pub async fn get_by_email(email: String, conn: &Data<DatabaseConnection>) -> Res
             username: user.username,
             email: user.email,
             password: user.password,
-            discord_id: user.discord_id
+            discord_id: user.discord_id,
         });
     }
 
