@@ -19,6 +19,31 @@ export default function Register() {
 
     const router = useRouter()
    
+    const onUsernameChange = async (username) => {
+        await fetch(`https://api.examclutch.com/api/user/check_username/${username}`).then(
+            (res) => {
+                if (res.status == 400) {
+                    document.getElementById("usernameExistsText").className = "text-red-500 text-xs float-right pr-1"
+                    return
+                } else {
+                    setUsername(username)
+                }
+            }
+        )
+    }
+
+    const onEmailChange = async (email) => {
+        await fetch(`https://api.examclutch.com/api/user/check_email/${email}`).then(
+            (res) => {
+                if (res.status == 400) {
+                    document.getElementById("emailExistsText").className = "text-red-500 text-xs float-right pr-1"
+                    return
+                } else {
+                    setEmail(email)
+                }
+            }
+        )
+    }
 
     const submit = async (e) => {
         e.preventDefault()
@@ -87,12 +112,14 @@ export default function Register() {
                     
                     <div className="pb-5">
                     <label htmlFor="username" className="sr-only">Username</label>
-                    <input id="username" name="username" type="text" autoComplete="username" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Username" onChange={e => setUsername(e.target.value)}/>
+                    <input id="username" name="username" type="text" autoComplete="username" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Username" onChange={e => onUsernameChange(e.target.value)}/>
+                    <p id="usernameExistsText" className="text-transparent text-xs float-right pr-1">Username exists</p>
                     </div>
 
                     <div className="pb-5">
                     <label htmlFor="email" className="sr-only">Email address</label>
-                    <input id="email" name="email" type="email" autoComplete="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Email address" onChange={e => setEmail(e.target.value)}/>
+                    <input id="email" name="email" type="email" autoComplete="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Email address" onChange={e => onEmailChange(e.target.value)}/>
+                    <p id="emailExistsText" className="text-transparent text-xs float-right pr-1">Email exists</p>
                     </div>
 
                     <div>
