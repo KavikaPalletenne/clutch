@@ -26,6 +26,17 @@ pub struct ResourceForm {
     pub files: Option<Vec<FileReference>>,
 }
 
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+pub struct SearchResource {
+    pub user_id: String,
+    pub group_id: String,
+    pub title: String,
+    pub description: String,
+    pub subject: String,
+    pub tags: Option<Vec<String>>,
+    pub files: Option<Vec<FileReference>>,
+}
+
 #[derive(Deserialize, Serialize)]
 pub struct DbResource {
     pub id: String,
@@ -73,17 +84,6 @@ pub struct CreatedResourceResponse {
     pub resource_id: i64,
     pub group_id: String,
     pub file_put_urls: Option<Vec<String>>,
-}
-
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
-pub struct SearchResource {
-    pub user_id: String,
-    pub group_id: String,
-    pub title: String,
-    pub description: String,
-    pub subject: String,
-    pub tags: Option<Vec<String>>,
-    pub files: Option<Vec<FileReference>>,
 }
 
 #[derive(Deserialize, Serialize, Clone, PartialEq)]
