@@ -32,7 +32,7 @@ const Home: NextPage = () => {
             
             <nav>  
                 <div className={"flex text-white float-right"}>
-                    <Link href="/login">
+                    <Link href="/app">
                         <a className="pt-2 pr-3">
                             Login
                         </a>
