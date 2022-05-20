@@ -23,6 +23,7 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .primary_key()
                     )
+                    .col(ColumnDef::new(user::Column::Username).string().not_null())
                     .col(ColumnDef::new(user::Column::Email).string().not_null())
                     .col(ColumnDef::new(user::Column::Password).string().not_null())
                     .col(ColumnDef::new(user::Column::DiscordId).string()) // Nullable

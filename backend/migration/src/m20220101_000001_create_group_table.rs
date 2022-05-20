@@ -20,8 +20,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(group::Column::Id)
-                            .integer()
-                            .auto_increment()
+                            .string()
                             .not_null()
                             .primary_key()
                     )
