@@ -64,7 +64,7 @@ pub async fn authorize(
     let token = req.cookie("auth_token");
 
     if let Some(cookie) = token {
-        if let Some(_) = decode_auth_token(cookie.to_string(), dk.get_ref()) {
+        if let Some(_) = decode_auth_token(cookie.value().to_string(), dk.get_ref()) {
             return HttpResponse::Ok().body("Authorized");
         }
     }
