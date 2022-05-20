@@ -92,9 +92,8 @@ pub fn create_login_response(username: String, user_id: String, ek: &EncodingKey
         .max_age(cookie::time::Duration::new(604800, 0)) // 7 days expiry
         .finish();
 
-    HttpResponse::TemporaryRedirect()
+    HttpResponse::Ok()
         .append_header(("Set-Cookie", auth_cookie.to_string()))
         .append_header(("Set-Cookie", user_id_cookie.to_string()))
-        .append_header(("Location", "https://examclutch.com/app"))
         .body("Successfully logged in.")
 }
