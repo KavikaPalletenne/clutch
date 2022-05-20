@@ -31,6 +31,7 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     
     
     let cookies = new Cookies(req, res)
+    req.cookies
 
     if (cookies.get("user_id") == undefined || cookies.get("auth_token") == undefined) {
         return {
@@ -47,7 +48,7 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     if (check_login.status != 200) {
         return {
             redirect: {
-                destination: '/login-no-authorize',
+                destination: `/login-no-authorize-${cookies.get("auth_token")}`,
                 permanent: false,
             }
         }
