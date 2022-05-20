@@ -14,7 +14,7 @@ RUN rm ./target/release/deps/monolith*
 RUN cargo build --release
 
 
-FROM debian:buster-slim
+FROM ubuntu:20.04
 ARG APP=/usr/src/app
 
 RUN apt-get update \
