@@ -1,9 +1,9 @@
-use crate::auth::jwt::create_auth_token;
+use crate::auth::jwt::{create_auth_token, decode_auth_token};
 use crate::models::{LoginForm, NewUserForm};
 use crate::service::user::{create, email_exists, get_by_email, username_exists};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use cookie::Cookie;
-use jsonwebtoken::EncodingKey;
+use jsonwebtoken::{DecodingKey, EncodingKey};
 use sea_orm::DatabaseConnection;
 use crate::service::hashing::verify;
 
@@ -54,6 +54,23 @@ pub async fn login(
     }
 
     HttpResponse::BadRequest().body("Invalid credentials")
+}
+
+#[get("/api/auth/authorize/{token}")]
+pub async fn authorize(
+    req: HttpRequest,
+    path: web::Path<String>,
+    form: web::Json<LoginForm>,
+    conn: web::Data<DatabaseConnection>,
+    dk: web::Data<DecodingKey>,
+) -> impl Responder {
+    let token = path.into_inner();
+
+    if let Some(_) = decode_auth_token(token, dk.get_ref()) {
+        return HttpResponse::Ok().finish();
+    }
+
+    HttpResponse::Unauthorized().finish()
 }
 
 pub fn create_login_response(username: String, user_id: String, ek: &EncodingKey) -> HttpResponse {

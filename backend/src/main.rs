@@ -97,6 +97,7 @@ async fn main() -> Result<()> {
             .app_data(Data::new(jwt_decoding_key.clone()))
             .service(handler::auth::register)
             .service(handler::auth::login)
+            .service(handler::auth::authorize)
             // OAuth2 Service
             // .service(oauth2::user_registration)
             // .service(oauth2::authorize)
