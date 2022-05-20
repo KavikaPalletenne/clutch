@@ -65,11 +65,11 @@ pub async fn authorize(
 
     if let Some(cookie) = token {
         if let Some(_) = decode_auth_token(cookie.to_string(), dk.get_ref()) {
-            return HttpResponse::Ok().finish();
+            return HttpResponse::Ok().body("Authorized");
         }
     }
 
-    HttpResponse::Unauthorized().finish()
+    HttpResponse::Unauthorized().body("Unauthorized")
 }
 
 pub fn create_login_response(username: String, user_id: String, ek: &EncodingKey) -> HttpResponse {
