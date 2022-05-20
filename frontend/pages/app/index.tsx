@@ -77,14 +77,14 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     
     const user_groups = await groups.json() as string[];
 
-    if (!user_groups) {
-        return {
-            redirect: {
-                destination: '/login',
-                permanent: false,
-            }
-        }
-    }
+    // if (!user_groups) {
+    //     return {
+    //         redirect: {
+    //             destination: '/login',
+    //             permanent: false,
+    //         }
+    //     }
+    // }
     
     if (user_groups.length == 0) {
         return {
