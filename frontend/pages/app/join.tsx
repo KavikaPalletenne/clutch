@@ -16,7 +16,7 @@ export default function Login() {
         e.preventDefault();
 
         await fetch(`https://api.examclutch.com/api/group/join/${groupId}`, {
-            method: "GET",
+            method: "POST",
             credentials: 'include'  
         }).then(function(response) {
             if (response.status == 200 || response.status == 400) {
