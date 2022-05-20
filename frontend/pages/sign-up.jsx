@@ -20,6 +20,8 @@ export default function Register() {
     const router = useRouter()
    
     const onUsernameChange = async (username) => {
+        document.getElementById("usernameExistsText").className = "text-transparent text-xs float-right pr-1"
+        
         await fetch(`https://api.examclutch.com/api/user/check_username/${username}`).then(
             (res) => {
                 if (res.status == 400) {
@@ -33,6 +35,8 @@ export default function Register() {
     }
 
     const onEmailChange = async (email) => {
+        document.getElementById("emailExistsText").className = "text-transparent text-xs float-right pr-1"
+        
         await fetch(`https://api.examclutch.com/api/user/check_email/${email}`).then(
             (res) => {
                 if (res.status == 400) {
@@ -69,6 +73,25 @@ export default function Register() {
             document.getElementById("confirmPasswordText").className = "text-red-500 text-xs float-right pr-1"
             return
         }
+
+        await fetch("https://api.examclutch.com/api/auth/register", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                'username': username,
+                'email': email,
+                'password': password,
+            })
+        }).then((res) => {
+            if (res.status == 200) {
+                router.push("/app")
+                return
+            }
+            return            
+        })
 
     }
     
