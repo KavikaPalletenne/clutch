@@ -5,6 +5,7 @@ use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use cookie::Cookie;
 use jsonwebtoken::EncodingKey;
 use sea_orm::DatabaseConnection;
+use crate::service::hashing::verify;
 
 #[post("/api/auth/register")]
 pub async fn register(
@@ -47,7 +48,9 @@ pub async fn login(
     }
 
     if let Ok(user) = get_by_email(form.clone().email, &conn).await {
-        return create_login_response(user.username, user.id, ek.get_ref());
+        if verify(form.clone().password, user.clone().password) {
+            return create_login_response(user.username, user.id, ek.get_ref());
+        }
     }
 
     HttpResponse::BadRequest().body("Invalid credentials")

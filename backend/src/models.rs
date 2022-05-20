@@ -57,7 +57,7 @@ pub struct User {
     pub discord_id: Option<String>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct AuthUser {
     pub id: String,
     pub username: String,

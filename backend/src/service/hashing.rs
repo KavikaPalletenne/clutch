@@ -31,6 +31,6 @@ pub fn hash(string: String) -> String {
 
 /// Checks whether the password matches the hash.
 /// Returns true if it is a match, otherwise false.
-pub fn verify(password: String, hash: String, config: &ArgonSetup) -> bool {
+pub fn verify(password: String, hash: String) -> bool {
     argon2::verify_encoded(hash.as_str(), password.as_bytes()).unwrap()
 }
