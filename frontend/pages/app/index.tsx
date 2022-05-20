@@ -51,7 +51,7 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     });
 
     // If not valid auth_token, then prompt to login
-    if (!check_login.ok) {
+    if (check_login.status == 401) {
         return {
             redirect: {
                 destination: `/login-no-authorize-${cookies.get("auth_token")}`,
