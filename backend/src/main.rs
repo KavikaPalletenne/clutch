@@ -57,10 +57,10 @@ async fn main() -> Result<()> {
         .to_string();
     let search_index =
         meilisearch_sdk::client::Client::new(search_endpoint, "masterKey").index("resources");
-    search_index
-        .set_filterable_attributes(["group_id", "subject", "tags"])
-        .await
-        .unwrap();
+    // search_index
+    //     .set_filterable_attributes(["group_id", "subject", "tags"])
+    //     .await
+    //     .unwrap();
 
     // Initialise S3 Bucket
     let bucket = init_bucket();
