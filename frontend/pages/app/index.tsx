@@ -44,7 +44,10 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
 
     let check_login = await fetch('https://api.examclutch.com/api/auth/authorize', {
         credentials: 'include',
-        headers: req ? { cookie: req.cookies.value } : undefined
+        // headers: req ? { cookie: req.cookies.value } : undefined
+        headers: {
+            'Cookie': `${cookies.get("auth_token")}`
+        }
     });
 
     // If not valid auth_token, then prompt to login
