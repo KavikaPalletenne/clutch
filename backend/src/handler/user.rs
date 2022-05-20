@@ -140,7 +140,7 @@ pub async fn delete(
 }
 
 #[get("/api/user/check_username/{username}")]
-pub async fn check_userame(
+pub async fn check_username(
     path: web::Path<String>,
     conn: web::Data<DatabaseConnection>,
 ) -> impl Responder {

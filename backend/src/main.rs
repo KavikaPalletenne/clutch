@@ -123,7 +123,7 @@ async fn main() -> Result<()> {
             .service(user::update)
             .service(user::delete)
             .service(user::check_email)
-            .service(user::check_userame)
+            .service(user::check_username)
             //CDN
             .app_data(Data::new(bucket.clone()))
             .service(cdn::download_file)
