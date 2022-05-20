@@ -1,4 +1,4 @@
-use actix_web::{HttpResponse, Responder, get};
+use actix_web::{get, HttpResponse, Responder};
 
 #[get("/")]
 /// Returns a web page indicating this is the API hostname.
@@ -6,29 +6,22 @@ pub async fn easter_egg() -> impl Responder {
     HttpResponse::Ok()
         .append_header(("Content-Type", "text/html"))
         .body("
-
         <!DOCTYPE html>
-
         <style>
-
             @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&display=swap');
-
             h1,a{
                 font-family: 'Space Mono';
                 font-weight: 700;
                 font-size: 15px;
                 color: white;
             }
-
             a:hover {
                 color: rgb(194,144,255);
             }
-
             body {
                 background-color: #222;
                 padding-top: 250px;
             }
-
             .button {
                 font:25px 'Space Mono';
                 text-decoration: none;
@@ -36,7 +29,6 @@ pub async fn easter_egg() -> impl Responder {
                 padding: 18px 54px 18px 54px;
                 border-radius: 20px;
             }
-
             .button:hover {
                 font:25px 'Space Mono';
                 text-decoration: none;
@@ -44,23 +36,16 @@ pub async fn easter_egg() -> impl Responder {
                 padding: 18px 54px 18px 54px;
                 border-radius: 20px;
             }
-
         </style>
-
-
         <head>
             <title>ExCl API - Welcome</title>
             <link rel=\"icon\" type=\"image/x-icon\" href=\"https://raw.githubusercontent.com/KavikaPalletenne/clutch/main/frontend/public/gradient_logo.svg\"/>
               <meta name=\"description\" content=\"API for ExamClutch.com - Study Together. Clutch your exams.\">
                 </head>
-
                 <body>
-
                 <svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"100%\" height=\"100%\">
-
                 <!-- Text using the #pattern in defs as the fill -->
               <text x=\"50%\" text-anchor=\"middle\" y=\"50%\" dy=\"0.4em\" fill=\"url(#pattern)\" font-family=\"Space Mono\" font-weight=\"500\" font-size=\"90px\">You weren't meant to see this...</text>
-
                   <defs>
                   <!-- Da gradient -->
               <linearGradient id=\"gradient\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0\">
@@ -70,7 +55,6 @@ pub async fn easter_egg() -> impl Responder {
                 <stop offset=\"75%\" style=\"stop-color:#8C9AFF;\"/>
                 <stop offset=\"100%\" style=\"stop-color:#C290FF;\"/>
                 </linearGradient>
-
                 <!-- Stitch 2 gradients together for seamless animation  -->
               <pattern id=\"pattern\" x=\"0\" y=\"0\" width=\"300%\" height=\"100%\" patternUnits=\"userSpaceOnUse\">
                 <rect x=\"0\" y=\"0\" width=\"150%\" height=\"100%\" fill=\"url(#gradient)\">
@@ -88,7 +72,6 @@ pub async fn easter_egg() -> impl Responder {
               repeatCount=\"indefinite\"/>
                   </rect>
                   </pattern>
-
                   <!-- Pull in font -->
               <!-- Copied from: https://static.sonos.com/v1/fonts/logo/sonos-logo-regular-webfont.svg -->
               <font horiz-adv-x=\"1024\" >
@@ -117,17 +100,11 @@ pub async fn easter_egg() -> impl Responder {
                 </font>
                 </defs>
                 </svg>
-
                 <div style=\"display: inline; position: absolute; bottom: 30px; left: 91.71px\">
                 <a style=\"display: inline; text-decoration: none\" href=\"https://examclutch.com\">ExamClutch</a>
-
                 <h1 style=\"display: inline\">API v0.1.111 created by the </h1>
                   <a style=\"display: inline; text-decoration: none\" href=\"https://examclutch.com/about-us\">ExCl team</a>
-
-
                 </div>
-
                 </body>
-
         ")
 }

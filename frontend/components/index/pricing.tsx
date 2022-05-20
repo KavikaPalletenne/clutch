@@ -33,7 +33,7 @@ export default function Pricing() {
                                 <div className="md:flex items-center justify-between">
                                     <h2 className="text-2xl font-semibold leading-6 text-exclpurple">Personal</h2>
                                     <p className="text-2xl md:mt-0 mt-4 font-semibold leading-6 text-gray-800">
-                                        $2<span className="font-normal text-base">/mo</span>
+                                        $5<span className="font-normal text-base">/mo</span>
                                     </p>
                                 </div>
                                 <p className="md:w-80 text-base leading-6 mt-4 text-gray-600">200MB upload/download limit.</p>
@@ -43,10 +43,10 @@ export default function Pricing() {
                             <div className="md:flex items-center justify-between">
                                 <h2 className="text-2xl font-semibold leading-6 text-exclpurple">Community</h2>
                                 <p className="text-2xl md:mt-0 mt-4 font-semibold leading-6 text-gray-800">
-                                    $1.50<span className="font-normal text-base">/member</span>
+                                    $3<span className="font-normal text-base">/member/mo</span>
                                 </p>
                             </div>
-                            <p className="md:w-80 text-base leading-6 mt-4 text-gray-600">200MB upload limit for all members.</p>
+                            <p className="md:w-80 text-base leading-6 mt-4 text-gray-600">200MB upload limit for all members. Needs to be paid by single account.</p>
                         </div>
                     </div>
                 </div>

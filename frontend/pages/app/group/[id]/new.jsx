@@ -114,7 +114,6 @@ export default function NewResourcePage(props) {
       fileArray.forEach( (f) =>
       { file = {
         "name": f.name,
-        "title": f.name,
         "size": f.size,
       }
       files.push(file) }

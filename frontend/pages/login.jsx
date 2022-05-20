@@ -18,7 +18,7 @@ export default function Login() {
     var userIdLoaded = false
     var loggedIn = false
 
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     
     useEffect(() => {
@@ -36,8 +36,28 @@ export default function Login() {
     }, [])
 
     
-    const submit = async (e: SyntheticEvent) => {
+    const submit = async (e) => {
+        e.preventDefault()
 
+        await fetch("https://api.examclutch.com/api/auth/login", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                'email': email,
+                'password': password,
+            })
+        }).then((res) => {
+            if (res.status == 200) {
+                router.push("/app")
+                return
+            } else {
+                setErrorMessage("Invalid credentials")
+            }
+            
+        })
     }
     
     return (
@@ -67,7 +87,7 @@ export default function Login() {
                 </h2>
                 <p className="mt-2 text-center text-sm text-gray-600">
                     Or
-                    <Link href="/register">
+                    <Link href="/sign-up">
                         <a className="pl-1 font-medium text-exclpurple hover:text-exclpurple-dark">
                             sign up for an account
                         </a>
@@ -79,22 +99,23 @@ export default function Login() {
                 <div className="rounded-md -space-y-px">
                     
                     <div className="pb-5">
-                    <label htmlFor="username" className="sr-only">Email address</label>
-                    <input id="username" name="username" type="email" autoComplete="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Email address" onChange={e => setUsername(e.target.value)}/>
+                    <label htmlFor="email" className="sr-only">Email address</label>
+                    <input id="email" name="email" type="email" autoComplete="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Email address" onChange={e => setEmail(e.target.value)}/>
                     </div>
 
                     <div>
                     <label htmlFor="password" className="sr-only">Password</label>
                     <input id="password" name="password" type="password" autoComplete="current-password" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Password" onChange={e => setPassword(e.target.value)}/>
                     </div>
-                    <p id="invalidCredentialsText" className="text-transparent text-sm float-left pl-1 pb-5 pt-2">{errorMessage}</p>
+                    <p id="invalidCredentialsText" className="text-red-500 text-sm float-left pl-1 pb-5 pt-2">{errorMessage}</p>
                 </div>
 
                 <div>
                     <button type="submit" className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-exclpurple hover:bg-exclpurple-dark rounded-3xl focus:outline-none ">
                     Sign in
                     </button>
-                </div>               
+                </div>
+                               
 
                 <div className="flex items-center justify-center">
 

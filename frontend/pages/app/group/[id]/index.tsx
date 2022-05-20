@@ -14,7 +14,7 @@ import GroupName from "../../../../components/app/GroupName";
 import { GetServerSideProps } from "next";
 
 type Group = {
-    _id: string;
+    id: string;
     name: string;
     description: string;
     discord_link: string;
@@ -23,7 +23,7 @@ type Group = {
 }
 
 export type Resource = {
-    _id: ObjectId;
+    id: bigint;
     user_id: string;
     group_id: string;
     title: string;
@@ -44,7 +44,6 @@ export type ObjectId = {
 
 export type FileReference = {
     name: string;
-    title: string;
     size: number;
 }
 
@@ -58,7 +57,7 @@ export default function GroupPage({ group }: {
     const [fullResources, setFullResources] = useState([] as Resource[])
     const [stateResources, setStateResources] = useState([] as Resource[])
     const listResources = stateResources.map((r: Resource) =>
-            <div key={r._id.$oid} className="pb-3">
+            <div key={r.title} className="pb-3">
                 <ResourceCard propResource={r} />
             </div>
     );
@@ -67,7 +66,7 @@ export default function GroupPage({ group }: {
 
         setUserId(Cookies.get('user_id'))
         
-        fetch(`https://api.examclutch.com/api/resource/get_all/${group._id}`, {
+        fetch(`https://api.examclutch.com/api/resource/get_all/${group.id}`, {
             credentials: 'include'
         }).then(r => {
             if (r.status == 401) {
@@ -90,7 +89,7 @@ export default function GroupPage({ group }: {
     const searchTermUpdate = async (e: React.ChangeEvent<any>) => {
         e.preventDefault()
 
-        let results = await fetch(`https://api.examclutch.com/api/search/${group._id}/${e.target.value}`, {
+        let results = await fetch(`https://api.examclutch.com/api/search/${group.id}/${e.target.value}`, {
             method: 'GET',
             credentials: 'include'
         }).then(r => r.json().then(function(data) {
@@ -145,13 +144,13 @@ export default function GroupPage({ group }: {
             <div className="flex justify-center">
             <div className="pt-10 grid grid-flow-col auto-cols-min">
                 <div className="pr-3 row-span-3 col-span-1">
-                <GroupNavigation currentGroupId={group._id} />
+                <GroupNavigation currentGroupId={group.id} />
                 </div>
                 <div className="">
                 <GroupTitle propGroup={group} />
                 </div>
                 <div className="pt-2 row-start-1">
-                <Link href={`/app/group/${group._id}/new`}>  
+                <Link href={`/app/group/${group.id}/new`}>  
                     <a>    
                     <div className="py-3.5 px-5 shadow-md inline-block rounded-2xl hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", fontWeight: "bold", backgroundImage: "linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%)"}}>
                         <div className="text-2xl text-white">
@@ -203,7 +202,10 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
         
         if (group_res.status != 401) {
             return {
-                notFound: true,
+                redirect: {
+                    destination: '/app',
+                    permanent: false,
+                }
             }
         }
     }

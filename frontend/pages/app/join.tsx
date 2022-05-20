@@ -34,9 +34,9 @@ export default function Login() {
 
         <Head>
           <meta charSet="utf-8" />
-          <meta name="description" content="Login to ScanTag - The Modern Name Tag" />
-          <meta name="robots" content="all" />
-          <meta name="googlebot" content="all" />
+          <meta name="description" content="Join a Group - ExamClutch" />
+          <meta name="robots" content="noindex" />
+          <meta name="googlebot" content="noindex" />
           <title>Join a Group - ExamClutch</title>
           <link rel="icon" href="/gradient_logo.svg" />
         </Head>

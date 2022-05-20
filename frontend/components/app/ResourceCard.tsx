@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { Resource, Tag } from '../../pages/app/group/[id]';
 import UserName from './UserName';
 import prettyBytes from 'pretty-bytes';
+import { group } from 'console';
 
 // type Resource = {
 //     _id: ObjectId;
@@ -31,7 +32,7 @@ export default function ResourceCard(props: {
 }) {
 
     const resource = {
-        "id": props.propResource._id,
+        "id": props.propResource.id,
         "group_id": props.propResource.group_id,
         "author": props.propResource.user_id,
         "title": props.propResource.title,
@@ -45,13 +46,13 @@ export default function ResourceCard(props: {
     const listFiles = resource.files.map((f) => 
         <div className="px-4 py-1" key={f.name}>
             {/* <Link href={ "https://examclutch.com/cdn/file/" + f.id }> */}
-            <Link href={ "https://api.examclutch.com/cdn/file/" + resource.id + '/' + f.name } passHref> 
+            <Link href={ "https://api.examclutch.com/cdn/file/" + resource.group_id + '/' + resource.id + '/' + f.name } passHref> 
                 <a target={"_blank"} rel="noopener noreferrer">
                     <div className="py-4 px-4 shadow-sm hover:shadow-md inline-block rounded-2xl bg-white duration-150" style={{fontFamily: "Roboto Mono", minWidth: "675px", maxWidth: "750px"}}>
                         
-                        <li className="justify-center float-left flex" style={{listStyle: 'none'}} key={f.title}>
+                        <li className="justify-center float-left flex" style={{listStyle: 'none'}} key={f.name}>
                             <div className="pl-5 font-bold">
-                                {f.title}
+                                {f.name}
                             </div>
                             
                         </li>

@@ -9,6 +9,7 @@ export default function Register() {
     
     const [errorMessage, setErrorMessage] = useState('Emails do not match');
 
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [confirmEmail, setConfirmEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -18,9 +19,56 @@ export default function Register() {
 
     const router = useRouter()
    
+    const onUsernameChange = async (username) => {
+        await fetch(`https://api.examclutch.com/api/user/check_username/${username}`).then(
+            (res) => {
+                if (res.status == 400) {
+                    document.getElementById("usernameExistsText").className = "text-red-500 text-xs float-right pr-1"
+                    return
+                } else {
+                    setUsername(username)
+                }
+            }
+        )
+    }
 
-    const submit = async (e: SyntheticEvent) => {
-    
+    const onEmailChange = async (email) => {
+        await fetch(`https://api.examclutch.com/api/user/check_email/${email}`).then(
+            (res) => {
+                if (res.status == 400) {
+                    document.getElementById("emailExistsText").className = "text-red-500 text-xs float-right pr-1"
+                    return
+                } else {
+                    setEmail(email)
+                }
+            }
+        )
+    }
+
+    const submit = async (e) => {
+        e.preventDefault()
+
+        document.getElementById("confirmEmailText").className = "text-transparent text-xs float-right pr-1"
+        setErrorMessage('Email does not match')
+        document.getElementById("confirmPasswordText").className = "text-transparent text-xs float-right pr-1"
+
+
+        if(email != confirmEmail) {
+            
+            document.getElementById("confirmEmailText").className = "text-red-500 text-xs float-right pr-1"
+            setErrorMessage('Email does not match')
+            
+            if(password != confirmPassword) {
+                document.getElementById("confirmPasswordText").className = "text-red-500 text-xs float-right pr-1"
+            }
+
+            return
+        }
+
+        if(password != confirmPassword) {
+            document.getElementById("confirmPasswordText").className = "text-red-500 text-xs float-right pr-1"
+            return
+        }
 
     }
     
@@ -63,8 +111,15 @@ export default function Register() {
                 <div className="rounded-md -space-y-px">
                     
                     <div className="pb-5">
-                    <label htmlFor="username" className="sr-only">Email address</label>
-                    <input id="username" name="username" type="email" autoComplete="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Email address" onChange={e => setEmail(e.target.value)}/>
+                    <label htmlFor="username" className="sr-only">Username</label>
+                    <input id="username" name="username" type="text" autoComplete="username" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Username" onChange={e => onUsernameChange(e.target.value)}/>
+                    <p id="usernameExistsText" className="text-transparent text-xs float-right pr-1">Username exists</p>
+                    </div>
+
+                    <div className="pb-5">
+                    <label htmlFor="email" className="sr-only">Email address</label>
+                    <input id="email" name="email" type="email" autoComplete="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Email address" onChange={e => onEmailChange(e.target.value)}/>
+                    <p id="emailExistsText" className="text-transparent text-xs float-right pr-1">Email exists</p>
                     </div>
 
                     <div>
@@ -72,6 +127,7 @@ export default function Register() {
                     <input id="confirmEmail" name="confirmEmail" type="email" autoComplete="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Confirm email address" onChange={e => setConfirmEmail(e.target.value)}/>
                     <p id="confirmEmailText" className="text-transparent text-xs float-right pr-1">{errorMessage}</p>
                     </div>
+                    
 
                     <div className="pb-1 pt-5">
                     <label htmlFor="password" className="sr-only">Password</label>

@@ -1,88 +1,73 @@
-use actix_web::{App, HttpServer};
+use crate::handler::{cdn, easter_egg, group, resource, search, user};
+use crate::service::storage::init_bucket;
 use actix_cors::Cors;
-// use rustls::internal::pemfile::{certs, pkcs8_private_keys};
-// use rustls::{ServerConfig};
-use anyhow::Result;
-use jsonwebtoken::EncodingKey;
-use std::env;
 use actix_web::middleware::Logger;
-// use std::fs::File;
-// use std::io::BufReader;
 use actix_web::web::Data;
-use crate::storage::init_bucket;
+use actix_web::{App, HttpServer};
+use anyhow::Result;
+use jsonwebtoken::{DecodingKey, EncodingKey};
+use sea_orm::{ConnectOptions, Database};
+use std::env;
+use std::time::Duration;
 
-mod oauth2;
+mod auth;
+mod errors;
+mod handler;
 mod models;
-mod jwt;
-mod resource;
-mod persistence;
-mod middleware;
-mod group;
-mod user;
-mod shared;
-mod cdn;
-mod file;
-mod storage;
-mod search;
+mod service;
 
-
-#[actix_web::main]
+#[tokio::main]
 async fn main() -> Result<()> {
-    let actix_port = std::env::var("ACTIX_PORT").expect("Error getting ACTIX_PORT").to_string();
+    let actix_port = std::env::var("ACTIX_PORT")
+        .expect("Error getting ACTIX_PORT")
+        .to_string();
 
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    // // // XPS file location
-    // // let cert_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/cert.pem").unwrap());
-    // // let key_file = &mut BufReader::new(File::open("C:/Users/kbpal/Documents/Development/clutch/backend/excl-api/keys/key.pem").unwrap());
-    // //
-    // // PC file location
-    // let cert_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/cert.pem").unwrap());
-    // let key_file = &mut BufReader::new(File::open("C:/Users/User/Documents/Development/GitHub/clutch/backend/keys/key.pem").unwrap());
-    //
-    // let cert_chain = certs(cert_file).unwrap();
-    // let mut keys = pkcs8_private_keys(key_file).unwrap();
-    // if keys.is_empty() {
-    //     eprintln!("Could not locate PKCS 8 private keys.");
-    //     std::process::exit(1);
-    // }
-    //
-    // // load ssl keys
-    // let mut config = ServerConfig::builder()
-    //     .with_safe_defaults()
-    //     .with_no_client_auth()
-    //     .with_single_cert(cert_chain, keys.remove(0))
-    //     .expect("bad certificate/key");
-    // // ServerConfig::new(NoClientAuth::new());
-
-
-    // let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-    // builder
-    //     .set_private_key("./keys/key.pem")
-    //     .unwrap();
-    // builder.set_certificate("./keys/cert.pem").unwrap();
-
     // Initialise JWT settings
-    let jwt_secret = env::var("JWT_SECRET").expect("Error getting JWT_SECRET").to_string();
+    let jwt_secret = env::var("JWT_SECRET")
+        .expect("Error getting JWT_SECRET")
+        .to_string();
     let jwt_encoding_key = EncodingKey::from_secret(jwt_secret.as_bytes());
+    let jwt_decoding_key = DecodingKey::from_secret(jwt_secret.as_bytes());
 
-    // Initialise DB
-    let database = persistence::create_mongodb_client()
-        .await
-        .expect("Failed to connect to DB");
-    println!("Successfully connected to database");
+    // TODO: Initialise DB Connection
+    let db_url = std::env::var("DATABASE_URL")
+        .expect("Error getting ACTIX_PORT")
+        .to_string();
+    let max_connections = std::env::var("DB_MAX_CONNECTIONS")
+        .expect("Error getting ACTIX_PORT")
+        .to_string()
+        .parse::<u32>()
+        .unwrap();
+    let mut options = ConnectOptions::new(db_url);
+    options
+        .max_connections(max_connections)
+        .min_connections(5)
+        .connect_timeout(Duration::from_secs(8))
+        .idle_timeout(Duration::from_secs(8))
+        .max_lifetime(Duration::from_secs(8))
+        .sqlx_logging(false);
+
+    let conn = Database::connect(options).await?;
 
     // Initialise Meilisearch Connection
-    let search_endpoint = env::var("SEARCH_ENDPOINT").expect("Error getting SEARCH_ENDPOINT").to_string();
-    let search_index = meilisearch_sdk::client::Client::new(search_endpoint, "masterKey").index("resources");
-    search_index.set_filterable_attributes(["group_id", "subject", "tags"]).await.unwrap();
+    let search_endpoint = env::var("SEARCH_ENDPOINT")
+        .expect("Error getting SEARCH_ENDPOINT")
+        .to_string();
+    let search_index =
+        meilisearch_sdk::client::Client::new(search_endpoint, "masterKey").index("resources");
+    search_index
+        .set_filterable_attributes(["group_id", "subject", "tags"])
+        .await
+        .unwrap();
 
     // Initialise S3 Bucket
     let bucket = init_bucket();
 
     println!("Starting server on port {}.", actix_port.clone());
-    HttpServer::new(move || {
 
+    HttpServer::new(move || {
         let cors = Cors::default()
             .allow_any_header()
             .allow_any_method()
@@ -107,47 +92,48 @@ async fn main() -> Result<()> {
         App::new()
             .wrap(cors)
             .wrap(Logger::default())
-            // OAuth2 Service
+            // Auth service
             .app_data(Data::new(jwt_encoding_key.clone()))
-            .service(oauth2::user_registration)
-            .service(oauth2::authorize)
-            .service(oauth2::get_user_guilds)
+            .app_data(Data::new(jwt_decoding_key.clone()))
+            .service(handler::auth::register)
+            .service(handler::auth::login)
+            // OAuth2 Service
+            // .service(oauth2::user_registration)
+            // .service(oauth2::authorize)
+            // .service(oauth2::get_user_guilds) // TODO: Oauth2 Service
             // Resource Service
-            .app_data(Data::new(database.clone()))
+            .app_data(Data::new(conn.clone()))
             .service(resource::create_resource)
-            .service(resource::fetch_resource_by_id)
-            .service(resource::fetch_resource_by_group_id)
-            .service(resource::update_resource)
-            .service(resource::delete_resource)
+            .service(resource::get)
+            .service(resource::get_by_group)
+            // .service(resource::update_resource)
+            // .service(resource::delete_resource)
             // Group Service
             .service(group::create_group)
-            .service(group::get_group_by_id)
-            .service(group::get_group_name_by_id)
+            .service(group::get)
+            .service(group::get_name)
             .service(group::join_group)
             .service(group::leave_group)
+            .service(group::get_user_groups)
             // User Service
             .service(user::create_user)
-            .service(user::get_user_by_id)
-            .service(user::get_username_by_id)
-            .service(user::user_exists)
-            .service(user::update_username_by_user_id)
-            .service(user::update_email_by_user_id)
-            .service(user::delete_user_by_id)
-            .service(user::get_user_groups)
+            .service(user::get)
+            .service(user::get_username)
+            .service(user::update)
+            .service(user::delete)
             //CDN
             .app_data(Data::new(bucket.clone()))
             .service(cdn::download_file)
             // Easter Eggs
-            .service(shared::easter_egg)
+            .service(easter_egg::easter_egg)
             // Search
             .app_data(Data::new(search_index.clone()))
             .service(search::search)
             .service(search::search_blank)
     })
-        // .bind_openssl("0.0.0.0:443", builder)?
-        .bind(format!("0.0.0.0:{}", actix_port))?
-        .run()
-        .await?;
+    .bind(format!("0.0.0.0:{}", actix_port))?
+    .run()
+    .await?;
 
     Ok(())
 }

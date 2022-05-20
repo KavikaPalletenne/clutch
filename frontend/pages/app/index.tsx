@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     if (cookies.get("user_id") == undefined || cookies.get("auth_token") == undefined) {
         return {
             redirect: {
-                destination: '/api/login',
+                destination: '/login',
                 permanent: false,
             }
         }
@@ -47,13 +47,13 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     if (check_login.status != 200) {
         return {
             redirect: {
-                destination: '/api/login',
+                destination: '/login',
                 permanent: false,
             }
         }
     }
 
-    const groups = await fetch(`https://api.examclutch.com/api/user/get_user_groups/${cookies.get("user_id")}`, {
+    const groups = await fetch(`https://api.examclutch.com/api/group/user_groups/${cookies.get("user_id")}`, {
         credentials: 'include',
         headers: req ? {cookie: req.cookies.value } : undefined
     });
@@ -62,14 +62,14 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
         if (groups.status == 401) {
             return {
                 redirect: {
-                    destination: '/api/login',
+                    destination: '/login',
                     permanent: false,
                 }
             }
         }
         return {
             redirect: {
-                destination: '/api/login',
+                destination: '/login',
                 permanent: false,
             }
         }
@@ -80,12 +80,20 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     if (!user_groups) {
         return {
             redirect: {
-                destination: '/api/login',
+                destination: '/login',
                 permanent: false,
             }
         }
     }
     
+    if (user_groups.length == 0) {
+        return {
+            redirect: {
+                destination: '/app/join',
+                permanent: false,
+            }
+        }  
+    }    
 
     return {
         redirect: {

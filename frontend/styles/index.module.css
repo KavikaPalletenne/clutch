@@ -68,7 +68,7 @@
     .heroSectionH1 {
         font-size: 100px;
         font-weight: 700;
-        font-family: 'Space Mono';
+        font-family: 'Space Mono', 'Mono';
 
         color: White;
     }
@@ -112,7 +112,7 @@
     .heroSectionH1 {
         font-size: 37px;
         font-weight: 700;
-        font-family: 'Space Mono';
+        font-family: 'Space Mono', 'Mono';
 
         color: White;
     }
