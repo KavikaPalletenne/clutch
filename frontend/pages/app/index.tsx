@@ -42,23 +42,24 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
         }
     }
 
-    let check_login = await fetch('https://api.examclutch.com/api/auth/authorize', {
-        credentials: 'include',
-        // headers: req ? { cookie: req.cookies.value } : undefined
-        headers: {
-            'Cookie': `${cookies.get("auth_token")}`
-        }
-    });
+    // let check_login = await fetch('https://api.examclutch.com/api/auth/authorize', {
+    //     method: 'GET',
+    //     credentials: 'include',
+    //     // headers: req ? { cookie: req.cookies.value } : undefined
+    //     headers: {
+    //         'Cookie': `${cookies.get("auth_token")}`
+    //     }
+    // });
 
-    // If not valid auth_token, then prompt to login
-    if (check_login.status == 401) {
-        return {
-            redirect: {
-                destination: `/login-no-authorize-${cookies.get("auth_token")}`,
-                permanent: false,
-            }
-        }
-    }
+    // // If not valid auth_token, then prompt to login
+    // if (check_login.status == 401) {
+    //     return {
+    //         redirect: {
+    //             destination: `/login-no-authorize-${cookies.get("auth_token")}`,
+    //             permanent: false,
+    //         }
+    //     }
+    // }
 
     const groups = await fetch(`https://api.examclutch.com/api/group/user_groups/${cookies.get("user_id")}`, {
         credentials: 'include',
