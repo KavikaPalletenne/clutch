@@ -56,18 +56,17 @@ pub async fn login(
     HttpResponse::BadRequest().body("Invalid credentials")
 }
 
-#[get("/api/auth/authorize/{token}")]
+#[get("/api/auth/authorize")]
 pub async fn authorize(
     req: HttpRequest,
-    path: web::Path<String>,
-    form: web::Json<LoginForm>,
-    conn: web::Data<DatabaseConnection>,
     dk: web::Data<DecodingKey>,
 ) -> impl Responder {
-    let token = path.into_inner();
+    let token = req.cookie("auth_token");
 
-    if let Some(_) = decode_auth_token(token, dk.get_ref()) {
-        return HttpResponse::Ok().finish();
+    if let Some(cookie) = token {
+        if let Some(_) = decode_auth_token(cookie.to_string(), dk.get_ref()) {
+            return HttpResponse::Ok().finish();
+        }
     }
 
     HttpResponse::Unauthorized().finish()
