@@ -33,7 +33,7 @@ pub async fn download_file(
     let file_download_url = bucket
         .presign_get(format!("/{}/{}/{}", group_id, resource_id, id), 3600, None)
         .unwrap(); // 1 hour expiry
-    HttpResponse::PermanentRedirect()
+    HttpResponse::TemporaryRedirect()
         .append_header(("Location", file_download_url))
         .body("Unable to find file.")
 }
