@@ -107,6 +107,7 @@ async fn main() -> Result<()> {
             .service(resource::create_resource)
             .service(resource::get)
             .service(resource::get_by_group)
+            .service(resource::delete_resource)
             // .service(resource::update_resource)
             // .service(resource::delete_resource)
             // Group Service
