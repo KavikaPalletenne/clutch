@@ -35,6 +35,7 @@ pub async fn download_file(
         .unwrap(); // 1 hour expiry
     HttpResponse::TemporaryRedirect()
         .append_header(("Location", file_download_url))
+        .append_header(("Cache-Control", "no-store"))
         .body("Unable to find file.")
 }
 
