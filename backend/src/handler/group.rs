@@ -59,7 +59,7 @@ pub async fn get_name(
     if let Ok(group) = res {
         return HttpResponse::Ok()
             .append_header(("Content-Type", "application/json"))
-            .body(format!("\"name\": \"{}\"", group.name).to_string());
+            .body(format!("{{\"name\": \"{}\"}}", group.name).to_string());
     }
 
     HttpResponse::BadRequest().body("Invalid group id provided")
