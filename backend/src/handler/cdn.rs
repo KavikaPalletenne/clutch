@@ -8,16 +8,13 @@ use sea_orm::DatabaseConnection;
 #[get("/cdn/file/{group_id}/{resource_id}/{id}")]
 pub async fn download_file(
     req: HttpRequest,
-    group_path: web::Path<String>,
-    resource_path: web::Path<i64>,
-    file_path: web::Path<String>,
     bucket: web::Data<Bucket>,
     conn: web::Data<DatabaseConnection>,
     dk: web::Data<DecodingKey>,
 ) -> impl Responder {
-    let group_id = group_path.into_inner();
-    let resource_id = resource_path.into_inner();
-    let id = file_path.into_inner();
+    let group_id = req.match_info().get("group_id").unwrap().to_string();
+    let resource_id = req.match_info().get("resource_id").unwrap().to_string().parse::<i64>().unwrap();
+    let id = req.match_info().get("id").unwrap();
 
     //////////////////////////////////////////////////////////////////////////
     // Auth //
