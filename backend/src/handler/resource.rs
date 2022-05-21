@@ -157,7 +157,7 @@ pub async fn create_resource(
             .unwrap();
         let delete_result = index
             .delete_document(created_resource_id)
-            .await.unwrap();
+            .await;
     }
 
     HttpResponse::BadRequest().body("Could not create new resource")
