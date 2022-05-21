@@ -93,8 +93,6 @@ pub async fn create_resource(
         .expect("Error")
     {
         return HttpResponse::Unauthorized().finish();
-    } else if form.user_id.ne(&get_user_id(&req, &dk).unwrap()) {
-        return HttpResponse::BadRequest().body("Not logged in user");
     }
 
     let mut form = form.clone();
