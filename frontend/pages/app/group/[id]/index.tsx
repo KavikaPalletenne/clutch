@@ -52,6 +52,7 @@ export default function GroupPage({ group }: {
     // resources: Resource[];
 }) {
     const router = useRouter();
+    let { id } = router.query;
     const [userId, setUserId] = useState(Cookies.get("user_id"))
     const [userName, setUserName] = useState('')
     const [fullResources, setFullResources] = useState([] as Resource[])
@@ -66,7 +67,7 @@ export default function GroupPage({ group }: {
 
         setUserId(Cookies.get('user_id'))
         
-        fetch(`https://api.examclutch.com/api/resource/get_all/${group.id}`, {
+        fetch(`https://api.examclutch.com/api/resource/get_all/${id}`, {
             credentials: 'include'
         }).then(r => {
             // if (r.status == 401) {
@@ -89,7 +90,7 @@ export default function GroupPage({ group }: {
     const searchTermUpdate = async (e: React.ChangeEvent<any>) => {
         e.preventDefault()
 
-        let results = await fetch(`https://api.examclutch.com/api/search/${group.id}/${e.target.value}`, {
+        let results = await fetch(`https://api.examclutch.com/api/search/${id}/${e.target.value}`, {
             method: 'GET',
             credentials: 'include'
         }).then(r => r.json().then(function(data) {
