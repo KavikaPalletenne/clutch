@@ -210,6 +210,7 @@ pub async fn delete_resource(
                         ).await;
                     }
                 }
+                return HttpResponse::Ok().body("Successfully deleted resource");
             }
         }
     }
