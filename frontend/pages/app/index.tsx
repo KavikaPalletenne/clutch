@@ -31,7 +31,6 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     
     
     let cookies = new Cookies(req, res)
-    req.cookies
 
     if (cookies.get("user_id") == undefined || cookies.get("auth_token") == undefined) {
         return {
