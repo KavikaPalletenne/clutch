@@ -69,9 +69,9 @@ export default function GroupPage({ group }: {
         fetch(`https://api.examclutch.com/api/resource/get_all/${group.id}`, {
             credentials: 'include'
         }).then(r => {
-            if (r.status == 401) {
-                router.push(`/api/login`)
-            }
+            // if (r.status == 401) {
+            //     router.push(`/api/login`)
+            // }
             r.json().then(function(data) {
             setStateResources(data as Resource[])
             setFullResources(data as Resource[])
