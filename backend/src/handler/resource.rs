@@ -1,9 +1,10 @@
+use std::fmt::format;
 use crate::auth::middleware::{
     get_user_id, has_group_viewing_permission, has_resource_viewing_permission, is_logged_in,
 };
 use crate::models::{CreatedResourceResponse, ResourceForm, SearchResource};
 use crate::service;
-use crate::service::resource::create;
+use crate::service::resource::{create, read};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use chrono::Utc;
 use jsonwebtoken::DecodingKey;
@@ -163,5 +164,57 @@ pub async fn create_resource(
     HttpResponse::BadRequest().body("Could not create new resource")
 }
 
+#[get("/api/resource/delete/{id}")]
+pub async fn delete_resource(
+    req: HttpRequest,
+    path: web::Path<i64>,
+    dk: web::Data<DecodingKey>,
+    conn: web::Data<DatabaseConnection>,
+    bucket: web::Data<Bucket>,
+    index: web::Data<Index>,
+) -> impl Responder {
+    let resource_id = path.into_inner();
+
+    if !is_logged_in(&req, &dk) {
+        return HttpResponse::TemporaryRedirect()
+            .append_header(("Location", "https://examclutch.com/login"))
+            .finish(); // Redirect to login
+    } else if !has_resource_viewing_permission(resource_id.clone(), &req, &conn, &dk)
+        .await
+        .expect("Error")
+    {
+        return HttpResponse::Unauthorized().finish();
+    }
+    let user_id = get_user_id(&req, dk.get_ref());
+
+    if let Some(uid) = user_id {
+        let res = read(resource_id.clone(), &conn).await;
+        if let Ok(resource) = res {
+            if resource.clone().user_id.eq(&uid) {
+                service::resource::delete(resource.clone().id, &conn)
+                    .await
+                    .unwrap();
+                let delete_result = index
+                    .delete_document(resource.clone().id)
+                    .await;
+
+                if let Some(files) = resource.clone().files {
+                    for f in files {
+                        bucket.delete_object(
+                            format!(
+                                "/{}/{}/{}",
+                                resource.clone().group_id,
+                                resource.clone().id,
+                                f.name
+                            )
+                        ).await;
+                    }
+                }
+            }
+        }
+    }
+
+    return HttpResponse::BadRequest().body("No such resource")
+}
 // TODO: update endpoint
 // TODO: delete endpoint
