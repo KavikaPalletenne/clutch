@@ -28,6 +28,7 @@ pub struct ResourceForm {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct SearchResource {
+    pub id: i64,
     pub user_id: String,
     pub group_id: String,
     pub title: String,
@@ -35,6 +36,7 @@ pub struct SearchResource {
     pub subject: String,
     pub tags: Option<Vec<String>>,
     pub files: Option<Vec<FileReference>>,
+    pub last_edited_at: DateTime<Utc>,
 }
 
 #[derive(Deserialize, Serialize)]

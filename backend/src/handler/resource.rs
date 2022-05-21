@@ -1,14 +1,16 @@
 use crate::auth::middleware::{
     get_user_id, has_group_viewing_permission, has_resource_viewing_permission, is_logged_in,
 };
-use crate::models::{CreatedResourceResponse, ResourceForm};
+use crate::models::{CreatedResourceResponse, ResourceForm, SearchResource};
 use crate::service;
 use crate::service::resource::create;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
+use chrono::Utc;
 use jsonwebtoken::DecodingKey;
 use meilisearch_sdk::indexes::Index;
 use s3::Bucket;
 use sea_orm::DatabaseConnection;
+use crate::search::search;
 
 #[get("/api/resource/{resource_id}")]
 pub async fn get(
@@ -128,8 +130,20 @@ pub async fn create_resource(
             file_put_urls: Option::from(file_put_urls),
         };
 
+        let search_document = SearchResource {
+            id: created_resource_id.clone(),
+            user_id: form.user_id,
+            group_id: form.group_id,
+            title: form.title,
+            description: form.description,
+            subject: form.subject,
+            tags: form.tags,
+            files: form.files,
+            last_edited_at: Utc::now(),
+        };
+
         let meili_result = index
-            .add_documents(&[form.clone()], Some(&created_resource_id.to_string()))
+            .add_documents(&[search_document.clone()], Some("id"))
             .await;
 
         if let Ok(_) = meili_result {
@@ -141,6 +155,9 @@ pub async fn create_resource(
         service::resource::delete(created_resource_id.clone(), &conn)
             .await
             .unwrap();
+        let delete_result = index
+            .delete_document(created_resource_id)
+            .await.unwrap();
     }
 
     HttpResponse::BadRequest().body("Could not create new resource")
