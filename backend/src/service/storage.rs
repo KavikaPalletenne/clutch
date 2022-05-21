@@ -3,7 +3,7 @@ use s3::{Bucket, Region};
 use std::env;
 
 pub fn init_bucket() -> Bucket {
-    let bucket_name = "excl";
+    let bucket_name = "excl-cdn";
     let access_key = env::var("S3_ACCESS_KEY")
         .expect("Error getting S3 CREDENTIALS")
         .to_string();
