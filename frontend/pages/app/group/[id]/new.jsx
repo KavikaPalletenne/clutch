@@ -228,7 +228,7 @@ export default function NewResourcePage(props) {
                   <div className="grid grid-cols-3 gap-6">
                     <div className="col-span-3 sm:col-span-2">
                       <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                        Title
+                        Title {fileUrls}
                       </label>
                       <div className="mt-1 flex rounded-md shadow-sm">
                         <input
