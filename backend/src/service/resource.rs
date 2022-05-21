@@ -171,7 +171,7 @@ pub async fn get_resource_by_group(
 
     let mut resources = Vec::<Resource>::new();
     for i in 0..response.len() {
-        let (resource, files) = response.remove(i);
+        let (resource, files) = response.get(i).unwrap().clone();
         let mut res_files = Vec::<FileReference>::new();
         for f in files {
             res_files.push(FileReference {
