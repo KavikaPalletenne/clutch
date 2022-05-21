@@ -153,6 +153,7 @@ export default function NewResourcePage(props) {
                 // 'Cookie': `auth_token=${authToken}`,
             },
             body: JSON.stringify({
+                'user_id': '',
                 'group_id': id,
                 'title': title,
                 'description': description,
