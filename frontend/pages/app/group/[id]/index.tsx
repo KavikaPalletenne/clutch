@@ -145,13 +145,13 @@ export default function GroupPage({ group }: {
             <div className="flex justify-center">
             <div className="pt-10 grid grid-flow-col auto-cols-min">
                 <div className="pr-3 row-span-3 col-span-1">
-                <GroupNavigation currentGroupId={group.id} />
+                <GroupNavigation currentGroupId={id as string} />
                 </div>
                 <div className="">
                 <GroupTitle propGroup={group} />
                 </div>
                 <div className="pt-2 row-start-1">
-                <Link href={`/app/group/${group.id}/new`}>  
+                <Link href={`/app/group/${id}/new`}>  
                     <a>    
                     <div className="py-3.5 px-5 shadow-md inline-block rounded-2xl hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", fontWeight: "bold", backgroundImage: "linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%)"}}>
                         <div className="text-2xl text-white">
