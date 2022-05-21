@@ -97,6 +97,9 @@ pub async fn create_resource(
         return HttpResponse::BadRequest().body("Not logged in user");
     }
 
+    let mut form = form.clone();
+    form.user_id = get_user_id(&req, &dk).unwrap();
+
     let create_response = service::resource::create(form.clone(), &conn).await;
 
     if let Ok(created_resource_id) = create_response {
