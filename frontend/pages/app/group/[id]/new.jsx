@@ -260,10 +260,11 @@ export default function NewResourcePage(props) {
                                 <option value="English">English</option>
                                 <option value="Literature">Literature</option>
                                 <option value="Economics">Economics</option>
-                                <option value="Economics">French</option>
-                                <option value="Economics">Japanese</option>
-                                <option value="Economics">Latin</option>
-                                <option value="Economics">Chinese</option>
+                                <option value="French">French</option>
+                                <option value="Japanese">Japanese</option>
+                                <option value="Latin">Latin</option>
+                                <option value="Chinese">Chinese</option>
+                                <option value="Psychology">Psychology</option>
                             </optgroup>
                         </select>
                       </div>
