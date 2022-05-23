@@ -132,7 +132,7 @@ pub async fn create_resource(
         };
 
         let search_document = SearchResource {
-            id: created_resource_id.clone(),
+            id: created_resource_id.clone() as u64,
             user_id: form.user_id,
             group_id: form.group_id,
             title: form.title,
@@ -191,7 +191,7 @@ pub async fn delete_resource(
         let res = read(resource_id.clone(), &conn).await;
         if let Ok(resource) = res {
             if resource.clone().user_id.eq(&uid) {
-                service::resource::delete(resource.clone().id, &conn)
+                service::resource::delete(resource.clone().id as i64, &conn)
                     .await
                     .unwrap();
                 let delete_result = index

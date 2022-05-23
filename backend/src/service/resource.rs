@@ -22,7 +22,6 @@ pub async fn create(resource: ResourceForm, conn: &Data<DatabaseConnection>) -> 
     //     .await.unwrap();
 
     let resource_id = generate_snowflake();
-    println!("CREATE resource_id: {}", resource_id.clone());
     resource::ActiveModel {
         id: Set(resource_id.clone()),
         user_id: Set(resource.user_id),
@@ -110,7 +109,7 @@ pub async fn read(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result<R
     }
 
     Ok(Resource {
-        id: resource.id,
+        id: resource.id as u64,
         user_id: resource.user_id,
         group_id: resource.group_id,
         title: resource.title,
@@ -180,9 +179,9 @@ pub async fn get_resource_by_group(
                 size: f.size,
             });
         }
-        println!("GET resource_id: {}", resource.clone().id);
+
         resources.push(Resource {
-            id: resource.id,
+            id: resource.id as u64,
             user_id: resource.user_id,
             group_id: resource.group_id,
             title: resource.title,
@@ -229,7 +228,7 @@ pub async fn get_resource_by_user(
         }
 
         resources.push(Resource {
-            id: resource.id,
+            id: resource.id as u64,
             user_id: resource.user_id,
             group_id: resource.group_id,
             title: resource.title,
