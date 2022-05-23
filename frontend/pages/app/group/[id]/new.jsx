@@ -165,8 +165,8 @@ export default function NewResourcePage(props) {
           setFileUrls(data['file_put_urls'][0])
           console.log(`Urls: ${fileUrls}`)
           setLoading(true)
-          setCancelUrl(`/api/resource/cancel/${data.group_id}/${data['resource_id'].replace(/^"(.*)"$/, '$1')}/delete`)
-          url = `/api/resource/cancel/${data.group_id}/${data['resource_id'].replace(/^"(.*)"$/, '$1')}/delete`
+          setCancelUrl(`/api/resource/cancel/${data.group_id}/${data['resource_id']}/delete`)
+          url = `/api/resource/cancel/${data.group_id}/${data['resource_id']}/delete`
 
           return await axios.request({
           method: "put", 
@@ -228,7 +228,7 @@ export default function NewResourcePage(props) {
                   <div className="grid grid-cols-3 gap-6">
                     <div className="col-span-3 sm:col-span-2">
                       <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                        Title {fileUrls}
+                        Title
                       </label>
                       <div className="mt-1 flex rounded-md shadow-sm">
                         <input
