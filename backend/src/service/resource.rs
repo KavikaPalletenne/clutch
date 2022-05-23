@@ -109,7 +109,7 @@ pub async fn read(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result<R
     }
 
     Ok(Resource {
-        id: resource.id as u64,
+        id: resource.id.to_string(),
         user_id: resource.user_id,
         group_id: resource.group_id,
         title: resource.title,
@@ -181,7 +181,7 @@ pub async fn get_resource_by_group(
         }
 
         resources.push(Resource {
-            id: resource.id as u64,
+            id: resource.id.to_string(),
             user_id: resource.user_id,
             group_id: resource.group_id,
             title: resource.title,
@@ -228,7 +228,7 @@ pub async fn get_resource_by_user(
         }
 
         resources.push(Resource {
-            id: resource.id as u64,
+            id: resource.id.to_string(),
             user_id: resource.user_id,
             group_id: resource.group_id,
             title: resource.title,

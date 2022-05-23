@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Resource {
-    pub id: u64,
+    pub id: String,
     pub user_id: String,
     pub group_id: String,
     pub title: String,
@@ -28,7 +28,7 @@ pub struct ResourceForm {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct SearchResource {
-    pub id: u64,
+    pub id: String,
     pub user_id: String,
     pub group_id: String,
     pub title: String,
