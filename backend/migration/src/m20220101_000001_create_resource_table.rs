@@ -21,7 +21,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(resource::Column::Id)
-                            .big_unsigned()
+                            .big_integer()
                             .not_null()
                             .primary_key()
                     )
@@ -48,7 +48,7 @@ impl MigrationTrait for Migration {
             .create_foreign_key(
                 ForeignKey::create()
                     .name("FK_group_id")
-                    .from(resource::Entity, resource::Column::UserId)
+                    .from(resource::Entity, resource::Column::GroupId)
                     .to(group::Entity, group::Column::Id)
                     .on_delete(ForeignKeyAction::Cascade)
                     .on_update(ForeignKeyAction::Cascade)
