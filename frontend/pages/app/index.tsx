@@ -27,10 +27,10 @@ export default function App() {
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
     
     
-    let cookies = new Cookies(req, res)
+    let cookies = new Cookies(context.req, context.res)
 
     if (cookies.get("user_id") == undefined || cookies.get("auth_token") == undefined) {
         return {
@@ -60,29 +60,31 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     //     }
     // }
 
-    const groups = await fetch(`https://api.examclutch.com/api/group/user_groups/${cookies.get("user_id")}`, {
+ 
+    const res = await fetch(`https://api.examclutch.com/api/group/user_groups/${cookies.get("user_id")}`, {
         credentials: 'include',
-        headers: req ? {cookie: req.cookies.value } : undefined
+        headers: context.req ? {cookie: context.req.headers.cookie} : undefined
     });
-    
-    if (!groups.ok) {
-        if (groups.status == 401) {
+
+    if (!res.ok) {
+        if (res.status == 401) {
             return {
                 redirect: {
-                    destination: '/login-no-groups',
+                    destination: `/login`,
                     permanent: false,
                 }
-            }
+            } 
         }
         return {
             redirect: {
-                destination: '/login-no-groups',
+                destination: `/login`,
                 permanent: false,
             }
-        }
+        } 
     }
+
+    const user_groups = await res.json() as string[]
     
-    const user_groups = await groups.json() as string[];
 
     // if (!user_groups) {
     //     return {
@@ -96,7 +98,7 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     if (user_groups.length == 0) {
         return {
             redirect: {
-                destination: '/app/join',
+                destination: `/app/join`,
                 permanent: false,
             }
         }  
