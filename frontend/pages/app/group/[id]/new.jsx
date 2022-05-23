@@ -38,7 +38,7 @@ export default function NewResourcePage(props) {
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [subject, setSubject] = useState('');
+    const [subject, setSubject] = useState('General');
     const [files, setFiles] = useState([]);
     const [fileData, setFileData] = useState([]);
     const [fileUrls, setFileUrls] = useState('');
@@ -260,6 +260,10 @@ export default function NewResourcePage(props) {
                                 <option value="English">English</option>
                                 <option value="Literature">Literature</option>
                                 <option value="Economics">Economics</option>
+                                <option value="Economics">French</option>
+                                <option value="Economics">Japanese</option>
+                                <option value="Economics">Latin</option>
+                                <option value="Economics">Chinese</option>
                             </optgroup>
                         </select>
                       </div>
