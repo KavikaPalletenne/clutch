@@ -22,12 +22,12 @@ pub async fn download_file(
         return HttpResponse::TemporaryRedirect()
             .append_header(("Location", "https://examclutch.com/login"))
             .finish(); // Redirect to login
-    } else if !has_resource_viewing_permission(resource_id.clone(), &req, &conn, &dk)
-        .await
-        .expect("Error")
-    {
-        return HttpResponse::Unauthorized().finish();
-    }
+    } // else if !has_resource_viewing_permission(resource_id.clone(), &req, &conn, &dk)
+    //     .await
+    //     .expect("Error")
+    // {
+    //     return HttpResponse::Unauthorized().finish();
+    // } // TODO: Add back AuthZ for file download
     //////////////////////////////////////////////////////////////////////////
 
     let file_download_url = bucket
