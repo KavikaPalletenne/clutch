@@ -35,5 +35,4 @@ pub fn init_bucket() -> Bucket {
     //Bucket::new_with_path_style(bucket_name, region, credentials).unwrap()
     Bucket::new(bucket_name, region, credentials)
         .unwrap()
-        .with_path_style()
 }
