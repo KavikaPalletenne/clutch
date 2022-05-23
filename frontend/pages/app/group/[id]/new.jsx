@@ -266,6 +266,9 @@ export default function NewResourcePage(props) {
                                 <option value="Chinese">Chinese</option>
                                 <option value="Psychology">Psychology</option>
                                 <option value="Enviro Science">Enviro Science</option>
+                                <option value="Legal Studies">Legal Studies</option>
+                                <option value="Accounting">Accounting</option>
+                                <option value="Business Management">Business Management</option>
                             </optgroup>
                         </select>
                       </div>
