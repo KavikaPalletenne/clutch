@@ -2,7 +2,7 @@ use std::fmt::format;
 use crate::auth::middleware::{
     get_user_id, has_group_viewing_permission, has_resource_viewing_permission, is_logged_in,
 };
-use crate::models::{CreatedResourceResponse, ResourceForm, SearchResource};
+use crate::models::{CreatedResourceResponse, Resource, ResourceForm, SearchResource};
 use crate::service;
 use crate::service::resource::{create, read};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
@@ -69,7 +69,7 @@ pub async fn get_by_group(
     if let Ok(resource) = res {
         return HttpResponse::Ok()
             .append_header(("Content-Type", "application/json"))
-            .body(serde_json::to_string(&resource).unwrap());
+            .body(serde_json::to_string::<Vec<Resource>>(&resource).unwrap());
     }
 
     HttpResponse::BadRequest().body("Invalid group id provided")
@@ -144,7 +144,7 @@ pub async fn create_resource(
         };
 
         let meili_result = index
-            .add_documents(&[search_document.clone()], Some("id"))
+            .add_documents::<SearchResource>(&[search_document.clone()], Some("id"))
             .await;
 
         if let Ok(_) = meili_result {

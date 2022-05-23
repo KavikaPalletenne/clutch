@@ -4,7 +4,7 @@ use crate::auth::middleware::{
 use crate::models::NewGroupForm;
 use crate::service;
 use crate::service::group;
-use crate::service::group::user_in_group;
+use crate::service::group::{read, user_in_group};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use jsonwebtoken::DecodingKey;
 use sea_orm::DatabaseConnection;
@@ -108,16 +108,22 @@ pub async fn join_group(
     let principal = get_user_id(&req, &dk);
 
     if let Some(user_id) = principal {
-        if user_in_group(user_id.clone(), group_id.clone(), &conn)
-            .await
-            .expect("Error")
-        {
-            return HttpResponse::BadRequest().body("Already joined group");
+        let group_res = read(group_id.clone(), &conn).await;
+
+        if let Ok(_group) = group_res {
+            if user_in_group(user_id.clone(), group_id.clone(), &conn)
+                .await
+                .expect("Error")
+            {
+                return HttpResponse::BadRequest().body("Already joined group");
+            }
+            let res = crate::service::group::join_group(group_id, user_id, &conn).await;
+            if let Ok(_) = res {
+                return HttpResponse::Ok().body("Successfully joined group");
+            }
         }
-        let res = crate::service::group::join_group(group_id, user_id, &conn).await;
-        if let Ok(_) = res {
-            return HttpResponse::Ok().body("Successfully joined group");
-        }
+
+        return HttpResponse::BadRequest().body("No such group");
     }
 
     HttpResponse::BadRequest().body("Could not join group")
