@@ -60,25 +60,27 @@ pub async fn create(resource: ResourceForm, conn: &Data<DatabaseConnection>) -> 
     }
 
     // Insert tags into DB
-    if let Some(form_files) = resource.tags {
-        let mut tags = Vec::<tag::ActiveModel>::new();
-        for t in form_files {
-            tags.push(tag::ActiveModel {
-                text: Set(t),
-                resource_id: Set(resource_id.clone()),
-                ..Default::default()
-            })
+    if let Some(form_tags) = resource.tags {
+        if form_tags.clone().len() != 0 {
+            let mut tags = Vec::<tag::ActiveModel>::new();
+            for t in form_tags {
+                tags.push(tag::ActiveModel {
+                    text: Set(t),
+                    resource_id: Set(resource_id.clone()),
+                    ..Default::default()
+                })
+            }
+            tag::Entity::insert_many(tags)
+                .exec(conn.get_ref())
+                .await
+                .expect(
+                    format!(
+                        "Could not insert tags for resource: {}",
+                        resource_id.clone()
+                    )
+                        .as_str(),
+                );
         }
-        tag::Entity::insert_many(tags)
-            .exec(conn.get_ref())
-            .await
-            .expect(
-                format!(
-                    "Could not insert tags for resource: {}",
-                    resource_id.clone()
-                )
-                .as_str(),
-            );
     }
 
     Ok(resource_id)
