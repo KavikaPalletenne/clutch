@@ -13,21 +13,21 @@ Open-source studying for everyone.
 ___
 ## Architecture
 ### Backend
-- Actix Web Server (CRUD, AuthZ)
+- Actix Web Server (CRUD, Auth)
 - Meilisearch Search Server
-- MongoDB Database
+- PostgreSQL Database (SeaORM)
 - S3 Compatible Storage (Files)
 
 ### Frontend
 - NextJS
 
 ### Authentication
-- Discord OAuth2
+- Custom Auth
 
 ## Infrastructure
 ### Backend
-- Server, Meilisearch, MongoDB - AWS Sydney (14.65 USD/month)
-- Object Storage - Linode Sydney (5 USD/month)
+- Server, Meilisearch, MongoDB - Hetzner
+- Object Storage - Linode
 
 ### Frontend
 - Vercel (Free Tier)
