@@ -31,7 +31,7 @@ async fn main() -> Result<()> {
     let jwt_encoding_key = EncodingKey::from_secret(jwt_secret.as_bytes());
     let jwt_decoding_key = DecodingKey::from_secret(jwt_secret.as_bytes());
 
-    // TODO: Initialise DB Connection
+    // Initialise DB Connection
     let db_url = std::env::var("DATABASE_URL")
         .expect("Error getting ACTIX_PORT")
         .to_string();
