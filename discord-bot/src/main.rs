@@ -1,22 +1,26 @@
+use crate::bot::{Bot, create_discord_client};
+use crate::cdn::get_download_file_url;
+use crate::resource::Resource;
+use crate::storage::init_bucket;
 use anyhow::Result;
 use meilisearch_sdk::search::SearchResults;
+use sea_orm::{ConnectOptions, Database};
 use serenity::async_trait;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
-use crate::cdn::get_download_file_url;
-use crate::resource::Resource;
+use std::time::Duration;
+use jsonwebtoken::{DecodingKey, EncodingKey};
+use serenity::Error::Decode;
+use crate::persistence::create_db_client;
 
+mod bot;
+mod cdn;
 mod persistence;
+mod resource;
 mod search;
 mod storage;
-mod cdn;
-mod resource;
-
-struct Bot {
-    database: mongodb::Database,
-    search_index: meilisearch_sdk::indexes::Index,
-    s3_bucket: s3::Bucket,
-}
+mod commands;
+mod service;
 
 #[async_trait]
 impl EventHandler for Bot {
@@ -26,8 +30,13 @@ impl EventHandler for Bot {
         // TODO: Switch to embeds
         if let Some(task) = msg.content.strip_prefix("$resource search") {
             let search_term = task.trim().to_string();
-            println!("Received request for search - Term: {}", search_term.clone());
-            let results: SearchResults<Resource> = self.search_index.search()
+            println!(
+                "Received request for search - Term: {}",
+                search_term.clone()
+            );
+            let results: SearchResults<Resource> = self
+                .search_index
+                .search()
                 .with_query(&search_term)
                 .with_filter(&*format!("group_id = {}", group_id))
                 .execute()
@@ -39,30 +48,41 @@ impl EventHandler for Bot {
                 resources.push(hit.result.clone());
             }
 
-            let mut response = format!("{} Search results for \"{}\":\n", msg.author.mention(), search_term.clone());
+            let mut response = format!(
+                "{} Search results for \"{}\":\n",
+                msg.author.mention(),
+                search_term.clone()
+            );
 
             if resources.len() == 0 {
-                msg.reply(ctx, format!("No resources found for \"{}\"", search_term).as_str()).await.unwrap();
+                msg.reply(
+                    ctx,
+                    format!("No resources found for \"{}\"", search_term).as_str(),
+                )
+                .await
+                .unwrap();
                 return;
             }
 
             let r = &resources[0];
-                response.push_str(format!("Title: {}", r.title).as_str());
-                response.push_str("\n");
-                response.push_str(format!("Description: {}", r.description).as_str());
-                response.push_str("\n");
-                if let Some(files) = &r.files {
-                    response.push_str("Files:\n");
-                    for f in files {
-                        response.push_str(format!("\t{}: {}", f.name.clone(), get_download_file_url(
-                        r.id.clone(),
-                          f.name.clone(),
-                            &self.s3_bucket)).as_str()
+            response.push_str(format!("Title: {}", r.title).as_str());
+            response.push_str("\n");
+            response.push_str(format!("Description: {}", r.description).as_str());
+            response.push_str("\n");
+            if let Some(files) = &r.files {
+                response.push_str("Files:\n");
+                for f in files {
+                    response.push_str(
+                        format!(
+                            "\t{}: {}",
+                            f.name.clone(),
+                            get_download_file_url(r.id.clone(), f.name.clone(), &self.s3_bucket)
                         )
-                    }
+                        .as_str(),
+                    )
                 }
-                response.push_str("\n");
-
+            }
+            response.push_str("\n");
 
             msg.reply(ctx, response).await.unwrap();
         }
@@ -72,43 +92,56 @@ impl EventHandler for Bot {
 #[tokio::main]
 async fn main() {
     // Configure client with Discord bot token
-    let token = std::env::var("DISCORD_TOKEN").expect("No Discord token found in environment");
+    let token = std::env::var("DISCORD_TOKEN").expect("No Discord bot token found in environment");
 
-    // Configure MongoDB connection
-    let database_url = std::env::var("DATABASE_URL").expect("No database url found in environment");
-    let database = persistence::create_mongodb_client(database_url).await.expect("Failed to connect to database");
-    println!("Successfully connected to database");
+    // Initialise JWT settings
+    let jwt_secret = std::env::var("JWT_SECRET")
+        .expect("Error getting JWT_SECRET")
+        .to_string();
+    let jwt_encoding_key = EncodingKey::from_secret(jwt_secret.as_bytes());
+    let jwt_decoding_key = DecodingKey::from_secret(jwt_secret.as_bytes());
 
-    // Configure Meilisearch connection
-    let search_url = std::env::var("SEARCH_URL").expect("No search url found in environment");
-    let search_index = search::create_search_client(search_url).await.expect("Failed to connect to search server");
-    println!("Successfully connected to Meilisearch");
+    // Initialise Meilisearch Connection
+    let search_endpoint = std::env::var("SEARCH_ENDPOINT")
+        .expect("Error getting SEARCH_ENDPOINT")
+        .to_string();
+    let search_api_key = std::env::var("SEARCH_API_KEY")
+        .expect("Error getting SEARCH_API_KEY")
+        .to_string();
+    let search_index =
+        meilisearch_sdk::client::Client::new(search_endpoint, search_api_key).index("resources");
+    // TODO: Add a command to build command or something to add filterable attributes the first time (must have atleast one resource).
 
-    // Configure object storage connection
-    let bucket_name = std::env::var("S3_BUCKET_NAME").expect("S3 env variable error");
-    let access_key = std::env::var("S3_ACCESS_KEY").expect("S3 env variable error");
-    let secret_key = std::env::var("S3_SECRET_KEY").expect("S3 env variable error");
-    let region_name = std::env::var("S3_REGION_NAME").expect("S3 env variable error");
-    let s3_endpoint = std::env::var("S3_ENDPOINT").expect("S3 env variable error");
-    let s3_bucket = storage::create_s3_bucket(
-        bucket_name,
-        access_key,
-        secret_key,
-        region_name,
-        s3_endpoint
-    );
-    println!("Successfully configured object storage");
+    // Initialise DB Connection
+    let db_url = std::env::var("DATABASE_URL")
+        .expect("Error getting ACTIX_PORT")
+        .to_string();
+    let max_connections = std::env::var("DB_MAX_CONNECTIONS")
+        .expect("Error getting ACTIX_PORT")
+        .to_string()
+        .parse::<u32>()
+        .unwrap();
+    let database = create_db_client(db_url, max_connections);
 
-    let bot = Bot {
-        database,
-        search_index,
-        s3_bucket,
-    };
+    // Initialise S3 Bucket
+    let s3_bucket = init_bucket();
+
+    let bot = Bot;
 
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client = // TODO: Implement command framework or split commands into different files atleast - follow this https://github.com/serenity-rs/serenity/tree/current/examples/e06_sample_bot_structure or https://github.com/serenity-rs/serenity/tree/current/examples/e05_command_framework or even slash commands
-        Client::builder(&token, intents).event_handler(bot).await.expect("Error creating Discord client");
+    let mut client = create_discord_client(token, &bot)
+        .await.expect("Error creating Discord client");
+
+    { // Insert data
+        let mut data = client.data.write().await;
+        data.insert::<sea_orm::DatabaseConnection>(database);
+        data.insert::<meilisearch_sdk::indexes::Index>(search_index);
+        data.insert::<s3::Bucket>(s3_bucket);
+        data.insert::<EncodingKey>(jwt_encoding_key);
+        data.insert::<DecodingKey>(jwt_decoding_key);
+    }
+
     client.start().await.unwrap();
 }

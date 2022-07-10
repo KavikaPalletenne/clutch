@@ -33,5 +33,6 @@ pub fn init_bucket() -> Bucket {
 
     println!("Bucket initialised");
     //Bucket::new_with_path_style(bucket_name, region, credentials).unwrap()
-    Bucket::new(bucket_name, region, credentials).unwrap()
+    Bucket::new(bucket_name, region, credentials)
+        .unwrap()
 }
