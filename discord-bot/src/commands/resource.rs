@@ -7,33 +7,37 @@ use crate::service::url_generation::{generate_create_resource_url, generate_dele
 
 #[command]
 pub async fn create(ctx: &Context, msg: &Message) -> CommandResult {
-    let group_id = msg.guild_id.unwrap().0.as_i64().clone(); // TODO: See what can be done about this (id might not fit into i64 as it is a u64)
+    let group = msg.guild(ctx).unwrap();
     let user = msg.author.clone();
     let encoding_key = ctx.data.read().await.get::<EncodingKey>().unwrap();
 
-    let url = generate_create_resource_url(group_id, user, encoding_key);
+    let url = generate_create_resource_url(group, user, encoding_key);
 
-    // TODO: Send an embed with the url as a DM
+    // TODO: Send a button with the url as a DM to the user
 
     todo!()
 }
 
+#[command]
 pub async fn delete(ctx: &Context, msg: &Message) -> CommandResult {
-    let user_id = msg.author.id.0.as_i64();
+    let user = msg.author.clone();
+    let encoding_key = ctx.data.read().await.get::<EncodingKey>().unwrap();
 
-    let url = generate_delete_url(user_id);
+    let url = generate_delete_url(user, encoding_key);
 
-    // TODO
+    // TODO: Send a button with the url as a DM to the user
 
     todo!()
 }
 
+#[command]
 pub async fn edit(ctx: &Context, msg: &Message) -> CommandResult {
-    let user_id = msg.author.id.0.as_i64();
+    let user = msg.author.clone();
+    let encoding_key = ctx.data.read().await.get::<EncodingKey>().unwrap();
 
-    let url = generate_edit_url(user_id);
+    let url = generate_edit_url(user, encoding_key);
 
-    // TODO
+    // TODO: Send a button with the url as a DM to the user
 
     todo!(0)
 }

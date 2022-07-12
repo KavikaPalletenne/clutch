@@ -6,9 +6,17 @@ use serenity::prelude::*;
 
 pub(crate) struct Bot;
 
-// General commands group
+// General commands group (root)
 #[group]
+#[sub_groups(resource)]
 struct General;
+
+#[group]
+#[prefix = "resource"]
+#[only_in("guilds")]
+#[commands(create, edit, delete)]
+struct Resource;
+
 
 impl EventHandler for Bot {}
 
