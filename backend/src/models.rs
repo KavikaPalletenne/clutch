@@ -133,3 +133,8 @@ pub struct NewGroupForm {
     pub description: String,
     pub discord_id: String,
 }
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct TokenQuery {
+    pub token: String,
+}

@@ -2,7 +2,7 @@ use std::fmt::format;
 use crate::auth::middleware::{
     get_user_id, has_group_viewing_permission, has_resource_viewing_permission, is_logged_in,
 };
-use crate::models::{CreatedResourceResponse, Resource, ResourceForm, SearchResource};
+use crate::models::{CreatedResourceResponse, Resource, ResourceForm, SearchResource, TokenQuery};
 use crate::service;
 use crate::service::resource::{create, read};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
@@ -11,6 +11,7 @@ use jsonwebtoken::DecodingKey;
 use meilisearch_sdk::indexes::Index;
 use s3::Bucket;
 use sea_orm::DatabaseConnection;
+use crate::auth::jwt::decode_create_resource_token;
 use crate::search::search;
 
 #[get("/api/resource/{resource_id}")]
@@ -219,3 +220,96 @@ pub async fn delete_resource(
 }
 // TODO: update endpoint
 // TODO: delete endpoint
+
+
+
+/////////////////////////
+// Discord Bot Endpoints
+////////////////////////
+
+#[post("/api/discord/resource/create")]
+pub async fn discord_create_resource(
+    form: web::Json<ResourceForm>,
+    web::Query(token_query): web::Query<TokenQuery>,
+    req: HttpRequest,
+    dk: web::Data<DecodingKey>,
+    bucket: web::Data<Bucket>,
+    index: web::Data<Index>,
+    conn: web::Data<DatabaseConnection>,
+) -> impl Responder {
+    let form = form.into_inner();
+    let files = form.files.clone();
+    // TODO: Add auth using token provided by bot
+    let token = token_query.token;
+
+    let possible_jwt = decode_create_resource_token(token, &dk);
+
+    if let Some(jwt) = possible_jwt {
+        let mut form = form.clone();
+        form.group_id = jwt.group_id.to_string();
+        form.user_id = jwt.sub.to_string();
+
+        let create_response = service::resource::create(form.clone(), &conn).await;
+
+        if let Ok(created_resource_id) = create_response {
+            let mut file_put_urls = Vec::<String>::new();
+            if let Some(f_vec) = form.clone().files {
+                for f in f_vec {
+                    file_put_urls.push(
+                        bucket
+                            .presign_put(
+                                format!(
+                                    "/{}/{}/{}",
+                                    form.group_id.clone(),
+                                    created_resource_id.clone(),
+                                    &f.name
+                                )
+                                    .as_str(),
+                                3600,
+                                None,
+                            )
+                            .unwrap(),
+                    );
+                }
+            }
+
+            let response = CreatedResourceResponse {
+                resource_id: created_resource_id.clone(),
+                group_id: form.clone().group_id,
+                file_put_urls: Option::from(file_put_urls),
+            };
+
+            let search_document = SearchResource {
+                id: created_resource_id.clone().to_string(),
+                user_id: form.user_id,
+                group_id: form.group_id,
+                title: form.title,
+                description: form.description,
+                subject: form.subject,
+                tags: form.tags,
+                files: form.files,
+                last_edited_at: Utc::now(),
+            };
+
+            let meili_result = index
+                .add_documents::<SearchResource>(&[search_document.clone()], Some("id"))
+                .await;
+
+            if let Ok(_) = meili_result {
+                return HttpResponse::Ok()
+                    .append_header(("Content-Type", "application/json"))
+                    .body(serde_json::to_string::<CreatedResourceResponse>(&response).unwrap());
+            }
+
+            service::resource::delete(created_resource_id.clone(), &conn)
+                .await
+                .unwrap();
+            let delete_result = index
+                .delete_document(created_resource_id)
+                .await;
+        }
+
+        return HttpResponse::BadRequest().body("Could not create new resource");
+    }
+    HttpResponse::Unauthorized().finish()
+}

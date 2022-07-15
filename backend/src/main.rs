@@ -105,6 +105,7 @@ async fn main() -> Result<()> {
             // Resource Service
             .app_data(Data::new(conn.clone()))
             .service(resource::create_resource)
+            .service(resource::discord_create_resource)
             .service(resource::get)
             .service(resource::get_by_group)
             .service(resource::delete_resource)
