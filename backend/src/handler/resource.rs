@@ -239,9 +239,9 @@ pub async fn discord_create_resource(
 ) -> impl Responder {
     let form = form.into_inner();
     let files = form.files.clone();
-    
-    let token = token_query.token;
 
+    let token = token_query.token;
+    println!("Token: {}", token.clone());
     let possible_jwt = decode_create_resource_token(token, &dk);
 
     if let Some(jwt) = possible_jwt {
