@@ -22,7 +22,7 @@ pub async fn generate_create_resource_url(
 
     let token = generate_create_resource_token(
         user_id,
-        group_id.parse::<i64>().unwrap(),
+        group_id,
         group_name,
         username,
         avatar_hash,

@@ -14,6 +14,7 @@ ___
 ## Architecture
 ### Backend
 - Actix Web Server (CRUD, Auth)
+- Tokio + Serenity.rs (Discord Bot)
 - Meilisearch Search Server
 - PostgreSQL Database (SeaORM)
 - S3 Compatible Storage (Files)
@@ -26,7 +27,7 @@ ___
 
 ## Infrastructure
 ### Backend
-- Server, Meilisearch, MongoDB - Hetzner
+- Server, Discord Bot, Meilisearch, MongoDB - Hetzner
 - Object Storage - Linode
 
 ### Frontend
