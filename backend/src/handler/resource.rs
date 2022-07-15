@@ -239,14 +239,14 @@ pub async fn discord_create_resource(
 ) -> impl Responder {
     let form = form.into_inner();
     let files = form.files.clone();
-    // TODO: Add auth using token provided by bot
+    
     let token = token_query.token;
 
     let possible_jwt = decode_create_resource_token(token, &dk);
 
     if let Some(jwt) = possible_jwt {
         let mut form = form.clone();
-        form.group_id = jwt.group_id.to_string();
+        form.group_id = jwt.group_id;
         form.user_id = jwt.sub.to_string();
 
         let create_response = service::resource::create(form.clone(), &conn).await;

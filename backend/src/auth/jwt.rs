@@ -59,7 +59,7 @@ pub struct CreateResourceJwtPayload {
     pub iat: i64, // issued-at (UNIX timestamp)
 
     // For AuthZ
-    pub group_id: i64,
+    pub group_id: String,
 
     // For display
     pub group_name: String,
@@ -128,9 +128,6 @@ pub fn decode_create_resource_token(
 
     return match decode_token {
         Ok(token) => Option::from(token.claims),
-        Err(err) => {
-            println!("JWT Decode Error: {}", err);
-            None::<CreateResourceJwtPayload>
-        }
+        Err(_err) => None::<CreateResourceJwtPayload>
     }
 }
