@@ -387,11 +387,8 @@ export default function NewResourcePage(props) {
 
 export async function getServerSideProps(context) {
   let { token } = context.query
-  // TEST TOKEN
-  let test_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MzYwMzU2MjA5MDU5NDMwNDEiLCJncm91cF9pZCI6IjY0NzMyOTI3MzU2ODU1OTExNCIsImdyb3VwX25hbWUiOiJNR1MgWWVhciAxMiIsInVzZXJuYW1lIjoiRW5kdmVvdXMiLCJhdmF0YXJfaGFzaCI6IjRkMzA4ZjY1NjU3ZDQwZGVjM2U1ZDBmNmJhYjU0NzBjIiwiaWF0IjoxNTE2MjM5MDIyfQ.Vz45eflkGQq0uroTgUfGQxHS_uv9F-loAm8pHtkkQmY"
-
   
-  var decoded = jwt_decode(test_token)
+  var decoded = jwt_decode(token)
 
   let greeting_array = [
     "Hello", "Hola", "Bonjour", "Ciao", "G'day"
@@ -401,7 +398,7 @@ export async function getServerSideProps(context) {
 
   return { props: {
       "greeting": greeting,
-      "token": test_token,
+      "token": token,
       "group_name": decoded["group_name"],
       "user_id": decoded["sub"],
       "username": decoded["username"],
