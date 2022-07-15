@@ -16,7 +16,7 @@ migration = { path = "migration" }
 tokio = { version = "1.17", features = ["macros", "rt-multi-thread"] }
 
 # Discord API
-serenity = { version = "0.11", default-features = false, features = ["client", "gateway", "rustls_backend", "model", "framework", "standard_framework"] }
+serenity = { version = "0.11", default-features = false, features = ["client", "gateway", "rustls_backend", "model", "framework", "standard_framework", "cache"] }
 
 # Database
 sea-orm = { version = "0.7", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
@@ -41,3 +41,4 @@ chrono = { version = "0.4", features = ["serde"] }
 thiserror = "1"
 jsonwebtoken = "8"
 cookie = "0.16"
+lexical-util = "0.8"
