@@ -156,7 +156,7 @@ export default function NewResourcePage(props) {
             },
             body: JSON.stringify({
                 'user_id': '',
-                'group_id': id,
+                'group_id': '',
                 'title': title,
                 'description': description,
                 'subject': subject,
@@ -207,7 +207,7 @@ export default function NewResourcePage(props) {
 
     return (
       
-      <div className='bg-slate-800 md:pl-96 pt-5' style={{fontFamily: "Roboto Mono"}}>
+      <div className='bg-gray-800 md:pl-96 pt-5' style={{fontFamily: "Roboto Mono"}}>
 
         <Head>
           <meta charSet="utf-8" />
@@ -239,7 +239,7 @@ export default function NewResourcePage(props) {
           <div className="mt-5 md:mt-0 md:col-span-2">
             <form onSubmit={submit} id="my-form">
               <div className="shadow sm:rounded-md sm:overflow-hidden">
-                <div className="px-4 py-5 bg-slate-800 space-y-6 sm:p-6">
+                <div className="px-4 py-5 bg-gray-800 space-y-6 sm:p-6">
                   <div className="grid grid-cols-3 gap-6">
                     <div className="col-span-3 sm:col-span-2">
                       <label htmlFor="title" className="block text-sm font-medium text-gray-300">
@@ -251,8 +251,8 @@ export default function NewResourcePage(props) {
                           type="text"
                           name="title"
                           id="title"
-                          className="focus:ring-exclpurple bg-slate-700 text-white focus:border-exclpurple flex-1 block w-full rounded-l-md rounded-none rounded-r-md sm:text-sm border-gray-800"
-                          placeholder="Choose a descriptive title to make searching easier..."
+                          className="focus:ring-exclpurple bg-gray-700 text-white focus:border-exclpurple flex-1 block w-full rounded-l-md rounded-none rounded-r-md sm:text-sm border-gray-800"
+                          placeholder="Choose a descriptive title..."
                         />
                       </div>
                     </div>
@@ -264,7 +264,7 @@ export default function NewResourcePage(props) {
                         Subject
                       </label>
                       <div className="">
-                        <select onChange={e => setSubject(e.target.value)} className="rounded-md bg-slate-700 text-white shadow-sm focus:border-exclpurple focus:ring-exclpurple border-gray-800" name="cars" id="cars">
+                        <select onChange={e => setSubject(e.target.value)} className="rounded-md bg-gray-700 text-white shadow-sm focus:border-exclpurple focus:ring-exclpurple border-gray-800" name="cars" id="cars">
                             <optgroup style={{fontFamily: "Roboto Mono"}}>
                                 <option value="General">General</option>
                                 <option value="Physics">Physics</option>
@@ -294,7 +294,7 @@ export default function NewResourcePage(props) {
                   <label htmlFor="tags" className="block pb-1 text-sm text-sm font-medium text-gray-300">
                         Tags
                   </label>
-                  <div className="flex border bg-slate-700 overflow-x-auto border-gray-800 focus-within:border-exclpurple focus-within:focus:ring-exclpurple shadow-sm rounded-md py-2 px-3">
+                  <div className="flex border bg-gray-700 overflow-x-auto border-gray-800 focus-within:border-exclpurple focus-within:focus:ring-exclpurple shadow-sm rounded-md py-2 px-3">
                     {tags.map((tag, index) => (
                       <div key={index} className="flex max-h-10 inline-grid justify-center bg-exclpurple rounded-2xl py-2 px-2 text-white mr-2">
                         {tag}
@@ -306,7 +306,7 @@ export default function NewResourcePage(props) {
                       </div>
                     ))}
                     <input 
-                    className="outline-none h-10 bg-slate-700 text-white"
+                    className="outline-none h-10 bg-gray-700 text-white"
                       value={tagInput}
                       placeholder={tagInputPlaceHolder}
                       onKeyDown={onKeyDown}
@@ -326,7 +326,7 @@ export default function NewResourcePage(props) {
                         id="description"
                         name="description"
                         rows={3}
-                        className="shadow-sm focus:ring-exclpurple bg-slate-700 text-white focus:border-exclpurple mt-1 block w-full sm:text-sm border border-gray-800 rounded-md"
+                        className="shadow-sm focus:ring-exclpurple bg-gray-700 text-white focus:border-exclpurple mt-1 block w-full sm:text-sm border border-gray-800 rounded-md"
                         placeholder="Tell the group a bit about this resource..."
                         defaultValue={''}
                       />
@@ -347,14 +347,14 @@ export default function NewResourcePage(props) {
                       />
                       <label htmlFor="fileUpload" className={styles.uploadButtonLabel}>Select files</label>
                       {listFiles}
-                      <div>
+                      <div className='text-gray-300 pt-2'>
                         Upload Progress: {fileProgress *100 + "%"}
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                <div className="px-4 py-3 bg-slate-800 text-right sm:px-6">
+                <div className="px-4 py-3 bg-gray-800 text-right sm:px-6">
                   <Link href={url}>
                   <a className="pr-1">
                   <button
