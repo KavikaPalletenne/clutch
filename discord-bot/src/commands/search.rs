@@ -1,83 +1,14 @@
-use anyhow::Result;
-use meilisearch_sdk::search::SearchResults;
-use serenity::async_trait;
-use serenity::framework::standard::macros::{command, group};
-use serenity::framework::standard::{Args, CommandResult, StandardFramework};
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
-use serenity::prelude::*;
-use crate::{EKey, get_download_file_url, S3Bucket, SearchIndex, Database};
-use crate::service::url_generation::generate_create_resource_url;
-use crate::resource::Resource;
-
+use crate::type_maps::{S3Bucket, SearchIndex};
+use crate::{Database, get_download_file_url, Resource};
 use lexical_util::num::AsPrimitive;
-use serenity::http::CacheHttp;
+use meilisearch_sdk::indexes::Index;
+use meilisearch_sdk::search::SearchResults;
+use s3::Bucket;
+use serenity::framework::standard::macros::command;
+use serenity::framework::standard::{Args, CommandResult};
+use serenity::model::prelude::*;
+use serenity::prelude::*;
 use crate::service::group::get_id_by_discord_id;
-
-// // Import commands
-// use crate::commands::resource::create;
-// use crate::commands::search::search;
-
-pub struct Bot;
-
-// General commands group (root)
-#[group]
-#[sub_groups(resourceg)]
-#[commands(search)]
-struct General;
-
-#[group]
-#[prefix = "resource"]
-#[only_in("guilds")]
-#[commands(create)]
-struct ResourceG;
-
-#[async_trait]
-impl EventHandler for Bot {
-    async fn ready(&self, _: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
-    }
-}
-
-pub async fn create_discord_client(token: String, bot: Bot) -> Result<Client> {
-    let framework = StandardFramework::new()
-        .configure(|c| c.prefix("$"))
-        .group(&GENERAL_GROUP)
-        .group(&RESOURCEG_GROUP);
-
-    let intents = GatewayIntents::GUILD_MESSAGES
-        | GatewayIntents::DIRECT_MESSAGES
-        | GatewayIntents::MESSAGE_CONTENT;
-
-    Ok(Client::builder(&token, intents)
-        .event_handler(bot)
-        .framework(framework)
-        .await
-        .expect("Error creating Discord client"))
-}
-
-#[command]
-pub async fn create(ctx: &Context, msg: &Message) -> CommandResult {
-    let group = ctx.http().get_guild(msg.guild_id.unwrap().0).await.unwrap();
-    let user = msg.author.clone();
-
-    let data = ctx.data.read().await;
-    let encoding_key = data.get::<EKey>().unwrap();
-    let database = data.get::<Database>().unwrap();
-
-    let url = generate_create_resource_url(group, user, encoding_key, database).await;
-
-    // TODO: Send a button with the url as a DM to the user
-    let response = format!("Click the link:\n{}",url);
-
-    msg.author.create_dm_channel(ctx).await.unwrap().send_message(ctx, |m| {
-        m.content(response)
-            .tts(false)
-        // .embed(|e| e.title("This is an embed").description("With a description"))
-    }).await.unwrap();
-
-    Ok(())
-}
 
 #[command]
 pub async fn search(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
@@ -85,7 +16,6 @@ pub async fn search(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 
     if let Some(guild_id) = possible_group_id {
         let data = ctx.data.read().await;
-
         let search_index = data.get::<SearchIndex>().unwrap();
         let s3_bucket = data.get::<S3Bucket>().unwrap();
         let database = data.get::<Database>().unwrap();
@@ -119,8 +49,8 @@ pub async fn search(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
                 ctx,
                 format!("No resources found for \"{}\"", search_term).as_str(),
             )
-                .await
-                .unwrap();
+            .await
+            .unwrap();
             return Ok(());
         }
 
@@ -143,7 +73,7 @@ pub async fn search(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
                             &s3_bucket
                         )
                     )
-                        .as_str(),
+                    .as_str(),
                 )
             }
         }

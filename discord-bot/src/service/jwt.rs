@@ -7,7 +7,7 @@ use uuid::Uuid;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UserAuthenticationJwtPayload {
     pub iss: String,      // issuer
-    pub sub: i64,      // subject (user's id)
+    pub sub: i64,         // subject (user's id)
     pub jti: Uuid,        // id
     pub aud: Vec<String>, // audience (uri the JWT is meant for)
 
@@ -17,7 +17,7 @@ pub struct UserAuthenticationJwtPayload {
     pub iat: i64, // issued-at (UNIX timestamp)
 
     // For display
-    pub username: String, // username
+    pub username: String,    // username
     pub avatar_hash: String, // url to Discord avatar
 }
 
@@ -25,7 +25,7 @@ pub struct UserAuthenticationJwtPayload {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreateResourceJwtPayload {
     pub iss: String,      // issuer
-    pub sub: i64,      // subject (user's id)
+    pub sub: i64,         // subject (user's id)
     pub jti: Uuid,        // id
     pub aud: Vec<String>, // audience (uri the JWT is meant for)
 
@@ -38,13 +38,19 @@ pub struct CreateResourceJwtPayload {
     pub group_id: i64,
 
     // For display
-    pub username: String, // username
+    pub group_name: String,
+    pub username: String,    // username
     pub avatar_hash: String, // url to Discord avatar
 }
 
-pub fn create_user_token(user_id: i64, username: String, avatar_hash: String, encoding_key: &EncodingKey) -> String {
+pub fn generate_user_token(
+    user_id: i64,
+    username: String,
+    avatar_hash: String,
+    encoding_key: &EncodingKey,
+) -> String {
     let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-    let expiry = i64::try_from((current_time + Duration::from_secs(604800)).as_secs()).unwrap(); // Expiry is 7 days (same as Discord)
+    let expiry = i64::try_from((current_time + Duration::from_secs(3600)).as_secs()).unwrap(); // Expiry is 1 hour
     let claims = UserAuthenticationJwtPayload {
         iss: "examclutch".to_string(),
         sub: user_id,
@@ -54,15 +60,22 @@ pub fn create_user_token(user_id: i64, username: String, avatar_hash: String, en
         nbf: i64::try_from(current_time.as_secs()).unwrap(),
         iat: i64::try_from(current_time.as_secs()).unwrap(),
         username,
-        avatar_hash
+        avatar_hash,
     };
 
     encode(&Header::default(), &claims, encoding_key).unwrap()
 }
 
-pub fn create_create_resource_token(user_id: i64, group_id: i64, username: String, avatar_hash: String, encoding_key: &EncodingKey) -> String {
+pub fn generate_create_resource_token(
+    user_id: i64,
+    group_id: i64,
+    group_name: String,
+    username: String,
+    avatar_hash: String,
+    encoding_key: &EncodingKey,
+) -> String {
     let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-    let expiry = i64::try_from((current_time + Duration::from_secs(604800)).as_secs()).unwrap(); // Expiry is 7 days (same as Discord)
+    let expiry = i64::try_from((current_time + Duration::from_secs(3600)).as_secs()).unwrap(); // Expiry is 1 hour
     let claims = CreateResourceJwtPayload {
         iss: "examclutch".to_string(),
         sub: user_id,
@@ -72,8 +85,9 @@ pub fn create_create_resource_token(user_id: i64, group_id: i64, username: Strin
         nbf: i64::try_from(current_time.as_secs()).unwrap(),
         iat: i64::try_from(current_time.as_secs()).unwrap(),
         group_id,
+        group_name,
         username,
-        avatar_hash
+        avatar_hash,
     };
 
     encode(&Header::default(), &claims, encoding_key).unwrap()
@@ -91,8 +105,8 @@ pub fn decode_user_token(
 
     return match decode_token {
         Ok(token) => Option::from(token.claims),
-        Err(_err) => None::<UserAuthenticationJwtPayload>
-    }
+        Err(_err) => None::<UserAuthenticationJwtPayload>,
+    };
 }
 
 pub fn decode_create_resource_token(
@@ -107,6 +121,6 @@ pub fn decode_create_resource_token(
 
     return match decode_token {
         Ok(token) => Option::from(token.claims),
-        Err(_err) => None::<CreateResourceJwtPayload>
-    }
+        Err(_err) => None::<CreateResourceJwtPayload>,
+    };
 }
