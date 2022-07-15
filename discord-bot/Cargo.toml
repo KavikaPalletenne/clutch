@@ -20,7 +20,6 @@ serenity = { version = "0.11", default-features = false, features = ["client", "
 
 # Database
 sea-orm = { version = "0.7", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
-mongodb = { version = "2.2", default-features = false, features = ["tokio-runtime", "bson-chrono-0_4"] }
 
 # Id
 rs-snowflake = "0.6"
