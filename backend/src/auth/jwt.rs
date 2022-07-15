@@ -128,6 +128,9 @@ pub fn decode_create_resource_token(
 
     return match decode_token {
         Ok(token) => Option::from(token.claims),
-        Err(_err) => None::<CreateResourceJwtPayload>
+        Err(err) => {
+            println!("JWT Decode Error: {}", err);
+            None::<CreateResourceJwtPayload>
+        }
     }
 }
