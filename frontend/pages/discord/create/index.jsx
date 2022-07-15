@@ -197,10 +197,10 @@ export default function NewResourcePage(props) {
           setLoading(false)
           if (response.status == 200) {
             setFileProgress(1.0)
-            router.push(`/discord/create/success`)
+            router.push(`/discord/flow/success`)
           }
           if (response.status == 401) {
-            router.push(`/discord/create/failed`)
+            router.push(`/discord/flow/failed`)
           }
         })
         .catch(err => {
