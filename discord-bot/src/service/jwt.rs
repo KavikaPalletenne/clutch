@@ -35,7 +35,7 @@ pub struct CreateResourceJwtPayload {
     pub iat: i64, // issued-at (UNIX timestamp)
 
     // For AuthZ
-    pub group_id: i64,
+    pub group_id: String,
 
     // For display
     pub group_name: String,
@@ -68,7 +68,7 @@ pub fn generate_user_token(
 
 pub fn generate_create_resource_token(
     user_id: i64,
-    group_id: i64,
+    group_id: String,
     group_name: String,
     username: String,
     avatar_hash: String,

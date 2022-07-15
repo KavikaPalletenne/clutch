@@ -15,7 +15,7 @@ use std::time::Duration;
 
 mod bot;
 mod cdn;
-mod commands;
+// mod commands;
 mod persistence;
 mod resource;
 mod search;
