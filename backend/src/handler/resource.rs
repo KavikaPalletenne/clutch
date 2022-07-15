@@ -311,5 +311,5 @@ pub async fn discord_create_resource(
 
         return HttpResponse::BadRequest().body("Could not create new resource");
     }
-    HttpResponse::Unauthorized().finish()
+    HttpResponse::Unauthorized().body("Invalid token provided")
 }
