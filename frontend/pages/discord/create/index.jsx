@@ -7,7 +7,7 @@ import { GetServerSideProps } from "next";
 import { FileReference } from "../../app/index"
 import FileRender from "../../../components/app/FileRender"
 import { AiOutlineClose } from "react-icons/ai"
-import { randomUUID } from 'crypto';
+import { pbkdf2Sync, randomUUID } from 'crypto';
 import axios from 'axios';
 import jwt_decode from "jwt-decode";
 import { decode } from 'punycode';
@@ -43,6 +43,7 @@ export default function NewResourcePage(props) {
     const [subject, setSubject] = useState('General');
     const [files, setFiles] = useState([]);
     const [fileData, setFileData] = useState([]);
+    const [fileType, setFileType] = useState('');
     const [fileUrls, setFileUrls] = useState('');
 
     const [cancelUrl, setCancelUrl] = useState(`/app/group/${id}`)
@@ -120,9 +121,9 @@ export default function NewResourcePage(props) {
       }
       files.push(file) }
       );
-
-      setFileData(fileArray)
       
+      setFileData(fileArray)
+      setFileType(fileArray[0].type)
 
       setListFiles(
       fileArray.map((f) => 
@@ -171,6 +172,9 @@ export default function NewResourcePage(props) {
           url = `/api/discord/resource/cancel/${data.group_id}/${data['resource_id']}/delete?token=${props.token}`
 
           return await axios.request({
+          headers: {
+            'content-type': fileType,
+          },
           method: "put", 
           url: `${data['file_put_urls'][0]}`, 
           data: fileData[0],
