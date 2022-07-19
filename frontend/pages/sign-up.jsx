@@ -101,7 +101,7 @@ export default function Register() {
 
         <Head>
           <meta charSet="utf-8" />
-          <meta name="description" content="Sign Up to ScanTag - The Modern Name Tag" />
+          <meta name="description" content="Sign Up to ExamClutch - Study together. Clutch your exams." />
           <meta name="robots" content="all" />
           <meta name="googlebot" content="all" />
           <title>Sign Up - ExamClutch</title>
