@@ -81,7 +81,7 @@ pub async fn create(ctx: &Context, msg: &Message) -> CommandResult {
         return Ok(())
     }
 
-    let url = generate_create_resource_url(group, user, encoding_key, database).await;
+    let url = generate_create_resource_url(group, user, db_user.unwrap().id, encoding_key, database).await;
 
     // TODO: Send a button with the url as a DM to the user
     let response = format!("Click the link to upload:\n{}",url);

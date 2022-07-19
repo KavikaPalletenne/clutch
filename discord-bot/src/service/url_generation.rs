@@ -9,6 +9,7 @@ use crate::service::group::get_id_by_discord_id;
 pub async fn generate_create_resource_url(
     group: PartialGuild,
     user: User,
+    db_user_id: String,
     encoding_key: &EncodingKey,
     conn: &DatabaseConnection,
 ) -> String {
