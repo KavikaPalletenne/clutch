@@ -101,6 +101,13 @@ pub struct LoginForm {
     pub password: String,
 }
 
+#[derive(Deserialize, Serialize, Clone, PartialEq)]
+pub struct DiscordLinkForm {
+    pub email: String,
+    pub password: String,
+    pub discord_token: String,
+}
+
 #[derive(Deserialize, Serialize)]
 pub struct UpdateUserForm {
     pub username: String,

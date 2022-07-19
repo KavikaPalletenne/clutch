@@ -241,13 +241,15 @@ pub async fn discord_create_resource(
     let files = form.files.clone();
 
     let token = token_query.token;
-    
+
     let possible_jwt = decode_create_resource_token(token, &dk);
 
     if let Some(jwt) = possible_jwt {
         let mut form = form.clone();
         form.group_id = jwt.group_id;
-        form.user_id = jwt.sub.to_string();
+        form.user_id = jwt.sub;
+        // TODO: Check if the user already has an account, if not, create an account for them (no need for email as you can just message them via discord)
+        // TODO: Create a way to init/create a group in database the first time
 
         let create_response = service::resource::create(form.clone(), &conn).await;
 

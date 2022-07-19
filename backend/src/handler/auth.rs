@@ -1,6 +1,6 @@
-use crate::auth::jwt::{create_auth_token, decode_auth_token};
-use crate::models::{LoginForm, NewUserForm};
-use crate::service::user::{create, email_exists, get_by_email, username_exists};
+use crate::auth::jwt::{create_auth_token, decode_auth_token, decode_user_token};
+use crate::models::{DiscordLinkForm, LoginForm, NewUserForm};
+use crate::service::user::{add_discord_id, create, email_exists, get_by_email, username_exists};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use cookie::Cookie;
 use jsonwebtoken::{DecodingKey, EncodingKey};
@@ -54,6 +54,30 @@ pub async fn login(
     }
 
     HttpResponse::BadRequest().body("Invalid credentials")
+}
+
+pub async fn discord_link(
+    req: HttpRequest,
+    form: web::Json<DiscordLinkForm>,
+    conn: web::Data<DatabaseConnection>,
+    dk: web::Data<DecodingKey>,
+) -> impl Responder {
+    if let Ok(user) = get_by_email(form.clone().email, &conn).await {
+        if verify(form.clone().password, user.clone().password) {
+            let discord_token = decode_user_token(form.clone().discord_token, dk.get_ref());
+            if let Some(claims) = discord_token {
+                let res = add_discord_id(user.id, claims.sub, &conn).await;
+
+                if let Ok(_) = res {
+                    return HttpResponse::Ok().body("Successfully linked Discord account to ExamClutch");
+                }
+            }
+            return HttpResponse::BadRequest().body("Invalid token");
+        }
+        return HttpResponse::BadRequest().body("Invalid credentials");
+    }
+
+    HttpResponse::BadRequest().body("User not found")
 }
 
 #[get("/api/auth/authorize")]
