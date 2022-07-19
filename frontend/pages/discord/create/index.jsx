@@ -223,7 +223,7 @@ export default function NewResourcePage(props) {
           <link rel="icon" href="/gradient_logo.svg" />
 
           <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7136601653169605"
-          crossorigin="anonymous"></script>
+          crossOrigin="anonymous"></script>
         </Head>
 
         
