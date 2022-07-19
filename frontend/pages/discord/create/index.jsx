@@ -390,7 +390,21 @@ export default function NewResourcePage(props) {
 }
 
 export async function getServerSideProps(context) {
+
   let { token } = context.query
+  
+  if (token == null) {
+    return { props: {
+      "greeting": "Hello",
+      "token": "token",
+      "group_name": "Group",
+      "user_id": "user_id",
+      "username": "Username",
+      "avatar_hash": "avatar_hash",
+    }
+  }
+  }
+
   
   var decoded = jwt_decode(token)
 
