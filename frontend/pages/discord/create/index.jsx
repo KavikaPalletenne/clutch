@@ -274,23 +274,23 @@ export default function NewResourcePage(props) {
                         <select onChange={e => setSubject(e.target.value)} className="rounded-md bg-gray-700 text-white shadow-sm focus:border-exclpurple focus:ring-exclpurple border-gray-800" name="cars" id="cars">
                             <optgroup style={{fontFamily: "Roboto Mono"}}>
                                 <option value="General">General</option>
-                                <option value="Physics">Physics</option>
-                                <option value="Maths Methods">Maths Methods</option>
-                                <option value="Specialist Maths">Specialist Maths</option>
+                                <option value="Accounting">Accounting</option>
                                 <option value="Biology">Biology</option>
+                                <option value="Business Management">Business Management</option>
                                 <option value="Chemistry">Chemistry</option>
-                                <option value="English">English</option>
-                                <option value="Literature">Literature</option>
+                                <option value="Chinese">Chinese</option>
                                 <option value="Economics">Economics</option>
+                                <option value="English">English</option>
+                                <option value="Enviro Science">Enviro Science</option>
                                 <option value="French">French</option>
                                 <option value="Japanese">Japanese</option>
                                 <option value="Latin">Latin</option>
-                                <option value="Chinese">Chinese</option>
-                                <option value="Psychology">Psychology</option>
-                                <option value="Enviro Science">Enviro Science</option>
                                 <option value="Legal Studies">Legal Studies</option>
-                                <option value="Accounting">Accounting</option>
-                                <option value="Business Management">Business Management</option>
+                                <option value="Literature">Literature</option>
+                                <option value="Maths Methods">Maths Methods</option>
+                                <option value="Physics">Physics</option>
+                                <option value="Psychology">Psychology</option>
+                                <option value="Specialist Maths">Specialist Maths</option>
                             </optgroup>
                         </select>
                       </div>
