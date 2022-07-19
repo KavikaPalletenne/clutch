@@ -56,6 +56,7 @@ pub async fn login(
     HttpResponse::BadRequest().body("Invalid credentials")
 }
 
+#[post("/api/auth/connect/discord")]
 pub async fn discord_link(
     req: HttpRequest,
     form: web::Json<DiscordLinkForm>,
