@@ -18,11 +18,10 @@ pub async fn generate_create_resource_url(
     let group_id = get_id_by_discord_id(discord_group_id, conn).await.unwrap();
     let group_name = group.name;
     let username = user.name;
-    let user_id = user.id.to_string();
     let avatar_hash = user.avatar.unwrap();
 
     let token = generate_create_resource_token(
-        user_id,
+        db_user_id,
         group_id,
         group_name,
         username,
