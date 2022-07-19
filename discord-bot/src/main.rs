@@ -22,6 +22,7 @@ mod search;
 mod service;
 mod storage;
 mod type_maps;
+mod errors;
 
 #[tokio::main]
 async fn main() {

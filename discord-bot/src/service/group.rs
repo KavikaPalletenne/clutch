@@ -165,5 +165,5 @@ pub async fn get_id_by_discord_id(
         .all(conn)
         .await?;
 
-     Ok(res[0].id.clone())
+    Ok(res[0].id.clone())
 }

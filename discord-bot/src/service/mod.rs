@@ -4,3 +4,4 @@ pub mod storage;
 pub mod jwt;
 pub mod url_generation;
 pub mod group;
+pub mod user;

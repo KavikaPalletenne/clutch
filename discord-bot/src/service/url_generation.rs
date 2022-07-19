@@ -12,12 +12,12 @@ pub async fn generate_create_resource_url(
     encoding_key: &EncodingKey,
     conn: &DatabaseConnection,
 ) -> String {
-    let discord_group_id = group.id.0.to_string();
+    let discord_group_id = group.id.to_string();
 
     let group_id = get_id_by_discord_id(discord_group_id, conn).await.unwrap();
     let group_name = group.name;
     let username = user.name;
-    let user_id = user.id.0.as_i64();
+    let user_id = user.id.to_string();
     let avatar_hash = user.avatar.unwrap();
 
     let token = generate_create_resource_token(
@@ -34,7 +34,7 @@ pub async fn generate_create_resource_url(
 
 pub fn generate_delete_url(user: User, encoding_key: &EncodingKey) -> String {
     let username = user.name;
-    let user_id = user.id.0.as_i64();
+    let user_id = user.id.to_string();
     let avatar_hash = user.avatar.unwrap();
 
     let token = generate_user_token(user_id, username, avatar_hash, encoding_key);
@@ -44,10 +44,20 @@ pub fn generate_delete_url(user: User, encoding_key: &EncodingKey) -> String {
 
 pub fn generate_edit_url(user: User, encoding_key: &EncodingKey) -> String {
     let username = user.name;
-    let user_id = user.id.0.as_i64();
+    let user_id = user.id.to_string();
     let avatar_hash = user.avatar.unwrap();
 
     let token = generate_user_token(user_id, username, avatar_hash, encoding_key);
 
     format!("https://examclutch.com/discord/edit?token={}", token)
+}
+
+pub fn generate_discord_link_url(user: User, encoding_key: &EncodingKey) -> String {
+    let username = user.name;
+    let user_id = user.id.to_string();
+    let avatar_hash = user.avatar.unwrap();
+
+    let token = generate_user_token(user_id, username, avatar_hash, encoding_key);
+
+    format!("https://examclutch.com/discord/link?token={}", token)
 }

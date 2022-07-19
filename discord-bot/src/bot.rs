@@ -7,12 +7,13 @@ use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use crate::{EKey, get_download_file_url, S3Bucket, SearchIndex, Database};
-use crate::service::url_generation::generate_create_resource_url;
+use crate::service::url_generation::{generate_create_resource_url, generate_discord_link_url};
 use crate::resource::Resource;
 
 use lexical_util::num::AsPrimitive;
 use serenity::http::CacheHttp;
 use crate::service::group::get_id_by_discord_id;
+use crate::service::user::{get_user_by_discord_id, read};
 
 // // Import commands
 // use crate::commands::resource::create;
@@ -65,10 +66,25 @@ pub async fn create(ctx: &Context, msg: &Message) -> CommandResult {
     let encoding_key = data.get::<EKey>().unwrap();
     let database = data.get::<Database>().unwrap();
 
+    let db_user = get_user_by_discord_id(user.id.to_string(), database).await?;
+
+    if let None = db_user {
+        let url = generate_discord_link_url(user, encoding_key);
+        let response = format!("Your Discord account has not been linked with ExamClutch. Click the following link to link:\n{}",url);
+
+        msg.author.create_dm_channel(ctx).await.unwrap().send_message(ctx, |m| {
+            m.content(response)
+                .tts(false)
+            // .embed(|e| e.title("This is an embed").description("With a description"))
+        }).await.unwrap();
+
+        return Ok(())
+    }
+
     let url = generate_create_resource_url(group, user, encoding_key, database).await;
 
     // TODO: Send a button with the url as a DM to the user
-    let response = format!("Click the link:\n{}",url);
+    let response = format!("Click the link to upload:\n{}",url);
 
     msg.author.create_dm_channel(ctx).await.unwrap().send_message(ctx, |m| {
         m.content(response)

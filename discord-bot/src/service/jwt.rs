@@ -7,7 +7,7 @@ use uuid::Uuid;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UserAuthenticationJwtPayload {
     pub iss: String,      // issuer
-    pub sub: i64,         // subject (user's id)
+    pub sub: String,         // subject (user's id)
     pub jti: Uuid,        // id
     pub aud: Vec<String>, // audience (uri the JWT is meant for)
 
@@ -25,7 +25,7 @@ pub struct UserAuthenticationJwtPayload {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreateResourceJwtPayload {
     pub iss: String,      // issuer
-    pub sub: i64,         // subject (user's id)
+    pub sub: String,         // subject (user's id)
     pub jti: Uuid,        // id
     pub aud: Vec<String>, // audience (uri the JWT is meant for)
 
@@ -44,7 +44,7 @@ pub struct CreateResourceJwtPayload {
 }
 
 pub fn generate_user_token(
-    user_id: i64,
+    user_id: String,
     username: String,
     avatar_hash: String,
     encoding_key: &EncodingKey,
@@ -67,7 +67,7 @@ pub fn generate_user_token(
 }
 
 pub fn generate_create_resource_token(
-    user_id: i64,
+    user_id: String,
     group_id: String,
     group_name: String,
     username: String,
