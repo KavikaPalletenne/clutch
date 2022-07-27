@@ -3,7 +3,9 @@ use s3::{Bucket, Region};
 use std::env;
 
 pub fn init_bucket() -> Bucket {
-    let bucket_name = "excl-cdn";
+    let bucket_name = env::var("S3_BUCKET_NAME")
+        .expect("Error getting S3 BUCKET NAME")
+        .to_string();
     let access_key = env::var("S3_ACCESS_KEY")
         .expect("Error getting S3 CREDENTIALS")
         .to_string();
@@ -33,6 +35,6 @@ pub fn init_bucket() -> Bucket {
 
     println!("Bucket initialised");
     //Bucket::new_with_path_style(bucket_name, region, credentials).unwrap()
-    Bucket::new(bucket_name, region, credentials)
+    Bucket::new(&*bucket_name, region, credentials)
         .unwrap()
 }
