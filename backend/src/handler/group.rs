@@ -19,9 +19,7 @@ pub async fn get(
     let group_id = path.into_inner();
 
     if !is_logged_in(&req, &dk) {
-        return HttpResponse::TemporaryRedirect()
-            .append_header(("Location", "https://examclutch.com/login"))
-            .finish(); // Redirect to login
+        return HttpResponse::Unauthorized().finish();
     } else if !has_group_viewing_permission(group_id.clone(), &req, &conn, &dk)
         .await
         .expect("Error")
@@ -37,7 +35,7 @@ pub async fn get(
             .body(serde_json::to_string(&group).unwrap());
     }
 
-    HttpResponse::BadRequest().body("Invalid group id provided")
+    HttpResponse::Unauthorized().finish()
 }
 
 #[get("/api/group/name/{group_id}")]
