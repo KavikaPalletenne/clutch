@@ -29,7 +29,9 @@ jobs:
           password: ${{ secrets.API_SSH_PASS }}
           port: 22
           script: |
+            cd
             cd clutch/backend
+            git pull
             cargo build --release
             cd
             rm /usr/bin/monolith
