@@ -32,7 +32,7 @@ jobs:
             cd
             cd clutch/backend
             git pull
-            cargo build --release
+            /root/.cargo/bin/cargo build --release
             cd
             rm /usr/bin/monolith
             cd clutch/backend
