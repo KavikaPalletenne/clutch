@@ -41,6 +41,7 @@ export default function NewResourcePage(props) {
     const [subject, setSubject] = useState('General');
     const [files, setFiles] = useState([]);
     const [fileData, setFileData] = useState([]);
+    const [fileType, setFileType] = useState('');
     const [fileUrls, setFileUrls] = useState('');
 
     const [cancelUrl, setCancelUrl] = useState(`/app/group/${id}`)
@@ -120,6 +121,7 @@ export default function NewResourcePage(props) {
       );
 
       setFileData(fileArray)
+      setFileType(fileArray[0].type)
       
 
       setListFiles(
@@ -169,6 +171,9 @@ export default function NewResourcePage(props) {
           url = `/api/resource/cancel/${data.group_id}/${data['resource_id']}/delete`
 
           return await axios.request({
+          headers: {
+            'content-type': fileType,
+          },
           method: "put", 
           url: `${data['file_put_urls'][0]}`, 
           data: fileData[0],
