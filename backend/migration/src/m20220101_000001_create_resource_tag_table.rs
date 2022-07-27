@@ -28,7 +28,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(tag::Column::Text).string().not_null())
                     .col(ColumnDef::new(tag::Column::ResourceId).big_unsigned().not_null())
                     .to_owned()
-            ).await;
+            ).await?;
         manager
             .create_foreign_key(
             ForeignKey::create()
@@ -38,7 +38,7 @@ impl MigrationTrait for Migration {
                 .on_delete(ForeignKeyAction::Cascade)
                 .on_update(ForeignKeyAction::Cascade)
                 .to_owned()
-            ).await;
+            ).await?;
         manager
             .create_index(
                 Index::create()
@@ -46,7 +46,7 @@ impl MigrationTrait for Migration {
                     .table(tag::Entity)
                     .col(tag::Column::ResourceId)
                     .to_owned()
-            ).await;
+            ).await?;
 
         Ok(())
     }

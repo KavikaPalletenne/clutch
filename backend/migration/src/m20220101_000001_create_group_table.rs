@@ -1,5 +1,4 @@
 use entity::group;
-use entity::resource;
 use sea_schema::migration::prelude::*;
 
 pub struct Migration;
@@ -29,7 +28,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(group::Column::DiscordId).string().not_null())
                     .to_owned()
             )
-            .await;
+            .await?;
 
         Ok(())
     }

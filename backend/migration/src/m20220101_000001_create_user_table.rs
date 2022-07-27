@@ -29,7 +29,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(user::Column::DiscordId).string()) // Nullable
                     .to_owned()
             )
-            .await;
+            .await?;
 
         Ok(())
     }

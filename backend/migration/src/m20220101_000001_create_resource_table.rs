@@ -33,7 +33,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(resource::Column::LastEditedAt).timestamp_with_time_zone().not_null()) // TODO: Find out how to auto add current timestamp
                     .to_owned()
             )
-            .await;
+            .await?;
         manager
             .create_foreign_key(
                 ForeignKey::create()
@@ -43,7 +43,7 @@ impl MigrationTrait for Migration {
                     .on_delete(ForeignKeyAction::Cascade)
                     .on_update(ForeignKeyAction::Cascade)
                     .to_owned()
-            ).await;
+            ).await?;
         manager
             .create_foreign_key(
                 ForeignKey::create()
@@ -53,7 +53,7 @@ impl MigrationTrait for Migration {
                     .on_delete(ForeignKeyAction::Cascade)
                     .on_update(ForeignKeyAction::Cascade)
                     .to_owned()
-            ).await;
+            ).await?;
         manager
             .create_index(
                 Index::create()
@@ -61,7 +61,7 @@ impl MigrationTrait for Migration {
                     .table(resource::Entity)
                     .col(resource::Column::UserId)
                     .to_owned()
-            ).await;
+            ).await?;
         manager
             .create_index(
                 Index::create()
@@ -69,7 +69,7 @@ impl MigrationTrait for Migration {
                     .table(resource::Entity)
                     .col(resource::Column::GroupId)
                     .to_owned()
-            ).await;
+            ).await?;
 
         Ok(())
     }

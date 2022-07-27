@@ -27,7 +27,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(group_user::Column::UserId).string().not_null())
                     .col(ColumnDef::new(group_user::Column::GroupId).string().not_null())
                     .to_owned()
-            ).await;
+            ).await?;
         manager
             .create_foreign_key(
             ForeignKey::create()
@@ -37,7 +37,7 @@ impl MigrationTrait for Migration {
                 .on_delete(ForeignKeyAction::Cascade)
                 .on_update(ForeignKeyAction::Cascade)
                 .to_owned()
-            ).await;
+            ).await?;
         manager
             .create_foreign_key(
                 ForeignKey::create()
@@ -47,7 +47,7 @@ impl MigrationTrait for Migration {
                     .on_delete(ForeignKeyAction::Cascade)
                     .on_update(ForeignKeyAction::Cascade)
                     .to_owned()
-            ).await;
+            ).await?;
         manager
             .create_index(
                 Index::create()
@@ -55,7 +55,7 @@ impl MigrationTrait for Migration {
                     .table(group_user::Entity)
                     .col(group_user::Column::GroupId)
                     .to_owned()
-            ).await;
+            ).await?;
         manager
             .create_index(
                 Index::create()
@@ -63,7 +63,7 @@ impl MigrationTrait for Migration {
                     .table(group_user::Entity)
                     .col(group_user::Column::UserId)
                     .to_owned()
-            ).await;
+            ).await?;
 
         Ok(())
     }
