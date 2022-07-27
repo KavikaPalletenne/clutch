@@ -4,10 +4,9 @@ use anyhow::{bail, Result};
 use crate::errors::MyDbError;
 use crate::models::{AuthUser, NewUserForm, UpdateUserForm, User};
 use crate::service::hashing::hash;
-use entity::group;
 use entity::user;
 use nanoid::nanoid;
-use sea_orm::{ActiveModelTrait, DatabaseConnection, DeleteResult, EntityTrait, Set};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, DeleteResult, Set};
 
 /// Create new user from form.
 /// Returns created user's id.
@@ -68,7 +67,7 @@ pub async fn update(
 
         let new: user::Model = u.update(conn.get_ref()).await?;
         if new.username.ne(&data.username) || new.email.ne(&data.email) {
-            return bail!(MyDbError::BadUpdate {
+            bail!(MyDbError::BadUpdate {
                 id: user_id,
                 table_name: "users".to_string()
             });
@@ -87,7 +86,7 @@ pub async fn delete(user_id: String, conn: &Data<DatabaseConnection>) -> Result<
         .await?;
 
     if res.rows_affected == 0 {
-        return bail!(MyDbError::NoSuchRow { id: user_id });
+        bail!(MyDbError::NoSuchRow { id: user_id });
     }
 
     Ok(())
@@ -101,7 +100,7 @@ pub async fn username_exists(username: String, conn: &Data<DatabaseConnection>) 
         .one(conn.get_ref())
         .await?;
 
-    if let Some(user) = res {
+    if let Some(_user) = res {
         return Ok(true);
     }
 
@@ -113,7 +112,7 @@ pub async fn email_exists(email: String, conn: &Data<DatabaseConnection>) -> Res
         .one(conn.get_ref())
         .await?;
 
-    if let Some(user) = res {
+    if let Some(_user) = res {
         return Ok(true);
     }
 
@@ -150,7 +149,7 @@ pub async fn add_discord_id(user_id: String, discord_user_id: String, conn: &Dat
 
         let new: user::Model = u.update(conn.get_ref()).await?;
         if new.discord_id.ne(&Option::from(discord_user_id)) {
-            return bail!(MyDbError::BadUpdate {
+            bail!(MyDbError::BadUpdate {
                 id: user_id,
                 table_name: "users".to_string()
             });

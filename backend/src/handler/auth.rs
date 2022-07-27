@@ -9,7 +9,6 @@ use crate::service::hashing::verify;
 
 #[post("/api/auth/register")]
 pub async fn register(
-    req: HttpRequest,
     form: web::Json<NewUserForm>,
     conn: web::Data<DatabaseConnection>,
     ek: web::Data<EncodingKey>,
@@ -35,7 +34,6 @@ pub async fn register(
 
 #[post("/api/auth/login")]
 pub async fn login(
-    req: HttpRequest,
     form: web::Json<LoginForm>,
     conn: web::Data<DatabaseConnection>,
     ek: web::Data<EncodingKey>,
@@ -58,7 +56,6 @@ pub async fn login(
 
 #[post("/api/auth/connect/discord")]
 pub async fn discord_link(
-    req: HttpRequest,
     form: web::Json<DiscordLinkForm>,
     conn: web::Data<DatabaseConnection>,
     dk: web::Data<DecodingKey>,

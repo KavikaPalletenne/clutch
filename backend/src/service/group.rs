@@ -2,8 +2,7 @@ use actix_web::web::Data;
 use anyhow::{bail, Result};
 
 use crate::errors::MyDbError;
-use crate::models::{Group, GroupResponse, NewGroupForm};
-use crate::service::hashing::hash;
+use crate::models::{GroupResponse, NewGroupForm};
 use entity::group;
 use entity::group_user;
 use nanoid::nanoid;
@@ -47,7 +46,7 @@ pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<G
             .await?;
 
     if response.len() == 0 {
-        return bail!(MyDbError::NoSuchRow {
+        bail!(MyDbError::NoSuchRow {
             id: group_id.to_string()
         });
     }
@@ -67,22 +66,22 @@ pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<G
     })
 }
 
-pub async fn update() {
-    // TODO: Implement this.
-}
+// pub async fn update() {
+//     todo!()
+// }
 
 /// Delete group by id.
-pub async fn delete(group_id: String, conn: &Data<DatabaseConnection>) -> Result<()> {
-    let res: DeleteResult = group::Entity::delete_by_id(group_id.clone())
-        .exec(conn.get_ref())
-        .await?;
-
-    if res.rows_affected == 0 {
-        return bail!(MyDbError::NoSuchRow { id: group_id });
-    }
-
-    Ok(())
-}
+// pub async fn delete(group_id: String, conn: &Data<DatabaseConnection>) -> Result<()> {
+//     let res: DeleteResult = group::Entity::delete_by_id(group_id.clone())
+//         .exec(conn.get_ref())
+//         .await?;
+//
+//     if res.rows_affected == 0 {
+//         bail!(MyDbError::NoSuchRow { id: group_id });
+//     }
+//
+//     Ok(())
+// }
 
 ///////////////////////
 // Utility Functions //
@@ -116,7 +115,7 @@ pub async fn leave_group(
         .await?;
 
     if res.rows_affected == 0 {
-        return bail!(MyDbError::NoSuchRow {
+        bail!(MyDbError::NoSuchRow {
             id: group_id.to_string()
         });
     }
@@ -137,7 +136,7 @@ pub async fn user_in_group(
         .one(conn.get_ref())
         .await?;
 
-    if let Some(record) = res {
+    if let Some(_record) = res {
         return Ok(true);
     }
 

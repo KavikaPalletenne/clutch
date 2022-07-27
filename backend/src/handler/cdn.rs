@@ -1,15 +1,12 @@
-use crate::auth::middleware::{has_resource_viewing_permission, is_logged_in};
+use crate::auth::middleware::is_logged_in;
 use actix_web::{get, web, HttpRequest, HttpResponse, Responder};
 use jsonwebtoken::DecodingKey;
 use s3::Bucket;
-use sea_orm::DatabaseConnection;
-// use crate::file::{direct_upload, DirectUploadResponse};
 
 #[get("/cdn/file/{group_id}/{resource_id}/{id}")]
 pub async fn download_file(
     req: HttpRequest,
     bucket: web::Data<Bucket>,
-    conn: web::Data<DatabaseConnection>,
     dk: web::Data<DecodingKey>,
 ) -> impl Responder {
     let group_id = req.match_info().get("group_id").unwrap().to_string();

@@ -1,10 +1,9 @@
-use std::fmt::format;
 use crate::auth::middleware::{
     get_user_id, has_group_viewing_permission, has_resource_viewing_permission, is_logged_in,
 };
 use crate::models::{CreatedResourceResponse, Resource, ResourceForm, SearchResource, TokenQuery};
 use crate::service;
-use crate::service::resource::{create, read};
+use crate::service::resource::read;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use chrono::Utc;
 use jsonwebtoken::DecodingKey;
@@ -12,7 +11,6 @@ use meilisearch_sdk::indexes::Index;
 use s3::Bucket;
 use sea_orm::DatabaseConnection;
 use crate::auth::jwt::decode_create_resource_token;
-use crate::search::search;
 
 #[get("/api/resource/{resource_id}")]
 pub async fn get(
@@ -86,7 +84,6 @@ pub async fn create_resource(
     conn: web::Data<DatabaseConnection>,
 ) -> impl Responder {
     let form = form.into_inner();
-    let files = form.files.clone();
 
     if !is_logged_in(&req, &dk) {
         return HttpResponse::TemporaryRedirect()
@@ -157,7 +154,7 @@ pub async fn create_resource(
         service::resource::delete(created_resource_id.clone(), &conn)
             .await
             .unwrap();
-        let delete_result = index
+        let _delete_result = index
             .delete_document(created_resource_id)
             .await;
     }
@@ -195,13 +192,13 @@ pub async fn delete_resource(
                 service::resource::delete( resource.clone().id.parse::<i64>().unwrap(), &conn)
                     .await
                     .unwrap();
-                let delete_result = index
+                let _delete_result = index
                     .delete_document(resource.clone().id)
                     .await;
 
                 if let Some(files) = resource.clone().files {
                     for f in files {
-                        bucket.delete_object(
+                        let _obj_delete_result = bucket.delete_object(
                             format!(
                                 "/{}/{}/{}",
                                 resource.clone().group_id,
@@ -231,14 +228,12 @@ pub async fn delete_resource(
 pub async fn discord_create_resource(
     form: web::Json<ResourceForm>,
     web::Query(token_query): web::Query<TokenQuery>,
-    req: HttpRequest,
     dk: web::Data<DecodingKey>,
     bucket: web::Data<Bucket>,
     index: web::Data<Index>,
     conn: web::Data<DatabaseConnection>,
 ) -> impl Responder {
     let form = form.into_inner();
-    let files = form.files.clone();
 
     let token = token_query.token;
 
@@ -306,7 +301,7 @@ pub async fn discord_create_resource(
             service::resource::delete(created_resource_id.clone(), &conn)
                 .await
                 .unwrap();
-            let delete_result = index
+            let _delete_result = index
                 .delete_document(created_resource_id)
                 .await;
         }

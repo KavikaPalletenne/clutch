@@ -1,6 +1,6 @@
 use actix_web::web::Data;
 use anyhow::{bail, Result};
-use chrono::{DateTime, Utc};
+use chrono::{Utc};
 
 use crate::errors::MyDbError;
 use crate::models::{FileReference, Resource, ResourceForm};
@@ -8,11 +8,9 @@ use crate::service::group;
 use crate::service::id::generate_snowflake;
 use entity::file_reference;
 use entity::resource;
-use entity::resource::Model;
 use entity::sea_orm;
 use entity::tag;
-use nanoid::nanoid;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
 use sea_orm::{DatabaseConnection, DeleteResult, Set};
 
 /// Inserts a new resource in the DB, along with files and tags.
@@ -96,7 +94,7 @@ pub async fn read(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result<R
             .await?;
 
     if response.len() == 0 {
-        return bail!(MyDbError::NoSuchRow {
+        bail!(MyDbError::NoSuchRow {
             id: resource_id.to_string()
         });
     }
@@ -125,13 +123,13 @@ pub async fn read(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result<R
 
 /// Updates resource by id.
 /// NOT IMPLEMENTED YET
-pub async fn update(// resource_id: String,
-    // data: ResourceForm,
-    // conn: &Data<DatabaseConnection>,
-) -> Result<()> {
-    // TODO: Make an update feature
-    Ok(())
-}
+// pub async fn update(// resource_id: String,
+//     // data: ResourceForm,
+//     // conn: &Data<DatabaseConnection>,
+// ) -> Result<()> {
+//     // TODO: Make an update feature
+//     Ok(())
+// }
 
 /// Deletes a resource by id.
 pub async fn delete(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result<()> {
@@ -140,7 +138,7 @@ pub async fn delete(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result
         .await?;
 
     if res.rows_affected == 0 {
-        return bail!(MyDbError::NoSuchRow {
+        bail!(MyDbError::NoSuchRow {
             id: resource_id.to_string()
         });
     }
@@ -157,7 +155,7 @@ pub async fn get_resource_by_group(
     // page_num: i32,
     conn: &Data<DatabaseConnection>,
 ) -> Result<Vec<Resource>> {
-    let mut response: Vec<(resource::Model, Vec<file_reference::Model>)> = resource::Entity::find()
+    let response: Vec<(resource::Model, Vec<file_reference::Model>)> = resource::Entity::find()
         .filter(resource::Column::GroupId.contains(group_id.as_str()))
         // .paginate(conn.get_ref(), per_page.try_into().unwrap())
         // .fetch_page(page_num.try_into().unwrap()) //TODO: Find out how to paginate and join
@@ -166,7 +164,7 @@ pub async fn get_resource_by_group(
         .await?;
 
     if response.len() == 0 {
-        return bail!(MyDbError::NoSuchRow {
+        bail!(MyDbError::NoSuchRow {
             id: group_id.to_string()
         });
     }
@@ -198,52 +196,52 @@ pub async fn get_resource_by_group(
     Ok(resources)
 }
 
-pub async fn get_resource_by_user(
-    user_id: String,
-    per_page: i32,
-    page_num: i32,
-    conn: &Data<DatabaseConnection>,
-) -> Result<Vec<Resource>> {
-    let mut response: Vec<(resource::Model, Vec<file_reference::Model>)> = resource::Entity::find()
-        .filter(resource::Column::UserId.contains(user_id.as_str()))
-        .find_with_related(file_reference::Entity)
-        .all(conn.get_ref())
-        // .paginate(conn.get_ref(), per_page.try_into().unwrap())
-        // .fetch_page(page_num.try_into().unwrap()) //TODO: Find out how to paginate and join
-        .await?;
-
-    if response.len() == 0 {
-        return bail!(MyDbError::NoSuchRow {
-            id: user_id.to_string()
-        });
-    }
-
-    let mut resources = Vec::<Resource>::new();
-    for i in 0..response.len() {
-        let (resource, files) = response.remove(i);
-        let mut res_files = Vec::<FileReference>::new();
-        for f in files {
-            res_files.push(FileReference {
-                name: f.name,
-                size: f.size,
-            });
-        }
-
-        resources.push(Resource {
-            id: resource.id.to_string(),
-            user_id: resource.user_id,
-            group_id: resource.group_id,
-            title: resource.title,
-            description: resource.description,
-            subject: resource.subject,
-            tags: Option::from(Vec::<String>::new()),
-            files: Option::from(res_files),
-            last_edited_at: resource.last_edited_at,
-        })
-    }
-
-    Ok(resources)
-}
+// pub async fn get_resource_by_user(
+//     user_id: String,
+//     // per_page: i32,
+//     // page_num: i32,
+//     conn: &Data<DatabaseConnection>,
+// ) -> Result<Vec<Resource>> {
+//     let mut response: Vec<(resource::Model, Vec<file_reference::Model>)> = resource::Entity::find()
+//         .filter(resource::Column::UserId.contains(user_id.as_str()))
+//         .find_with_related(file_reference::Entity)
+//         .all(conn.get_ref())
+//         // .paginate(conn.get_ref(), per_page.try_into().unwrap())
+//         // .fetch_page(page_num.try_into().unwrap()) //TODO: Find out how to paginate and join
+//         .await?;
+//
+//     if response.len() == 0 {
+//         bail!(MyDbError::NoSuchRow {
+//             id: user_id.to_string()
+//         });
+//     }
+//
+//     let mut resources = Vec::<Resource>::new();
+//     for i in 0..response.len() {
+//         let (resource, files) = response.remove(i);
+//         let mut res_files = Vec::<FileReference>::new();
+//         for f in files {
+//             res_files.push(FileReference {
+//                 name: f.name,
+//                 size: f.size,
+//             });
+//         }
+//
+//         resources.push(Resource {
+//             id: resource.id.to_string(),
+//             user_id: resource.user_id,
+//             group_id: resource.group_id,
+//             title: resource.title,
+//             description: resource.description,
+//             subject: resource.subject,
+//             tags: Option::from(Vec::<String>::new()),
+//             files: Option::from(res_files),
+//             last_edited_at: resource.last_edited_at,
+//         })
+//     }
+//
+//     Ok(resources)
+// }
 
 pub async fn user_can_view_resource(
     user_id: String,

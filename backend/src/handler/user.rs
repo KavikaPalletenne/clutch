@@ -1,8 +1,7 @@
 use crate::auth::middleware::{has_user_viewing_permission, is_logged_in};
 use crate::models::{NewUserForm, UpdateUserForm};
 use crate::service::user;
-use actix_web::{get, post, web, web::Data, HttpRequest, HttpResponse, Responder};
-use anyhow::Result;
+use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use jsonwebtoken::DecodingKey;
 use sea_orm::DatabaseConnection;
 
@@ -106,7 +105,7 @@ pub async fn update(
 
     let update_response = crate::service::user::update(user_id, form.into_inner(), &conn).await;
 
-    if let Ok(res) = update_response {
+    if let Ok(_res) = update_response {
         return HttpResponse::Ok().body("Successfully updated user");
     }
 
@@ -132,7 +131,7 @@ pub async fn delete(
 
     let delete_response = crate::service::user::delete(user_id, &conn).await;
 
-    if let Ok(res) = delete_response {
+    if let Ok(_res) = delete_response {
         return HttpResponse::Ok().body("Successfully deleted user");
     }
 

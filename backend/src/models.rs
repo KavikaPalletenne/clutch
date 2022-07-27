@@ -1,5 +1,4 @@
 use chrono::{DateTime, Utc};
-use sea_orm::DeriveIntoActiveModel;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Clone)]

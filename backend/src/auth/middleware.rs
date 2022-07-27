@@ -1,8 +1,5 @@
 use crate::auth::jwt::decode_auth_token;
-use actix_web::body::MessageBody;
-use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::{web, HttpRequest};
-use actix_web_lab::middleware::Next;
 use anyhow::Result;
 use jsonwebtoken::DecodingKey;
 use sea_orm::DatabaseConnection;
@@ -25,7 +22,7 @@ pub fn is_logged_in(req: &HttpRequest, decoding_key: &DecodingKey) -> bool {
 
         let possible_claims = decode_auth_token(token, decoding_key);
 
-        if let Some(claims) = possible_claims {
+        if let Some(_claims) = possible_claims {
             return true;
         }
     }

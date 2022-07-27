@@ -8,10 +8,10 @@ pub enum MyDbError {
     BadUpdate { id: String, table_name: String },
 }
 
-#[derive(Error, Debug)]
-pub enum MyAuthError {
-    #[error("Request contains no JWT")]
-    NoJwt,
-    #[error("Jwt is invalid")]
-    InvalidJwt,
-}
+// #[derive(Error, Debug)]
+// pub enum MyAuthError {
+//     #[error("Request contains no JWT")]
+//     NoJwt,
+//     #[error("Jwt is invalid")]
+//     InvalidJwt,
+// }
