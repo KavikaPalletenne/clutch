@@ -10,6 +10,7 @@ pub struct Model {
     pub name: String,
     pub description: String,
     pub discord_id: String,
+    pub private: bool, // If the group is private, or open to non-members
 }
 
 impl Entity {

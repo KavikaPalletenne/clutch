@@ -5,4 +5,8 @@ pub mod group;
 pub mod user;
 pub mod group_user;
 
+pub mod role;
+pub mod role_permission;
+pub mod user_role;
+
 pub use sea_orm;
