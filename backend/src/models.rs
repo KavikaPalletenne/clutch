@@ -138,6 +138,7 @@ pub struct NewGroupForm {
     pub name: String,
     pub description: String,
     pub discord_id: String,
+    pub private: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
