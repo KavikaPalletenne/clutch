@@ -32,6 +32,13 @@ impl MigrationTrait for Migration {
             )
             .await?;
         manager
+            .drop_foreign_key(
+                ForeignKeyDropStatement::new()
+                    .name("FK_resource_id")
+                    .table(file_reference::Entity)
+                    .to_owned()
+            ).await?;
+        manager
             .create_foreign_key(
                 ForeignKey::create()
                     .name("FK_resource_id")
@@ -39,6 +46,13 @@ impl MigrationTrait for Migration {
                     .to(resource::Entity, resource::Column::Id)
                     .on_delete(ForeignKeyAction::Cascade)
                     .on_update(ForeignKeyAction::Cascade)
+                    .to_owned()
+            ).await?;
+        manager
+            .drop_index(
+                Index::drop()
+                    .name("idx-resource-id")
+                    .table(file_reference::Entity)
                     .to_owned()
             ).await?;
         manager

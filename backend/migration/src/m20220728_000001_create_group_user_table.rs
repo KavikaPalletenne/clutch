@@ -29,6 +29,13 @@ impl MigrationTrait for Migration {
                     .to_owned()
             ).await?;
         manager
+            .drop_foreign_key(
+                ForeignKeyDropStatement::new()
+                    .name("FK_group_id")
+                    .table(group_user::Entity)
+                    .to_owned()
+            ).await?;
+        manager
             .create_foreign_key(
             ForeignKey::create()
                 .name("FK_group_id")
@@ -37,6 +44,13 @@ impl MigrationTrait for Migration {
                 .on_delete(ForeignKeyAction::Cascade)
                 .on_update(ForeignKeyAction::Cascade)
                 .to_owned()
+            ).await?;
+        manager
+            .drop_foreign_key(
+                ForeignKeyDropStatement::new()
+                    .name("FK_user_id")
+                    .table(group_user::Entity)
+                    .to_owned()
             ).await?;
         manager
             .create_foreign_key(
@@ -49,11 +63,25 @@ impl MigrationTrait for Migration {
                     .to_owned()
             ).await?;
         manager
+            .drop_index(
+                Index::drop()
+                    .name("idx-group-id")
+                    .table(group_user::Entity)
+                    .to_owned()
+            ).await?;
+        manager
             .create_index(
                 Index::create()
                     .name("idx-group-id")
                     .table(group_user::Entity)
                     .col(group_user::Column::GroupId)
+                    .to_owned()
+            ).await?;
+        manager
+            .drop_index(
+                Index::drop()
+                    .name("idx-user-id")
+                    .table(group_user::Entity)
                     .to_owned()
             ).await?;
         manager

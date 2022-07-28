@@ -26,6 +26,7 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(group::Column::Name).string().not_null())
                     .col(ColumnDef::new(group::Column::Description).string().not_null())
                     .col(ColumnDef::new(group::Column::DiscordId).string().not_null())
+                    .col(ColumnDef::new(group::Column::Private).boolean().not_null())
                     .to_owned()
             )
             .await?;
