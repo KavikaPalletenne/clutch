@@ -137,7 +137,11 @@ pub async fn get_by_email(email: String, conn: &Data<DatabaseConnection>) -> Res
     bail!(MyDbError::NoSuchRow { id: email })
 }
 
-pub async fn add_discord_id(user_id: String, discord_user_id: String, conn: &Data<DatabaseConnection>) -> Result<()> {
+pub async fn add_discord_id(
+    user_id: String,
+    discord_user_id: String,
+    conn: &Data<DatabaseConnection>,
+) -> Result<()> {
     let response: Option<user::Model> = user::Entity::find_by_id(user_id.clone())
         .one(conn.get_ref())
         .await?;

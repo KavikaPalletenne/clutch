@@ -1,3 +1,4 @@
+use crate::auth::jwt::decode_create_resource_token;
 use crate::auth::middleware::{
     get_user_id, has_group_viewing_permission, has_resource_viewing_permission, is_logged_in,
 };
@@ -10,7 +11,6 @@ use jsonwebtoken::DecodingKey;
 use meilisearch_sdk::indexes::Index;
 use s3::Bucket;
 use sea_orm::DatabaseConnection;
-use crate::auth::jwt::decode_create_resource_token;
 
 #[get("/api/resource/{resource_id}")]
 pub async fn get(
@@ -154,9 +154,7 @@ pub async fn create_resource(
         service::resource::delete(created_resource_id.clone(), &conn)
             .await
             .unwrap();
-        let _delete_result = index
-            .delete_document(created_resource_id)
-            .await;
+        let _delete_result = index.delete_document(created_resource_id).await;
     }
 
     HttpResponse::BadRequest().body("Could not create new resource")
@@ -189,23 +187,21 @@ pub async fn delete_resource(
         let res = read(resource_id.clone(), &conn).await;
         if let Ok(resource) = res {
             if resource.clone().user_id.eq(&uid) {
-                service::resource::delete( resource.clone().id.parse::<i64>().unwrap(), &conn)
+                service::resource::delete(resource.clone().id.parse::<i64>().unwrap(), &conn)
                     .await
                     .unwrap();
-                let _delete_result = index
-                    .delete_document(resource.clone().id)
-                    .await;
+                let _delete_result = index.delete_document(resource.clone().id).await;
 
                 if let Some(files) = resource.clone().files {
                     for f in files {
-                        let _obj_delete_result = bucket.delete_object(
-                            format!(
+                        let _obj_delete_result = bucket
+                            .delete_object(format!(
                                 "/{}/{}/{}",
                                 resource.clone().group_id,
                                 resource.clone().id,
                                 f.name
-                            )
-                        ).await;
+                            ))
+                            .await;
                     }
                 }
                 return HttpResponse::Ok().body("Successfully deleted resource");
@@ -213,12 +209,10 @@ pub async fn delete_resource(
         }
     }
 
-    return HttpResponse::BadRequest().body("No such resource")
+    return HttpResponse::BadRequest().body("No such resource");
 }
 // TODO: update endpoint
 // TODO: delete endpoint
-
-
 
 /////////////////////////
 // Discord Bot Endpoints
@@ -261,7 +255,7 @@ pub async fn discord_create_resource(
                                     created_resource_id.clone(),
                                     &f.name
                                 )
-                                    .as_str(),
+                                .as_str(),
                                 3600,
                                 None,
                             )
@@ -301,9 +295,7 @@ pub async fn discord_create_resource(
             service::resource::delete(created_resource_id.clone(), &conn)
                 .await
                 .unwrap();
-            let _delete_result = index
-                .delete_document(created_resource_id)
-                .await;
+            let _delete_result = index.delete_document(created_resource_id).await;
         }
 
         return HttpResponse::BadRequest().body("Could not create new resource");

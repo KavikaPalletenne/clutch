@@ -1,6 +1,6 @@
 use actix_web::web::Data;
 use anyhow::{bail, Result};
-use chrono::{Utc};
+use chrono::Utc;
 
 use crate::errors::MyDbError;
 use crate::models::{FileReference, Resource, ResourceForm};
@@ -76,7 +76,7 @@ pub async fn create(resource: ResourceForm, conn: &Data<DatabaseConnection>) -> 
                         "Could not insert tags for resource: {}",
                         resource_id.clone()
                     )
-                        .as_str(),
+                    .as_str(),
                 );
         }
     }

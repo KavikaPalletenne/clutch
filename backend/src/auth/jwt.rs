@@ -41,7 +41,7 @@ pub struct UserAuthenticationJwtPayload {
     pub iat: i64, // issued-at (UNIX timestamp)
 
     // For display
-    pub username: String, // username
+    pub username: String,    // username
     pub avatar_hash: String, // url to Discord avatar
 }
 
@@ -63,7 +63,7 @@ pub struct CreateResourceJwtPayload {
 
     // For display
     pub group_name: String,
-    pub username: String, // username
+    pub username: String,    // username
     pub avatar_hash: String, // url to Discord avatar
 }
 
@@ -112,8 +112,8 @@ pub fn decode_user_token(
 
     return match decode_token {
         Ok(token) => Option::from(token.claims),
-        Err(_err) => None::<UserAuthenticationJwtPayload>
-    }
+        Err(_err) => None::<UserAuthenticationJwtPayload>,
+    };
 }
 
 pub fn decode_create_resource_token(
@@ -128,6 +128,6 @@ pub fn decode_create_resource_token(
 
     return match decode_token {
         Ok(token) => Option::from(token.claims),
-        Err(_err) => None::<CreateResourceJwtPayload>
-    }
+        Err(_err) => None::<CreateResourceJwtPayload>,
+    };
 }
