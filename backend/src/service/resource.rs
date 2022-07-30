@@ -156,7 +156,7 @@ pub async fn get_resource_by_group(
     conn: &Data<DatabaseConnection>,
 ) -> Result<Vec<Resource>> {
     let response: Vec<(resource::Model, Vec<file_reference::Model>)> = resource::Entity::find()
-        .filter(resource::Column::GroupId.contains(group_id.as_str()))
+        .filter(resource::Column::GroupId.eq(group_id.as_str()))
         // .paginate(conn.get_ref(), per_page.try_into().unwrap())
         // .fetch_page(page_num.try_into().unwrap()) //TODO: Find out how to paginate and join
         .find_with_related(file_reference::Entity)
