@@ -26,7 +26,6 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(role_permission::Column::RoleId).big_integer().not_null())
                     .col(ColumnDef::new(role_permission::Column::Key).string().not_null())
-                    .col(ColumnDef::new(role_permission::Column::Value).string().not_null())
                     .to_owned()
             )
             .await?;
