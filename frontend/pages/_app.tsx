@@ -18,7 +18,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" />
     <link rel="preconnect" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" />
     <link rel="preconnect" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" />
-    <!-- Google Analytics Global Tag -->
+    
     <Script strategy="lazyOnload" src={"https://www.googletagmanager.com/gtag/js?id=G-PWCR99JC9Z"} />
     <Script strategy="lazyOnload">
       {`
