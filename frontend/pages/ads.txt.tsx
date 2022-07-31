@@ -10,7 +10,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
   return {
     redirect: {
         destination: 'https://srv.adstxtmanager.com/19390/examclutch.com',
-        permanent: true,
+        permanent: false,
     }
 }
 }

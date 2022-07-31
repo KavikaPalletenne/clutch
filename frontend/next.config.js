@@ -5,7 +5,7 @@ module.exports = {
     return [
       {
         source: '/ads.txt',
-        destination: 'http://srv.adstxtmanager.com/19390/examcldutch.com',
+        destination: 'http://srv.adstxtmanager.com/19390/examclutch.com',
         permanent: true,
       },
     ]
