@@ -129,6 +129,7 @@ pub struct GroupResponse {
     pub name: String,
     pub description: String,
     pub discord_link: String,
+    pub private: bool,
     pub members: Vec<String>,        // id's of users that are members
     pub administrators: Vec<String>, // id's of users that are administrators
 }
