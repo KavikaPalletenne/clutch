@@ -225,7 +225,7 @@ export default function NewResourcePage(props) {
           {/* <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7136601653169605"
           crossOrigin="anonymous"></script> */}
 
-        <script src="//www.ezojs.com/basicads.js?d=examclutch.com" type="text/javascript"></script>
+        <script async src="//www.ezojs.com/basicads.js?d=examclutch.com" type="text/javascript"></script>
         </Head>
 
         

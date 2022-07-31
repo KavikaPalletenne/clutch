@@ -115,7 +115,7 @@ export default function GroupPage({ group }: {
           crossOrigin="anonymous"></script> */}
 
 
-            <script src="//www.ezojs.com/basicads.js?d=examclutch.com" type="text/javascript"></script>
+            <script async src="//www.ezojs.com/basicads.js?d=examclutch.com" type="text/javascript"></script>
 
             </Head>
 

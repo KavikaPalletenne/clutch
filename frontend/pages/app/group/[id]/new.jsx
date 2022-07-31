@@ -221,7 +221,7 @@ export default function NewResourcePage(props) {
           <title>Create New Resource - ExamClutch</title>
           <link rel="icon" href="/gradient_logo.svg" />
   
-          <script src="//www.ezojs.com/basicads.js?d=examclutch.com" type="text/javascript"></script>
+          <script async src="//www.ezojs.com/basicads.js?d=examclutch.com" type="text/javascript"></script>
 
         </Head>
 
