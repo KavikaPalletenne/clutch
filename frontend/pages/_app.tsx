@@ -19,8 +19,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     <link rel="preconnect" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" />
     <link rel="preconnect" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" />
     
-    <Script strategy="lazyOnload" src={"https://www.googletagmanager.com/gtag/js?id=G-PWCR99JC9Z"} />
-    <Script strategy="lazyOnload">
+    <Script id="google-analytics-gtag" strategy="lazyOnload" src={"https://www.googletagmanager.com/gtag/js?id=G-PWCR99JC9Z"} />
+    <Script id="google-analytics-script" strategy="lazyOnload">
       {`
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
