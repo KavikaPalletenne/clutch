@@ -17,19 +17,19 @@ pub async fn get(
     dk: web::Data<DecodingKey>,
 ) -> impl Responder {
     let group_id = path.into_inner();
-
-    if !is_logged_in(&req, &dk) {
-        return HttpResponse::Unauthorized().finish();
-    } else if !has_group_viewing_permission(group_id.clone(), &req, &conn, &dk)
-        .await
-        .expect("Error")
-    {
-        return HttpResponse::Unauthorized().finish();
-    }
-
     let res = group::read(group_id.clone(), &conn).await;
 
     if let Ok(group) = res {
+        if group.private {
+            if !is_logged_in(&req, &dk) {
+                return HttpResponse::Unauthorized().finish();
+            } else if !has_group_viewing_permission(group_id.clone(), &req, &conn, &dk)
+                .await
+                .expect("Error")
+            {
+                return HttpResponse::Unauthorized().finish();
+            }
+        }
         return HttpResponse::Ok()
             .append_header(("Content-Type", "application/json"))
             .body(serde_json::to_string(&group).unwrap());

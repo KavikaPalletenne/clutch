@@ -11,6 +11,7 @@ use jsonwebtoken::DecodingKey;
 use meilisearch_sdk::indexes::Index;
 use s3::Bucket;
 use sea_orm::DatabaseConnection;
+use crate::service::group;
 
 #[get("/api/resource/{resource_id}")]
 pub async fn get(
@@ -52,20 +53,23 @@ pub async fn get_by_group(
 ) -> impl Responder {
     let group_id = path.into_inner();
 
-    if !is_logged_in(&req, &dk) {
-        return HttpResponse::TemporaryRedirect()
-            .append_header(("Location", "https://examclutch.com/login"))
-            .finish(); // Redirect to login
-    } else if !has_group_viewing_permission(group_id.clone(), &req, &conn, &dk)
-        .await
-        .expect("Error")
-    {
-        return HttpResponse::Unauthorized().finish();
-    }
-
     let res = service::resource::get_resource_by_group(group_id.clone(), &conn).await;
 
     if let Ok(resource) = res {
+        let group_res = group::read(group_id.clone(), &conn).await.expect("Error getting group");
+
+        if group_res.private {
+            if !is_logged_in(&req, &dk) {
+                return HttpResponse::TemporaryRedirect()
+                    .append_header(("Location", "https://examclutch.com/login"))
+                    .finish(); // Redirect to login
+            } else if !has_group_viewing_permission(group_id.clone(), &req, &conn, &dk)
+                .await
+                .expect("Error")
+            {
+                return HttpResponse::Unauthorized().finish();
+            }
+        }
         return HttpResponse::Ok()
             .append_header(("Content-Type", "application/json"))
             .body(serde_json::to_string::<Vec<Resource>>(&resource).unwrap());
