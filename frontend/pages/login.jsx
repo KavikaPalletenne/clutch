@@ -12,7 +12,7 @@ export default function Login() {
 
     const [errorMessage, setErrorMessage] = useState('')
 
-    const {autologin} = router.query
+    const {autologin, redirect} = router.query
 
     var isMounted = false
     var userIdLoaded = false
@@ -51,7 +51,12 @@ export default function Login() {
             })
         }).then((res) => {
             if (res.status == 200) {
-                router.push("/app")
+
+                if (redirect == null) {
+                    router.push("/app")
+                    return
+                }
+                router.push(redirect)
                 return
             } else {
                 setErrorMessage("Invalid credentials")
@@ -87,7 +92,7 @@ export default function Login() {
                 </h2>
                 <p className="mt-2 text-center text-sm text-gray-600">
                     Or
-                    <Link href="/sign-up">
+                    <Link href={`/sign-up?redirect=${redirect}`}>
                         <a className="pl-1 font-medium text-exclpurple hover:text-exclpurple-dark">
                             sign up for an account
                         </a>
