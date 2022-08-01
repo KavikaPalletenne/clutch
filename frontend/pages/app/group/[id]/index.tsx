@@ -47,12 +47,13 @@ export type FileReference = {
     size: number;
 }
 
-export default function GroupPage({ group }: {
+export default function GroupPage({ group, loggedIn }: {
     group: Group;
+    loggedIn: boolean;
     // resources: Resource[];
 }) {
     const router = useRouter();
-    let { id } = router.query;
+    let { id, page_num } = router.query;
     const [userId, setUserId] = useState(Cookies.get("user_id"))
     const [userName, setUserName] = useState('')
     const [fullResources, setFullResources] = useState([] as Resource[])
@@ -67,7 +68,7 @@ export default function GroupPage({ group }: {
 
         setUserId(Cookies.get('user_id'))
         
-        fetch(`https://api.examclutch.com/api/resource/get_all/${id}`, {
+        fetch(`https://api.examclutch.com/api/resource/get_all/${id}?page=0&num_per_page=2000000`, {
             credentials: 'include'
         }).then(r => {
             // if (r.status == 401) {
@@ -105,7 +106,7 @@ export default function GroupPage({ group }: {
     }
 
     return(
-        <div>
+        <div className="bg-gray-50 min-h-screen">
             <Head>
                 <title>{group.name} - ExamClutch</title>
                 <meta name="description" content="Exam Clutch Dashboard" />
@@ -119,7 +120,18 @@ export default function GroupPage({ group }: {
 
             </Head>
 
-            <div className="pt-10 grid justify-items-center">
+            { loggedIn ? null :
+                <div style={{'fontFamily': 'Roboto Mono'}} className='justify-content-center justify-center float align-items-center sticky top-0 pt-2 px-96'>
+                    <div className="bg-exclpurple-dark px-5 py-3 focus:text-white rounded-2xl shadow-xl text-xl font-bold text-center">
+                    <Link href="/login">
+                            <a>
+                                <h1 style={{fontFamily: "Roboto Mono"}} className="text-lg text-white">Sign up to share resources and create your own groups</h1>
+                            </a>
+                        </Link>
+                    </div>
+                </div>
+            }
+            <div className="pt-10 grid justify-items-center bg-gray">
                 {/* Header Bar */}
                 <div>
                 <div className="py-4 px-4 shadow-md inline-block rounded-2xl bg-white duration-150 grid" style={{fontFamily: "Roboto Mono", backgroundImage: "linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%)"}}>
@@ -137,12 +149,19 @@ export default function GroupPage({ group }: {
                                 placeholder="Redox reactions..."
                                 />
                         </div>
-                        <h1 style={{fontFamily: "Roboto Mono"}} className="text-white text-lg">Hey {userName}!</h1>
-                        <Link href="/api/logout">
+                        { loggedIn ? <h1 style={{fontFamily: "Roboto Mono"}} className="text-white text-lg">Hey {userName}!</h1>: null }
+                        { loggedIn ? <Link href="/api/logout">
                             <a>
                                 <h1 style={{fontFamily: "Roboto Mono"}} className="text-white text-lg">Logout</h1>
                             </a>
                         </Link>
+                        :
+                        <Link href={`/login?redirect=/app/group/${id}`}>
+                            <a>
+                                <h1 style={{fontFamily: "Roboto Mono"}} className="text-white text-lg">Login</h1>
+                            </a>
+                        </Link>
+}
                     </div>
 
                 </div>
@@ -151,13 +170,13 @@ export default function GroupPage({ group }: {
             <div className="flex justify-center">
             <div className="pt-10 grid grid-flow-col auto-cols-min">
                 <div className="pr-3 row-span-3 col-span-1">
-                <GroupNavigation currentGroupId={id as string} />
+                {loggedIn ? <GroupNavigation currentGroupId={id as string} /> : null }                
                 </div>
                 <div className="">
                 <GroupTitle propGroup={group} />
                 </div>
                 <div className="pt-2 row-start-1">
-                <Link href={`/app/group/${id}/new`}>  
+                { loggedIn ? <Link href={`/app/group/${id}/new`}>  
                     <a>    
                     <div className="py-3.5 px-5 shadow-md inline-block rounded-2xl hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", fontWeight: "bold", backgroundImage: "linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%)"}}>
                         <div className="text-2xl text-white">
@@ -168,9 +187,22 @@ export default function GroupPage({ group }: {
                     </div>
                     </a>
                 </Link>
+                :
+                <Link href={`/login?redirect=/app/group/${id}/new`}>  
+                    <a>    
+                    <div className="py-3.5 px-5 shadow-md inline-block rounded-2xl hover:shadow-lg duration-150" style={{fontFamily: "Roboto Mono", fontWeight: "bold", backgroundImage: "linear-gradient(225deg, rgba(140,154,255,1) 0%, rgba(194,144,255,1) 100%)"}}>
+                        <div className="text-2xl text-white">
+                            <h1>
+                                New
+                            </h1>
+                        </div>
+                    </div>
+                    </a>
+                </Link>
+                }
                 </div>
                 <div className="pl-3 row-span-3 col-span-1">
-                <Members admins={group.administrators} members={group.members} />
+                { loggedIn ? <Members admins={group.administrators} members={group.members} /> : null }
                 </div>
                 <div className="row-start-2 col-start-2 col-span-2 pt-5">
                     { listResources }
@@ -230,10 +262,25 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
     // });
     // const resources = await resources_res.json() as Resource[];
 
-    return {
-        props: {
-            group
-            // resources
+    const logged_in_res = await fetch('https://api.examclutch.com/api/auth/logged_in', {
+        credentials: 'include',
+        headers: context.req ? {cookie: context.req.headers.cookie} : undefined
+    });
+
+    if (logged_in_res.ok) {
+        return {
+            props: {
+                group,
+                loggedIn: true,
+            }
         }
     }
+
+    return {
+        props: {
+            group,
+            loggedIn: false,
+        }
+    }
+    
 }

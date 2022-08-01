@@ -18,6 +18,8 @@ export default function Register() {
     const role = "general"
 
     const router = useRouter()
+
+    const {redirect} = router.query
    
     const onUsernameChange = async (username) => {
         document.getElementById("usernameExistsText").className = "text-transparent text-xs float-right pr-1"
@@ -87,7 +89,11 @@ export default function Register() {
             })
         }).then((res) => {
             if (res.status == 200) {
-                router.push("/app")
+                if (redirect == null) {
+                    router.push("/app")
+                    return
+                }
+                router.push(redirect)
                 return
             }
             return            

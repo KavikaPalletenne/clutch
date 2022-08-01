@@ -51,7 +51,7 @@ export default function Login() {
                     </a>
                 </Link>
                 <h2 className="mt-6 text-center text-4xl text-gray-900" style={{fontFamily: "Space Mono", fontWeight: 'bold'}}>
-                    Enter a group ID
+                    Join a group
                 </h2>
                 <p className="mt-2 text-center text-sm text-gray-600">
                     Or
@@ -67,8 +67,8 @@ export default function Login() {
                 <div className="rounded-md -space-y-px">
                     
                     <div className="pb-5">
-                    <label htmlFor="group_id" className="sr-only">Group Id</label>
-                    <input id="group_id" name="group_id" type="text" autoComplete="off" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Group ID" onChange={e => setGroupId(e.target.value)}/>
+                    <label htmlFor="group_id" className="sr-only">Invite code</label>
+                    <input id="group_id" name="group_id" type="text" autoComplete="off" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md rounded-b-md focus:outline-none focus:ring-exclpurple focus:border-exclpurple focus:z-10 sm:text-sm" placeholder="Invite code" onChange={e => setGroupId(e.target.value)}/>
                     </div>
                     <p id="invalidCredentialsText" className="text-transparent text-sm float-left pl-1 pb-5 pt-2">{errorMessage}</p>
                 </div>
@@ -77,8 +77,16 @@ export default function Login() {
                     <button type="submit" className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-exclpurple hover:bg-exclpurple-dark rounded-3xl focus:outline-none duration-300 ">
                     Join
                     </button>
+                    <p className="mt-2 text-center text-sm text-gray-600">
+                    <Link href="/app/create">
+                        <a className="pl-1 font-medium text-exclpurple hover:text-exclpurple-dark duration-300">
+                            Create a group
+                        </a>
+                    </Link>
+                </p>
                 </div>               
                 </form>
+                
             </div>
         </div>
 
