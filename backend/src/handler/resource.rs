@@ -84,6 +84,7 @@ pub async fn get_by_group(
                 .append_header(("Content-Type", "application/json"))
                 .body(serde_json::to_string::<Vec<Resource>>(&resource).unwrap());
         }
+        return HttpResponse::BadRequest().body("Error getting resources");
     }
     HttpResponse::BadRequest().body("Invalid group id provided")
 }
