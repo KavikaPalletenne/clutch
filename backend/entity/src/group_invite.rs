@@ -1,5 +1,6 @@
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use sea_orm::entity::prelude::*;
+use sea_orm::DeleteMany;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
@@ -41,7 +42,7 @@ impl Entity {
     }
 
     pub fn delete_by_code(code: String) -> DeleteMany<Entity> {
-        Self::delete_many().filter(Column::Code.eq(String))
+        Self::delete_many().filter(Column::Code.eq(code))
     }
 }
 
