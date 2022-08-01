@@ -1,4 +1,4 @@
-pub use sea_schema::migration::prelude::*;
+pub use sea_orm_migration::prelude::*;
 
 mod m20220728_000001_create_resource_table;
 mod m20220728_000001_create_file_reference_table;
