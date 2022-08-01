@@ -10,7 +10,9 @@ use entity::file_reference;
 use entity::resource;
 use entity::sea_orm;
 use entity::tag;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, PaginatorTrait, ModelTrait, QueryOrder};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, EntityTrait, ModelTrait, PaginatorTrait, QueryFilter, QueryOrder,
+};
 use sea_orm::{DatabaseConnection, DeleteResult, Set};
 
 /// Inserts a new resource in the DB, along with files and tags.
@@ -168,16 +170,16 @@ pub async fn get_resource_by_group(
         });
     }
 
-    let mut response_vector = Vec::<(resource::Model, Vec<file_reference::Model>, Vec::<tag::Model>)>::new();
+    let mut response_vector =
+        Vec::<(resource::Model, Vec<file_reference::Model>, Vec<tag::Model>)>::new();
 
     for r in response {
-        let files: Vec<file_reference::Model> = r.find_related(file_reference::Entity)
+        let files: Vec<file_reference::Model> = r
+            .find_related(file_reference::Entity)
             .all(conn.get_ref())
             .await?;
 
-        let tags: Vec<tag::Model> = r.find_related(tag::Entity)
-            .all(conn.get_ref())
-            .await?;
+        let tags: Vec<tag::Model> = r.find_related(tag::Entity).all(conn.get_ref()).await?;
 
         response_vector.push((r, files, tags));
     }

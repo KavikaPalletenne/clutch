@@ -2,8 +2,11 @@ use crate::auth::jwt::decode_create_resource_token;
 use crate::auth::middleware::{
     get_user_id, has_group_viewing_permission, has_resource_viewing_permission, is_logged_in,
 };
-use crate::models::{CreatedResourceResponse, PageQuery, Resource, ResourceForm, SearchResource, TokenQuery};
+use crate::models::{
+    CreatedResourceResponse, PageQuery, Resource, ResourceForm, SearchResource, TokenQuery,
+};
 use crate::service;
+use crate::service::group;
 use crate::service::resource::read;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use chrono::Utc;
@@ -11,7 +14,6 @@ use jsonwebtoken::DecodingKey;
 use meilisearch_sdk::indexes::Index;
 use s3::Bucket;
 use sea_orm::DatabaseConnection;
-use crate::service::group;
 
 #[get("/api/resource/{resource_id}")]
 pub async fn get(
@@ -57,7 +59,13 @@ pub async fn get_by_group(
 
     // Check if group exists
     if let Ok(group) = group_res {
-        let res = service::resource::get_resource_by_group(group_id.clone(), page_query.num_per_page, page_query.page,&conn).await;
+        let res = service::resource::get_resource_by_group(
+            group_id.clone(),
+            page_query.num_per_page,
+            page_query.page,
+            &conn,
+        )
+        .await;
 
         if let Ok(resource) = res {
             if group.private {

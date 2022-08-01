@@ -45,7 +45,7 @@ pub async fn create(
         conn,
     )
     .await
-        .expect("Error creating role \"owner\"");
+    .expect("Error creating role \"owner\"");
     Role::assign_role(creator_id, role_id, conn)
         .await
         .expect("Error assigning creator to role \"owner\"");

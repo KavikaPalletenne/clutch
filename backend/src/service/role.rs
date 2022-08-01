@@ -20,31 +20,27 @@ pub struct RoleUsers {
 
 static PERMISSION_KEYS: [&str; 9] = [
     "owner",
-    "administrator",    // HAS ALL THE POWER!!!
+    "administrator", // HAS ALL THE POWER!!!
     "role_manage", // Can add role - need to make sure the roles they create/add to users do not have more permission than they themselves do!
     "member_ban",
     "resource_delete", // Can delete resources even if they did not create them
     "member_kick",
     "group_edit",      // Can change name and description of group
     "nickname_change", // Can change own nickname
-    "invite_create",          // Can create invite links
+    "invite_create",   // Can create invite links
 ];
 // TODO: Some sort of role permission integer - permission needs to be higher/lower than a value to be able to do a task
 
 impl Role {
-    pub async fn get(
-        id: i64,
-        conn: &Data<DatabaseConnection>,
-    ) -> Result<Role> {
-        let mut res: Vec<(role::Model, Vec<role_permission::Model>)> = role::Entity::find_by_id(id.clone())
-            .find_with_related(role_permission::Entity)
-            .all(conn.get_ref())
-            .await?;
+    pub async fn get(id: i64, conn: &Data<DatabaseConnection>) -> Result<Role> {
+        let mut res: Vec<(role::Model, Vec<role_permission::Model>)> =
+            role::Entity::find_by_id(id.clone())
+                .find_with_related(role_permission::Entity)
+                .all(conn.get_ref())
+                .await?;
 
         if res.len() == 0 {
-            bail!(MyDbError::NoSuchRow {
-                id: id.to_string()
-            });
+            bail!(MyDbError::NoSuchRow { id: id.to_string() });
         }
 
         let (role, permissions) = res.remove(0);
@@ -53,29 +49,23 @@ impl Role {
             res_permissions.push(p.key);
         }
 
-        Ok(
-            Role {
-                role_id: role.id,
-                name: role.name,
-                group_id: role.group_id,
-                permissions: res_permissions
-            }
-        )
+        Ok(Role {
+            role_id: role.id,
+            name: role.name,
+            group_id: role.group_id,
+            permissions: res_permissions,
+        })
     }
 
-    pub async fn get_role_users(
-        id: i64,
-        conn: &Data<DatabaseConnection>,
-    ) -> Result<RoleUsers> {
-        let mut res: Vec<(role::Model, Vec<user_role::Model>)> = role::Entity::find_by_id(id.clone())
-            .find_with_related(user_role::Entity)
-            .all(conn.get_ref())
-            .await?;
+    pub async fn get_role_users(id: i64, conn: &Data<DatabaseConnection>) -> Result<RoleUsers> {
+        let mut res: Vec<(role::Model, Vec<user_role::Model>)> =
+            role::Entity::find_by_id(id.clone())
+                .find_with_related(user_role::Entity)
+                .all(conn.get_ref())
+                .await?;
 
         if res.len() == 0 {
-            bail!(MyDbError::NoSuchRow {
-                id: id.to_string()
-            });
+            bail!(MyDbError::NoSuchRow { id: id.to_string() });
         }
 
         let (_role, users) = res.remove(0);
@@ -84,12 +74,10 @@ impl Role {
             res_users.push(u.user_id)
         }
 
-        Ok(
-            RoleUsers {
-                role_id: id,
-                users: res_users
-            }
-        )
+        Ok(RoleUsers {
+            role_id: id,
+            users: res_users,
+        })
     }
 
     pub async fn create(
