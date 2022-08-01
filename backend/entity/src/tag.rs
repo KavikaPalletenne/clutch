@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    pub id: i32,
+    pub id: i64,
     pub text: String, // Text of the tag
     pub resource_id: i64,
 }
