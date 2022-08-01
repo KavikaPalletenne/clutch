@@ -5,10 +5,10 @@ use crate::models::{CreateInviteCodeQuery, NewGroupForm};
 use crate::service;
 use crate::service::group;
 use crate::service::group::{generate_invite_code, get_invite_code_group, read, user_in_group};
+use crate::service::role::Role;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use jsonwebtoken::DecodingKey;
 use sea_orm::DatabaseConnection;
-use crate::service::role::Role;
 
 #[get("/api/group/{group_id}")]
 pub async fn get(
@@ -106,26 +106,28 @@ pub async fn create_invite_code(
 
     let group_id = path.into_inner();
 
-    let user_permissions = Role::get_user_permissions(
-        group_id.clone(),
-        creator.clone(),
-        &conn,
-    ).await.expect("Error getting user permissions");
-    if user_permissions.contains(&"administrator".to_string()) || user_permissions.contains(&"owner".to_string()) || user_permissions.contains(&"invite_create".to_string()) {
+    let user_permissions = Role::get_user_permissions(group_id.clone(), creator.clone(), &conn)
+        .await
+        .expect("Error getting user permissions");
+    if user_permissions.contains(&"administrator".to_string())
+        || user_permissions.contains(&"owner".to_string())
+        || user_permissions.contains(&"invite_create".to_string())
+    {
         let code = generate_invite_code(
             group_id.clone(),
             creator.clone(),
             create_code_query.expiry,
             &conn,
-        ).await.expect("Error generating invite code");
+        )
+        .await
+        .expect("Error generating invite code");
 
         return HttpResponse::Ok()
             .append_header(("Content-Type", "application/json"))
             .body(format!("{{\"invite_code\": \"{}\"}}", code).to_string());
     }
 
-    HttpResponse::Unauthorized()
-        .body("Not allowed to create invites in group")
+    HttpResponse::Unauthorized().body("Not allowed to create invites in group")
 }
 
 #[post("/api/group/join/{invite_code}")]

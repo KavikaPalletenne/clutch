@@ -264,8 +264,10 @@ pub async fn get_user_groups(
     Ok(response)
 }
 
-pub async fn user_is_admin(group_id: String, user_id: String, conn: &Data<DatabaseConnection>) -> Result<bool> {
-
-
+pub async fn user_is_admin(
+    group_id: String,
+    user_id: String,
+    conn: &Data<DatabaseConnection>,
+) -> Result<bool> {
     Ok(false)
 }

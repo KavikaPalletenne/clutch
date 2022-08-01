@@ -62,7 +62,11 @@ impl Role {
         })
     }
 
-    pub async fn get_user_permissions(group_id: String, user_id: String, conn: &Data<DatabaseConnection>) -> Result<Vec<String>> {
+    pub async fn get_user_permissions(
+        group_id: String,
+        user_id: String,
+        conn: &Data<DatabaseConnection>,
+    ) -> Result<Vec<String>> {
         let roles: Vec<user_role::Model> = user_role::Entity::find_by_user_id(user_id.clone())
             .all(conn.get_ref())
             .await?;
@@ -72,9 +76,10 @@ impl Role {
         // Go through all of the user's roles
         for role in roles {
             // Get permissions for specific role
-            let role_permissions: Vec<role_permission::Model> = role_permission::Entity::find_by_role(role.role_id)
-                .all(conn.get_ref())
-                .await?;
+            let role_permissions: Vec<role_permission::Model> =
+                role_permission::Entity::find_by_role(role.role_id)
+                    .all(conn.get_ref())
+                    .await?;
 
             // Go through all of the permissions for specific role
             for permission in role_permissions {
