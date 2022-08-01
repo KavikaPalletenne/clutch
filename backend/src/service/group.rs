@@ -77,6 +77,7 @@ pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<G
         name: g.name,
         description: g.description,
         discord_link: g.discord_id,
+        private: g.private,
         members: users,
         administrators: vec![], // TODO: Make roles in group_user table and return admins
     })

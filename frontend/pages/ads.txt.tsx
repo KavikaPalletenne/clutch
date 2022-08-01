@@ -13,4 +13,3 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
         permanent: false,
     }
 }
-}
