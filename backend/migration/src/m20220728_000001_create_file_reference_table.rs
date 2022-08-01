@@ -1,6 +1,6 @@
 use entity::file_reference;
 use entity::resource;
-use sea_schema::migration::prelude::*;
+use sea_orm_migration::prelude::*;
 
 pub struct Migration;
 

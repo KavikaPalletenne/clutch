@@ -2,8 +2,11 @@ use crate::auth::jwt::decode_create_resource_token;
 use crate::auth::middleware::{
     get_user_id, has_group_viewing_permission, has_resource_viewing_permission, is_logged_in,
 };
-use crate::models::{CreatedResourceResponse, Resource, ResourceForm, SearchResource, TokenQuery};
+use crate::models::{
+    CreatedResourceResponse, PageQuery, Resource, ResourceForm, SearchResource, TokenQuery,
+};
 use crate::service;
+use crate::service::group;
 use crate::service::resource::read;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use chrono::Utc;
@@ -11,7 +14,6 @@ use jsonwebtoken::DecodingKey;
 use meilisearch_sdk::indexes::Index;
 use s3::Bucket;
 use sea_orm::DatabaseConnection;
-use crate::service::group;
 
 #[get("/api/resource/{resource_id}")]
 pub async fn get(
@@ -47,34 +49,42 @@ pub async fn get(
 #[get("/api/resource/get_all/{group_id}")]
 pub async fn get_by_group(
     req: HttpRequest,
+    web::Query(page_query): web::Query<PageQuery>,
     path: web::Path<String>,
     conn: web::Data<DatabaseConnection>,
     dk: web::Data<DecodingKey>,
 ) -> impl Responder {
     let group_id = path.into_inner();
+    let group_res = group::read(group_id.clone(), &conn).await;
 
-    let res = service::resource::get_resource_by_group(group_id.clone(), &conn).await;
+    // Check if group exists
+    if let Ok(group) = group_res {
+        let res = service::resource::get_resource_by_group(
+            group_id.clone(),
+            page_query.num_per_page,
+            page_query.page,
+            &conn,
+        )
+        .await;
 
-    if let Ok(resource) = res {
-        let group_res = group::read(group_id.clone(), &conn).await.expect("Error getting group");
-
-        if group_res.private {
-            if !is_logged_in(&req, &dk) {
-                return HttpResponse::TemporaryRedirect()
-                    .append_header(("Location", "https://examclutch.com/login"))
-                    .finish(); // Redirect to login
-            } else if !has_group_viewing_permission(group_id.clone(), &req, &conn, &dk)
-                .await
-                .expect("Error")
-            {
-                return HttpResponse::Unauthorized().finish();
+        if let Ok(resource) = res {
+            if group.private {
+                if !is_logged_in(&req, &dk) {
+                    return HttpResponse::TemporaryRedirect()
+                        .append_header(("Location", "https://examclutch.com/login"))
+                        .finish(); // Redirect to login
+                } else if !has_group_viewing_permission(group_id.clone(), &req, &conn, &dk)
+                    .await
+                    .expect("Error")
+                {
+                    return HttpResponse::Unauthorized().finish();
+                }
             }
+            return HttpResponse::Ok()
+                .append_header(("Content-Type", "application/json"))
+                .body(serde_json::to_string::<Vec<Resource>>(&resource).unwrap());
         }
-        return HttpResponse::Ok()
-            .append_header(("Content-Type", "application/json"))
-            .body(serde_json::to_string::<Vec<Resource>>(&resource).unwrap());
     }
-
     HttpResponse::BadRequest().body("Invalid group id provided")
 }
 

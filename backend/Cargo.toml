@@ -19,7 +19,7 @@ actix-cors = "0.6"
 env_logger = "0.9"
 
 # Database
-sea-orm = { version = "0.7", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
+sea-orm = { version = "0.9", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
 
 # Hashing
 rust-argon2 = "1.0"

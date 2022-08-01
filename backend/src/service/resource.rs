@@ -10,7 +10,9 @@ use entity::file_reference;
 use entity::resource;
 use entity::sea_orm;
 use entity::tag;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, EntityTrait, ModelTrait, PaginatorTrait, QueryFilter, QueryOrder,
+};
 use sea_orm::{DatabaseConnection, DeleteResult, Set};
 
 /// Inserts a new resource in the DB, along with files and tags.
@@ -151,16 +153,15 @@ pub async fn delete(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result
 ///////////////////////
 pub async fn get_resource_by_group(
     group_id: String,
-    // per_page: i32,
-    // page_num: i32,
+    per_page: i32,
+    page_num: i32,
     conn: &Data<DatabaseConnection>,
 ) -> Result<Vec<Resource>> {
-    let response: Vec<(resource::Model, Vec<file_reference::Model>)> = resource::Entity::find()
+    let response: Vec<resource::Model> = resource::Entity::find()
         .filter(resource::Column::GroupId.eq(group_id.as_str()))
-        // .paginate(conn.get_ref(), per_page.try_into().unwrap())
-        // .fetch_page(page_num.try_into().unwrap()) //TODO: Find out how to paginate and join
-        .find_with_related(file_reference::Entity)
-        .all(conn.get_ref())
+        .order_by_desc(resource::Column::LastEditedAt)
+        .paginate(conn.get_ref(), per_page.try_into().unwrap())
+        .fetch_page(page_num.try_into().unwrap()) //TODO: Find out how to paginate and join in one go to reduce DB roundtrips
         .await?;
 
     if response.len() == 0 {
@@ -169,15 +170,34 @@ pub async fn get_resource_by_group(
         });
     }
 
+    let mut response_vector =
+        Vec::<(resource::Model, Vec<file_reference::Model>, Vec<tag::Model>)>::new();
+
+    for r in response {
+        let files: Vec<file_reference::Model> = r
+            .find_related(file_reference::Entity)
+            .all(conn.get_ref())
+            .await?;
+
+        let tags: Vec<tag::Model> = r.find_related(tag::Entity).all(conn.get_ref()).await?;
+
+        response_vector.push((r, files, tags));
+    }
+
     let mut resources = Vec::<Resource>::new();
-    for i in 0..response.len() {
-        let (resource, files) = response.get(i).unwrap().clone();
+    for item in response_vector {
+        let (resource, files, tags) = item;
         let mut res_files = Vec::<FileReference>::new();
         for f in files {
             res_files.push(FileReference {
                 name: f.name,
                 size: f.size,
             });
+        }
+
+        let mut res_tags = Vec::<String>::new();
+        for t in tags {
+            res_tags.push(t.text);
         }
 
         resources.push(Resource {
@@ -187,7 +207,7 @@ pub async fn get_resource_by_group(
             title: resource.title,
             description: resource.description,
             subject: resource.subject,
-            tags: Option::from(Vec::<String>::new()),
+            tags: Option::from(res_tags),
             files: Option::from(res_files),
             last_edited_at: resource.last_edited_at,
         })

@@ -15,7 +15,7 @@ rustls = "0.20"
 chrono = { version = "0.4", features = ["serde"] }
 
 [dependencies.sea-orm]
-version = "^0.7"
+version = "^0.9"
 features = [
     "macros",
     "runtime-tokio-rustls",
