@@ -26,6 +26,7 @@ pub async fn create(
     creator_id: String, // user_id of creator
     conn: &Data<DatabaseConnection>,
 ) -> Result<String> {
+    // TODO: Change this to get nicer ids - see invite code generation with custom alphabet
     let group_id = nanoid!().to_string();
     group::ActiveModel {
         id: Set(group_id.clone()),
@@ -39,7 +40,7 @@ pub async fn create(
     .await
     .expect("Could not insert group");
 
-    join_group(group_id.clone(), creator_id.clone(), conn)
+    add_to_group(group_id.clone(), creator_id.clone(), conn)
         .await
         .expect("Error adding creator to group");
 
@@ -169,6 +170,23 @@ pub async fn get_invite_code_group(
     }
 
     bail!(MyDbError::NoSuchRow { id: code });
+}
+
+pub async fn add_to_group(
+    group_id: String,
+    user_id: String,
+    conn: &Data<DatabaseConnection>
+) -> Result<()> {
+    group_user::ActiveModel {
+        user_id: Set(user_id),
+        group_id: Set(group_id),
+        ..Default::default()
+    }
+        .insert(conn.get_ref())
+        .await
+        .expect("Could not insert group_user");
+
+    Ok(())
 }
 
 pub async fn join_group(
