@@ -12,5 +12,5 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
         destination: 'https://srv.adstxtmanager.com/19390/examclutch.com',
         permanent: false,
     }
-}
+  }
 }

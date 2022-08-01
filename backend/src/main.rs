@@ -99,6 +99,7 @@ async fn main() -> Result<()> {
             .service(handler::auth::login)
             .service(handler::auth::discord_link)
             .service(handler::auth::authorize)
+            .service(handler::auth::check_logged_in)
             // OAuth2 Service
             // .service(oauth2::user_registration)
             // .service(oauth2::authorize)

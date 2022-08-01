@@ -1,6 +1,6 @@
 use actix_web::web::Data;
 use anyhow::{bail, Result};
-use chrono::{Utc};
+use chrono::Utc;
 
 use crate::errors::MyDbError;
 use crate::models::{FileReference, Resource, ResourceForm};
@@ -76,7 +76,7 @@ pub async fn create(resource: ResourceForm, conn: &Data<DatabaseConnection>) -> 
                         "Could not insert tags for resource: {}",
                         resource_id.clone()
                     )
-                        .as_str(),
+                    .as_str(),
                 );
         }
     }
@@ -156,7 +156,7 @@ pub async fn get_resource_by_group(
     conn: &Data<DatabaseConnection>,
 ) -> Result<Vec<Resource>> {
     let response: Vec<(resource::Model, Vec<file_reference::Model>)> = resource::Entity::find()
-        .filter(resource::Column::GroupId.contains(group_id.as_str()))
+        .filter(resource::Column::GroupId.eq(group_id.as_str()))
         // .paginate(conn.get_ref(), per_page.try_into().unwrap())
         // .fetch_page(page_num.try_into().unwrap()) //TODO: Find out how to paginate and join
         .find_with_related(file_reference::Entity)

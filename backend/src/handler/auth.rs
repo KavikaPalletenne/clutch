@@ -1,11 +1,12 @@
 use crate::auth::jwt::{create_auth_token, decode_auth_token, decode_user_token};
 use crate::models::{DiscordLinkForm, LoginForm, NewUserForm};
+use crate::service::hashing::verify;
 use crate::service::user::{add_discord_id, create, email_exists, get_by_email, username_exists};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use cookie::Cookie;
 use jsonwebtoken::{DecodingKey, EncodingKey};
 use sea_orm::DatabaseConnection;
-use crate::service::hashing::verify;
+use crate::auth::middleware::is_logged_in;
 
 #[post("/api/auth/register")]
 pub async fn register(
@@ -54,6 +55,19 @@ pub async fn login(
     HttpResponse::BadRequest().body("Invalid credentials")
 }
 
+#[get("/api/auth/logged_in")]
+pub async fn check_logged_in(
+    req: HttpRequest,
+    dk: web::Data<DecodingKey>,
+) -> impl Responder {
+    let logged_in = is_logged_in(&req, dk.get_ref());
+
+    if logged_in {
+        return HttpResponse::Ok().finish();
+    }
+    HttpResponse::Unauthorized().finish()
+}
+
 #[post("/api/auth/connect/discord")]
 pub async fn discord_link(
     form: web::Json<DiscordLinkForm>,
@@ -67,7 +81,8 @@ pub async fn discord_link(
                 let res = add_discord_id(user.id, claims.sub, &conn).await;
 
                 if let Ok(_) = res {
-                    return HttpResponse::Ok().body("Successfully linked Discord account to ExamClutch");
+                    return HttpResponse::Ok()
+                        .body("Successfully linked Discord account to ExamClutch");
                 }
             }
             return HttpResponse::BadRequest().body("Invalid token");
@@ -79,10 +94,7 @@ pub async fn discord_link(
 }
 
 #[get("/api/auth/authorize")]
-pub async fn authorize(
-    req: HttpRequest,
-    dk: web::Data<DecodingKey>,
-) -> impl Responder {
+pub async fn authorize(req: HttpRequest, dk: web::Data<DecodingKey>) -> impl Responder {
     let token = req.cookie("auth_token");
 
     if let Some(cookie) = token {

@@ -10,7 +10,13 @@ pub async fn download_file(
     dk: web::Data<DecodingKey>,
 ) -> impl Responder {
     let group_id = req.match_info().get("group_id").unwrap().to_string();
-    let resource_id = req.match_info().get("resource_id").unwrap().to_string().parse::<i64>().unwrap();
+    let resource_id = req
+        .match_info()
+        .get("resource_id")
+        .unwrap()
+        .to_string()
+        .parse::<i64>()
+        .unwrap();
     let id = req.match_info().get("id").unwrap();
 
     //////////////////////////////////////////////////////////////////////////
@@ -20,12 +26,12 @@ pub async fn download_file(
             .append_header(("Location", "https://examclutch.com/login"))
             .finish(); // Redirect to login
     } // else if !has_resource_viewing_permission(resource_id.clone(), &req, &conn, &dk)
-    //     .await
-    //     .expect("Error")
-    // {
-    //     return HttpResponse::Unauthorized().finish();
-    // } // TODO: Add back AuthZ for file download
-    //////////////////////////////////////////////////////////////////////////
+      //     .await
+      //     .expect("Error")
+      // {
+      //     return HttpResponse::Unauthorized().finish();
+      // } // TODO: Add back AuthZ for file download
+      //////////////////////////////////////////////////////////////////////////
 
     let file_download_url = bucket
         .presign_get(format!("/{}/{}/{}", group_id, resource_id, id), 3600, None)

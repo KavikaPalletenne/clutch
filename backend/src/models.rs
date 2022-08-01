@@ -142,6 +142,12 @@ pub struct NewGroupForm {
     pub private: bool,
 }
 
+#[derive(Deserialize, Serialize, Clone)]
+pub struct NewRoleForm {
+    pub name: String,
+    pub group_id: String,
+}
+
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct TokenQuery {
     pub token: String,

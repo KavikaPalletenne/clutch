@@ -111,8 +111,12 @@ export default function GroupPage({ group }: {
                 <meta name="description" content="Exam Clutch Dashboard" />
                 <meta name="robots" content="noindex" />
                 <link rel="icon" href="/gradient_logo.svg" />
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7136601653169605"
-                crossOrigin="anonymous"></script>
+                {/* <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7136601653169605"
+          crossOrigin="anonymous"></script> */}
+
+
+            <script async src="//www.ezojs.com/basicads.js?d=examclutch.com" type="text/javascript"></script>
+
             </Head>
 
             <div className="pt-10 grid justify-items-center">

@@ -3,6 +3,7 @@ use anyhow::{bail, Result};
 
 use crate::errors::MyDbError;
 use crate::models::{GroupResponse, NewGroupForm};
+use crate::service::role::Role;
 use entity::group;
 use entity::group_user;
 use nanoid::nanoid;
@@ -14,7 +15,7 @@ use sea_orm::{
 /// Returns created group's id.
 pub async fn create(
     group: NewGroupForm,
-    creator: String, // user_id of creator
+    creator_id: String, // user_id of creator
     conn: &Data<DatabaseConnection>,
 ) -> Result<String> {
     let group_id = nanoid!().to_string();
@@ -23,16 +24,31 @@ pub async fn create(
         name: Set(group.name),
         description: Set(group.description),
         discord_id: Set(group.discord_id),
+        private: Set(group.private),
         ..Default::default()
     }
     .insert(conn.get_ref())
     .await
     .expect("Could not insert group");
 
-    join_group(group_id.clone(), creator, conn)
+    join_group(group_id.clone(), creator_id.clone(), conn)
         .await
         .expect("Error adding creator to group");
-    // TODO: Way to add user as admin of group
+
+    // Add creator owner
+    let mut owner_permissions = Vec::<String>::new();
+    owner_permissions.push("owner".to_string());
+    let role_id = Role::create(
+        "owner".to_string(),
+        group_id.clone(),
+        owner_permissions,
+        conn,
+    )
+    .await
+        .expect("Error creating role \"owner\"");
+    Role::assign_role(creator_id, role_id, conn)
+        .await
+        .expect("Error assigning creator to role \"owner\"");
 
     Ok(group_id)
 }
@@ -103,6 +119,14 @@ pub async fn join_group(
 
     Ok(())
 }
+
+// pub async fn add_group_admin(
+//     group_id: String,
+//     user_id: String,
+//     conn: &Data<DatabaseConnection>,
+// ) -> Result<()> {
+//     group
+// }
 
 pub async fn leave_group(
     user_id: String,
