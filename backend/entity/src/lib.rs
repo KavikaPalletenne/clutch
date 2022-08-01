@@ -4,6 +4,7 @@ pub mod tag;
 pub mod group;
 pub mod user;
 pub mod group_user;
+pub mod group_invite;
 
 pub mod role;
 pub mod role_permission;

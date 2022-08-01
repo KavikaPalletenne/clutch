@@ -158,3 +158,8 @@ pub struct PageQuery {
     pub page: i32,
     pub num_per_page: i32,
 }
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct CreateInviteCodeQuery {
+    pub expiry: i64,
+}

@@ -42,11 +42,11 @@ pub async fn get_username(
 ) -> impl Responder {
     let user_id = path.into_inner();
 
-//     if !is_logged_in(&req, &dk) {
-//         return HttpResponse::TemporaryRedirect()
-//             .append_header(("Location", "https://examclutch.com/login"))
-//             .finish(); // Redirect to login
-//     }
+    //     if !is_logged_in(&req, &dk) {
+    //         return HttpResponse::TemporaryRedirect()
+    //             .append_header(("Location", "https://examclutch.com/login"))
+    //             .finish(); // Redirect to login
+    //     }
     let res = user::read(user_id, &conn).await;
 
     if let Ok(user) = res {

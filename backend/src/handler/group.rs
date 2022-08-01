@@ -1,10 +1,11 @@
 use crate::auth::middleware::{
     get_user_id, has_group_viewing_permission, has_user_viewing_permission, is_logged_in,
 };
-use crate::models::NewGroupForm;
+use crate::models::{CreateInviteCodeQuery, NewGroupForm};
 use crate::service;
 use crate::service::group;
-use crate::service::group::{read, user_in_group};
+use crate::service::group::{generate_invite_code, get_invite_code_group, read, user_in_group};
+use crate::service::role::Role;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use jsonwebtoken::DecodingKey;
 use sea_orm::DatabaseConnection;
@@ -88,7 +89,48 @@ pub async fn create_group(
 // TODO: update group function
 // TODO: delete group function
 
-#[post("/api/group/join/{group_id}")]
+#[post("/api/group/{group_id}/create_invite")]
+pub async fn create_invite_code(
+    req: HttpRequest,
+    path: web::Path<String>,
+    web::Query(create_code_query): web::Query<CreateInviteCodeQuery>,
+    conn: web::Data<DatabaseConnection>,
+    dk: web::Data<DecodingKey>,
+) -> impl Responder {
+    if !is_logged_in(&req, &dk) {
+        return HttpResponse::TemporaryRedirect()
+            .append_header(("Location", "https://examclutch.com/login"))
+            .finish(); // Redirect to login
+    }
+    let creator = get_user_id(&req, &dk).unwrap();
+
+    let group_id = path.into_inner();
+
+    let user_permissions = Role::get_user_permissions(group_id.clone(), creator.clone(), &conn)
+        .await
+        .expect("Error getting user permissions");
+    if user_permissions.contains(&"administrator".to_string())
+        || user_permissions.contains(&"owner".to_string())
+        || user_permissions.contains(&"invite_create".to_string())
+    {
+        let code = generate_invite_code(
+            group_id.clone(),
+            creator.clone(),
+            create_code_query.expiry,
+            &conn,
+        )
+        .await
+        .expect("Error generating invite code");
+
+        return HttpResponse::Ok()
+            .append_header(("Content-Type", "application/json"))
+            .body(format!("{{\"invite_code\": \"{}\"}}", code).to_string());
+    }
+
+    HttpResponse::Unauthorized().body("Not allowed to create invites in group")
+}
+
+#[post("/api/group/join/{invite_code}")]
 pub async fn join_group(
     req: HttpRequest,
     path: web::Path<String>,
@@ -101,30 +143,33 @@ pub async fn join_group(
             .finish(); // Redirect to login
     }
 
-    let group_id = path.into_inner();
+    let invite_code = path.into_inner();
+    let possible_id = get_invite_code_group(invite_code.clone(), &conn).await;
 
-    let principal = get_user_id(&req, &dk);
+    if let Ok(group_id) = possible_id {
+        let principal = get_user_id(&req, &dk);
 
-    if let Some(user_id) = principal {
-        let group_res = read(group_id.clone(), &conn).await;
+        if let Some(user_id) = principal {
+            let group_res = read(group_id.clone(), &conn).await;
 
-        if let Ok(_group) = group_res {
-            if user_in_group(user_id.clone(), group_id.clone(), &conn)
-                .await
-                .expect("Error")
-            {
-                return HttpResponse::BadRequest().body("Already joined group");
+            if let Ok(_group) = group_res {
+                if user_in_group(user_id.clone(), group_id.clone(), &conn)
+                    .await
+                    .expect("Error")
+                {
+                    return HttpResponse::BadRequest().body("Already joined group");
+                }
+                let res = crate::service::group::join_group(invite_code, user_id, &conn).await;
+                if let Ok(_) = res {
+                    return HttpResponse::Ok().body("Successfully joined group");
+                }
             }
-            let res = crate::service::group::join_group(group_id, user_id, &conn).await;
-            if let Ok(_) = res {
-                return HttpResponse::Ok().body("Successfully joined group");
-            }
+
+            return HttpResponse::BadRequest().body("No such group");
         }
-
-        return HttpResponse::BadRequest().body("No such group");
     }
 
-    HttpResponse::BadRequest().body("Could not join group")
+    HttpResponse::BadRequest().body("No such invite code")
 }
 
 #[post("/api/group/leave/{group_id}")]

@@ -33,6 +33,8 @@ pub enum Relation {
     Resource,
     #[sea_orm(has_many = "super::group_user::Entity")]
     GroupUser,
+    #[sea_orm(has_many = "super::group_invite::Entity")]
+    GroupInvite
 }
 
 impl Related<super::resource::Entity> for Entity {
@@ -44,6 +46,12 @@ impl Related<super::resource::Entity> for Entity {
 impl Related<super::group_user::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::GroupUser.def()
+    }
+}
+
+impl Related<super::group_invite::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::GroupInvite.def()
     }
 }
 

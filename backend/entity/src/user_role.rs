@@ -39,4 +39,10 @@ impl Related<super::role::Entity> for Entity {
     }
 }
 
+impl Entity {
+    pub fn find_by_user_id(user_id: String) -> Select<Entity> {
+        Self::find().filter(Column::UserId.eq(user_id))
+    }
+}
+
 impl ActiveModelBehavior for ActiveModel {}

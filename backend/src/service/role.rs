@@ -18,6 +18,11 @@ pub struct RoleUsers {
     pub users: Vec<String>, // Array of user ids of users with that role
 }
 
+pub struct UserPermissions {
+    pub group_id: String,
+    pub permissions: String,
+}
+
 static PERMISSION_KEYS: [&str; 9] = [
     "owner",
     "administrator", // HAS ALL THE POWER!!!
@@ -55,6 +60,39 @@ impl Role {
             group_id: role.group_id,
             permissions: res_permissions,
         })
+    }
+
+    pub async fn get_user_permissions(
+        group_id: String,
+        user_id: String,
+        conn: &Data<DatabaseConnection>,
+    ) -> Result<Vec<String>> {
+        let roles: Vec<user_role::Model> = user_role::Entity::find_by_user_id(user_id.clone())
+            .all(conn.get_ref())
+            .await?;
+
+        let mut full_permissions = Vec::<String>::new();
+
+        // Go through all of the user's roles
+        for role in roles {
+            // Get permissions for specific role
+            let role_permissions: Vec<role_permission::Model> =
+                role_permission::Entity::find_by_role(role.role_id)
+                    .all(conn.get_ref())
+                    .await?;
+
+            // Go through all of the permissions for specific role
+            for permission in role_permissions {
+                // If permission is not already granted from
+                // another role, add it to full_permissions vector
+                if full_permissions.contains(&permission.key) {
+                    continue;
+                }
+                full_permissions.push(permission.key);
+            }
+        }
+
+        Ok(full_permissions)
     }
 
     pub async fn get_role_users(id: i64, conn: &Data<DatabaseConnection>) -> Result<RoleUsers> {
