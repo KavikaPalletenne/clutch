@@ -34,6 +34,10 @@ impl Entity {
             .filter(Column::Key.eq(permission))
     }
 
+    pub fn find_by_role(role_id: i64) -> Select<Entity> {
+        Self::find().filter(Column::RoleId.eq(role_id))
+    }
+
     pub fn delete_by_role_id(role_id: i64) -> DeleteMany<Entity> {
         Self::delete_many().filter(Column::RoleId.eq(role_id))
     }
