@@ -16,6 +16,7 @@ const Home: NextPage = () => {
         <meta name="robots" content="index" />
         <meta name="googlebot" content="index" />
         <link rel="icon" href="/gradient_logo.svg" />
+        <script async src="//www.ezojs.com/basicads.js?d=examclutch.com" type="text/javascript"></script>
       </Head>
       
       <div className='-z-30 absolute'>
