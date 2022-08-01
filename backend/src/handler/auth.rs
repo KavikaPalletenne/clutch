@@ -6,6 +6,7 @@ use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use cookie::Cookie;
 use jsonwebtoken::{DecodingKey, EncodingKey};
 use sea_orm::DatabaseConnection;
+use crate::auth::middleware::is_logged_in;
 
 #[post("/api/auth/register")]
 pub async fn register(
@@ -52,6 +53,19 @@ pub async fn login(
     }
 
     HttpResponse::BadRequest().body("Invalid credentials")
+}
+
+#[get("/api/auth/logged_in")]
+pub async fn check_logged_in(
+    req: HttpRequest,
+    dk: web::Data<DecodingKey>,
+) -> impl Responder {
+    let logged_in = is_logged_in(&req, dk.get_ref());
+
+    if logged_in {
+        return HttpResponse::Ok().finish();
+    }
+    HttpResponse::Unauthorized().finish()
 }
 
 #[post("/api/auth/connect/discord")]
