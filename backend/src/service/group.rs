@@ -1,6 +1,6 @@
 use actix_web::web::Data;
 use anyhow::{bail, Result};
-use chrono::Utc;
+use chrono::{Duration, Utc};
 
 use crate::errors::MyDbError;
 use crate::models::{GroupResponse, NewGroupForm};
@@ -10,8 +10,14 @@ use entity::group_invite;
 use entity::group_user;
 use nanoid::nanoid;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DatabaseConnection, DeleteResult, EntityTrait, QueryFilter, Set,
+    ActiveModelTrait, ColumnTrait, DatabaseConnection, DbErr, DeleteResult, EntityTrait,
+    QueryFilter, Set,
 };
+
+static INVITE_CODE_ALPHABET: [char; 36] = [
+    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+    'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+];
 
 /// Create new group from form.
 /// Returns created group's id.
@@ -105,18 +111,64 @@ pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<G
 ///////////////////////
 // Utility Functions //
 ///////////////////////
-pub async fn get_invite_code_group(code: String, conn: &Data<DatabaseConnection>) -> Result<String> {
+pub async fn generate_invite_code(
+    group_id: String,
+    creator_id: String,
+    expiry_hours: i64, // Number of hours from now
+    conn: &Data<DatabaseConnection>,
+) -> Result<String> {
+    let mut code = nanoid!(10, &INVITE_CODE_ALPHABET);
+
+    while code_exists(code.clone(), &conn).await? {
+        let code = nanoid!(10, &INVITE_CODE_ALPHABET);
+    }
+
+    let res: Result<entity::group_invite::Model, DbErr> = group_invite::ActiveModel {
+        group_id: Set(group_id),
+        code: Set(code.clone()),
+        expiry: Set(Utc::now()
+            .checked_add_signed(Duration::hours(expiry_hours))
+            .unwrap()),
+        uses: Set(0),
+        creator: Set(creator_id),
+        ..Default::default()
+    }
+    .insert(conn.get_ref())
+    .await;
+
+    if let Ok(_insert_result) = res {
+        return Ok(code);
+    }
+
+    bail!(MyDbError::BadInsert {
+        table_name: "group_invites".to_string()
+    })
+}
+
+pub async fn code_exists(code: String, conn: &Data<DatabaseConnection>) -> Result<bool> {
     let res: Option<group_invite::Model> = group_invite::Entity::find_by_code(code.clone())
         .one(conn.get_ref())
-        .await;
+        .await?;
+
+    if let Some(_) = res {
+        return Ok(true);
+    }
+    Ok(false)
+}
+
+pub async fn get_invite_code_group(
+    code: String,
+    conn: &Data<DatabaseConnection>,
+) -> Result<String> {
+    let res: Option<group_invite::Model> = group_invite::Entity::find_by_code(code.clone())
+        .one(conn.get_ref())
+        .await?;
 
     if let Some(invite) = res {
         return Ok(invite.group_id);
     }
 
-    bail!(MyDbError::NoSuchRow {
-            id: code
-    });
+    bail!(MyDbError::NoSuchRow { id: code });
 }
 
 pub async fn join_group(
@@ -126,10 +178,9 @@ pub async fn join_group(
 ) -> Result<()> {
     let res: Option<group_invite::Model> = group_invite::Entity::find_by_code(code.clone())
         .one(conn.get_ref())
-        .await;
+        .await?;
 
     if let Some(invite) = res {
-
         // Check if not expired
         if invite.expiry.timestamp() > Utc::now().timestamp() {
             group_user::ActiveModel {
@@ -137,17 +188,15 @@ pub async fn join_group(
                 group_id: Set(invite.group_id),
                 ..Default::default()
             }
-                .insert(conn.get_ref())
-                .await
-                .expect("Could not insert group_user");
+            .insert(conn.get_ref())
+            .await
+            .expect("Could not insert group_user");
 
-            Ok(())
+            return Ok(());
         }
     }
 
-    bail!(MyDbError::NoSuchRow {
-            id: code
-    });
+    bail!(MyDbError::NoSuchRow { id: code });
 }
 
 // pub async fn add_group_admin(
@@ -213,4 +262,10 @@ pub async fn get_user_groups(
     }
 
     Ok(response)
+}
+
+pub async fn user_is_admin(group_id: String, user_id: String, conn: &Data<DatabaseConnection>) -> Result<bool> {
+
+
+    Ok(false)
 }
