@@ -152,3 +152,9 @@ pub struct NewRoleForm {
 pub struct TokenQuery {
     pub token: String,
 }
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct PageQuery {
+    pub page: i32,
+    pub num_per_page: i32,
+}

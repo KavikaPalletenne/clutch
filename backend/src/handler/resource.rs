@@ -2,7 +2,7 @@ use crate::auth::jwt::decode_create_resource_token;
 use crate::auth::middleware::{
     get_user_id, has_group_viewing_permission, has_resource_viewing_permission, is_logged_in,
 };
-use crate::models::{CreatedResourceResponse, Resource, ResourceForm, SearchResource, TokenQuery};
+use crate::models::{CreatedResourceResponse, PageQuery, Resource, ResourceForm, SearchResource, TokenQuery};
 use crate::service;
 use crate::service::resource::read;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
@@ -47,6 +47,7 @@ pub async fn get(
 #[get("/api/resource/get_all/{group_id}")]
 pub async fn get_by_group(
     req: HttpRequest,
+    web::Query(page_query): web::Query<PageQuery>,
     path: web::Path<String>,
     conn: web::Data<DatabaseConnection>,
     dk: web::Data<DecodingKey>,
@@ -56,7 +57,7 @@ pub async fn get_by_group(
 
     // Check if group exists
     if let Ok(group) = group_res {
-        let res = service::resource::get_resource_by_group(group_id.clone(), 10, 1,&conn).await;
+        let res = service::resource::get_resource_by_group(group_id.clone(), page_query.num_per_page, page_query.page,&conn).await;
 
         if let Ok(resource) = res {
             if group.private {
