@@ -1,6 +1,7 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 use sea_orm::DeleteMany;
+use sea_orm::tests_cfg::filling::Entity;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
 #[sea_orm(table_name = "groups")]
@@ -33,6 +34,8 @@ pub enum Relation {
     Resource,
     #[sea_orm(has_many = "super::group_user::Entity")]
     GroupUser,
+    #[sea_orm(has_man = "super::group_invite::Entity")]
+    GroupInvite
 }
 
 impl Related<super::resource::Entity> for Entity {
@@ -44,6 +47,12 @@ impl Related<super::resource::Entity> for Entity {
 impl Related<super::group_user::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::GroupUser.def()
+    }
+}
+
+impl Related<super::group_invite::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::GroupInvite.def()
     }
 }
 

@@ -7,6 +7,8 @@ mod m20220728_000001_create_group_table;
 mod m20220728_000001_create_group_user_table;
 mod m20220728_000001_create_user_table;
 
+mod m20220801_000001_create_group_invite_table;
+
 mod m20220728_000001_create_role_table;
 mod m20220728_000001_create_role_permission_table;
 mod m20220728_000001_create_user_role_table;
