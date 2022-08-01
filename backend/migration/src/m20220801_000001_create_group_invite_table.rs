@@ -25,7 +25,7 @@ impl MigrationTrait for Migration {
                             .primary_key()
                     )
                     .col(ColumnDef::new(group_invite::Column::GroupId).string().not_null())
-                    .col(ColumnDef::new(group_ìnvite::Column::Code).string().not_null())
+                    .col(ColumnDef::new(group_invite::Column::Code).string().not_null())
                     .col(ColumnDef::new(group_invite::Column::Expiry).timestamp_with_time_zone().not_null())
                     .col(ColumnDef::new(group_invite::Column::Uses).big_integer().not_null())
                     .col(ColumnDef::new(group_invite::Column::Creator).string().not_null())
