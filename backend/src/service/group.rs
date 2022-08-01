@@ -1,10 +1,12 @@
 use actix_web::web::Data;
 use anyhow::{bail, Result};
+use chrono::Utc;
 
 use crate::errors::MyDbError;
 use crate::models::{GroupResponse, NewGroupForm};
 use crate::service::role::Role;
 use entity::group;
+use entity::group_invite;
 use entity::group_user;
 use nanoid::nanoid;
 use sea_orm::{
@@ -103,21 +105,49 @@ pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<G
 ///////////////////////
 // Utility Functions //
 ///////////////////////
+pub async fn get_invite_code_group(code: String, conn: &Data<DatabaseConnection>) -> Result<String> {
+    let res: Option<group_invite::Model> = group_invite::Entity::find_by_code(code.clone())
+        .one(conn.get_ref())
+        .await;
+
+    if let Some(invite) = res {
+        return Ok(invite.group_id);
+    }
+
+    bail!(MyDbError::NoSuchRow {
+            id: code
+    });
+}
+
 pub async fn join_group(
-    group_id: String,
+    code: String,
     user_id: String,
     conn: &Data<DatabaseConnection>,
 ) -> Result<()> {
-    group_user::ActiveModel {
-        user_id: Set(user_id),
-        group_id: Set(group_id),
-        ..Default::default()
-    }
-    .insert(conn.get_ref())
-    .await
-    .expect("Could not insert group_user");
+    let res: Option<group_invite::Model> = group_invite::Entity::find_by_code(code.clone())
+        .one(conn.get_ref())
+        .await;
 
-    Ok(())
+    if let Some(invite) = res {
+
+        // Check if not expired
+        if invite.expiry.timestamp() > Utc::now().timestamp() {
+            group_user::ActiveModel {
+                user_id: Set(user_id),
+                group_id: Set(invite.group_id),
+                ..Default::default()
+            }
+                .insert(conn.get_ref())
+                .await
+                .expect("Could not insert group_user");
+
+            Ok(())
+        }
+    }
+
+    bail!(MyDbError::NoSuchRow {
+            id: code
+    });
 }
 
 // pub async fn add_group_admin(

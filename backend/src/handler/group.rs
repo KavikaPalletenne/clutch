@@ -4,7 +4,7 @@ use crate::auth::middleware::{
 use crate::models::NewGroupForm;
 use crate::service;
 use crate::service::group;
-use crate::service::group::{read, user_in_group};
+use crate::service::group::{get_invite_code_group, read, user_in_group};
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use jsonwebtoken::DecodingKey;
 use sea_orm::DatabaseConnection;
@@ -88,7 +88,7 @@ pub async fn create_group(
 // TODO: update group function
 // TODO: delete group function
 
-#[post("/api/group/join/{group_id}")]
+#[post("/api/group/join/{invite_code}")]
 pub async fn join_group(
     req: HttpRequest,
     path: web::Path<String>,
@@ -100,31 +100,34 @@ pub async fn join_group(
             .append_header(("Location", "https://examclutch.com/login"))
             .finish(); // Redirect to login
     }
+    
+    let invite_code = path.into_inner();
+    let possible_id = get_invite_code_group(invite_code.clone(), &conn).await;
 
-    let group_id = path.into_inner();
+    if let Ok(group_id) = possible_id {
+        let principal = get_user_id(&req, &dk);
 
-    let principal = get_user_id(&req, &dk);
+        if let Some(user_id) = principal {
+            let group_res = read(group_id.clone(), &conn).await;
 
-    if let Some(user_id) = principal {
-        let group_res = read(group_id.clone(), &conn).await;
-
-        if let Ok(_group) = group_res {
-            if user_in_group(user_id.clone(), group_id.clone(), &conn)
-                .await
-                .expect("Error")
-            {
-                return HttpResponse::BadRequest().body("Already joined group");
+            if let Ok(_group) = group_res {
+                if user_in_group(user_id.clone(), group_id.clone(), &conn)
+                    .await
+                    .expect("Error")
+                {
+                    return HttpResponse::BadRequest().body("Already joined group");
+                }
+                let res = crate::service::group::join_group(invite_code, user_id, &conn).await;
+                if let Ok(_) = res {
+                    return HttpResponse::Ok().body("Successfully joined group");
+                }
             }
-            let res = crate::service::group::join_group(group_id, user_id, &conn).await;
-            if let Ok(_) = res {
-                return HttpResponse::Ok().body("Successfully joined group");
-            }
+
+            return HttpResponse::BadRequest().body("No such group");
         }
-
-        return HttpResponse::BadRequest().body("No such group");
     }
 
-    HttpResponse::BadRequest().body("Could not join group")
+    HttpResponse::BadRequest().body("No such invite code")
 }
 
 #[post("/api/group/leave/{group_id}")]
