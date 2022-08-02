@@ -29,3 +29,5 @@ backend/excl-api/docker_command.txt
 backend/docker_command.txt
 backend/microservices-migration.txt
 **.psd
+environment_variables(discord_bot).txt
+environment_variables.txt
