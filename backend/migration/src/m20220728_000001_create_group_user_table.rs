@@ -19,7 +19,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(group_user::Column::Id)
-                            .integer()
+                            .big_integer()
                             .auto_increment()
                             .not_null()
                             .primary_key()
@@ -65,14 +65,14 @@ impl MigrationTrait for Migration {
         manager
             .drop_index(
                 Index::drop()
-                    .name("idx-group-id")
+                    .name("idx-group-user-group-id")
                     .table(group_user::Entity)
                     .to_owned()
             ).await?;
         manager
             .create_index(
                 Index::create()
-                    .name("idx-group-id")
+                    .name("idx-group-user-group-id")
                     .table(group_user::Entity)
                     .col(group_user::Column::GroupId)
                     .to_owned()

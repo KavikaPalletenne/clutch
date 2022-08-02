@@ -68,32 +68,32 @@ impl MigrationTrait for Migration {
                     .on_update(ForeignKeyAction::Cascade)
                     .to_owned()
             ).await?;
-        manager
-            .drop_index(
-                Index::drop()
-                    .name("idx-user-id")
-                    .table(resource::Entity)
-                    .to_owned()
-            ).await?;
+        // manager
+        //     .drop_index(
+        //         Index::drop()
+        //             .name("idx-user-id")
+        //             .table(resource::Entity)
+        //             .to_owned()
+        //     ).await?;
         manager
             .create_index(
                 Index::create()
-                    .name("idx-user-id")
+                    .name("idx-resource-user-id")
                     .table(resource::Entity)
                     .col(resource::Column::UserId)
                     .to_owned()
             ).await?;
-        manager
-            .drop_index(
-                Index::drop()
-                    .name("idx-group-id")
-                    .table(resource::Entity)
-                    .to_owned()
-            ).await?;
+        // manager
+        //     .drop_index(
+        //         Index::drop()
+        //             .name("idx-group-id")
+        //             .table(resource::Entity)
+        //             .to_owned()
+        //     ).await?;
         manager
             .create_index(
                 Index::create()
-                    .name("idx-group-id")
+                    .name("idx-resource-group-id")
                     .table(resource::Entity)
                     .col(resource::Column::GroupId)
                     .to_owned()

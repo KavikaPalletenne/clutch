@@ -20,7 +20,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(file_reference::Column::Id)
-                            .integer()
+                            .big_integer()
                             .auto_increment()
                             .not_null()
                             .primary_key()
@@ -48,17 +48,17 @@ impl MigrationTrait for Migration {
                     .on_update(ForeignKeyAction::Cascade)
                     .to_owned()
             ).await?;
-        manager
-            .drop_index(
-                Index::drop()
-                    .name("idx-resource-id")
-                    .table(file_reference::Entity)
-                    .to_owned()
-            ).await?;
+        // manager
+        //     .drop_index(
+        //         Index::drop()
+        //             .name("idx-file-reference-resource-id")
+        //             .table(file_reference::Entity)
+        //             .to_owned()
+        //     ).await?;
         manager
             .create_index(
                 Index::create()
-                    .name("idx-resource-id")
+                    .name("idx-file-reference-resource-id")
                     .table(file_reference::Entity)
                     .col(file_reference::Column::ResourceId)
                     .to_owned()
