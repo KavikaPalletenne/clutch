@@ -79,7 +79,7 @@ pub async fn create_group(
         if let Ok(created_group_id) = create_response {
             return HttpResponse::Ok()
                 .append_header(("Content-Type", "application/json"))
-                .body(format!("\"id\": \"{}\"", created_group_id).to_string());
+                .body(format!("{{\"id\": \"{}\"}}", created_group_id).to_string());
         }
     }
 
