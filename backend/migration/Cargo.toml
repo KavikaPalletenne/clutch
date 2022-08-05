@@ -9,5 +9,6 @@ name = "migration"
 path = "src/lib.rs"
 
 [dependencies]
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
 sea-orm-migration = { version = "0.9", default-features = false, features = [ "runtime-tokio-rustls", "sqlx-postgres" ] }
 entity = { path = "../entity" }

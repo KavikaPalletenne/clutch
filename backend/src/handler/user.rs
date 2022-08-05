@@ -79,7 +79,7 @@ pub async fn create_user(
     if let Ok(res) = create_response {
         return HttpResponse::Ok()
             .append_header(("Content-Type", "application/json"))
-            .body(format!("\"username\": \"{}\"", res).to_string());
+            .body(format!("{{\"username\": \"{}\"}}", res).to_string());
     }
 
     HttpResponse::BadRequest().body("Could not create new user")

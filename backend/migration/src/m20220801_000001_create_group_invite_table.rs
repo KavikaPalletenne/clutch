@@ -51,14 +51,14 @@ impl MigrationTrait for Migration {
         manager
             .drop_index(
                 Index::drop()
-                    .name("idx-group-id")
+                    .name("idx-group-invites-group-id")
                     .table(group_invite::Entity)
                     .to_owned()
             ).await?;
         manager
             .create_index(
                 Index::create()
-                    .name("idx-group-id")
+                    .name("idx-group-invite-group-id")
                     .table(group_invite::Entity)
                     .col(group_invite::Column::GroupId)
                     .to_owned()
@@ -66,14 +66,14 @@ impl MigrationTrait for Migration {
         manager
             .drop_index(
                 Index::drop()
-                    .name("idx-code")
+                    .name("idx-group-invites-code")
                     .table(group_invite::Entity)
                     .to_owned()
             ).await?;
         manager
             .create_index(
                 Index::create()
-                    .name("idx-code")
+                    .name("idx-group-invite-code")
                     .table(group_invite::Entity)
                     .col(group_invite::Column::Code)
                     .to_owned()

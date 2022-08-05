@@ -67,13 +67,15 @@ export default function GroupPage({ group, loggedIn }: {
     useEffect(() => {
 
         setUserId(Cookies.get('user_id'))
-        
+
         fetch(`https://api.examclutch.com/api/resource/get_all/${id}?page=0&num_per_page=2000000`, {
             credentials: 'include'
         }).then(r => {
-            // if (r.status == 401) {
-            //     router.push(`/api/login`)
-            // }
+            if (!r.ok) {
+                setStateResources([] as Resource[])
+                setFullResources([] as Resource[])
+                return
+            }
             r.json().then(function(data) {
             setStateResources(data as Resource[])
             setFullResources(data as Resource[])
@@ -86,7 +88,7 @@ export default function GroupPage({ group, loggedIn }: {
             .then((data) => {
             setUserName(data.username)
         })
-      }, [])
+      }, [id])
 
     const searchTermUpdate = async (e: React.ChangeEvent<any>) => {
         e.preventDefault()

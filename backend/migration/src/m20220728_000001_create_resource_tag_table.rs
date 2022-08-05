@@ -20,7 +20,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(tag::Column::Id)
-                            .integer()
+                            .big_integer()
                             .auto_increment()
                             .not_null()
                             .primary_key()
@@ -56,7 +56,7 @@ impl MigrationTrait for Migration {
         manager
             .create_index(
                 Index::create()
-                    .name("idx-resource-id")
+                    .name("idx-resource-tag-resource-id")
                     .table(tag::Entity)
                     .col(tag::Column::ResourceId)
                     .to_owned()

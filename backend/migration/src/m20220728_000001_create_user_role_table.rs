@@ -73,7 +73,7 @@ impl MigrationTrait for Migration {
         manager
             .create_index(
                 Index::create()
-                    .name("idx-user-id")
+                    .name("idx-user-role-user-id")
                     .table(user_role::Entity)
                     .col(user_role::Column::UserId)
                     .to_owned()
@@ -88,7 +88,7 @@ impl MigrationTrait for Migration {
         manager
             .create_index(
                 Index::create()
-                    .name("idx-role-id")
+                    .name("idx-user-role-role-id")
                     .table(user_role::Entity)
                     .col(user_role::Column::RoleId)
                     .to_owned()

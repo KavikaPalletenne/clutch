@@ -30,6 +30,13 @@ function MyApp({ Component, pageProps }: AppProps) {
       `}
     </Script>
 
+    <Script async strategy='lazyOnload' src="https://fundingchoicesmessages.google.com/i/pub-7136601653169605?ers=1" nonce="zolXR5gcRhueMtgtxmoTQg"></Script>
+    <Script id="google-ad-blocking-popup" strategy='lazyOnload' nonce="zolXR5gcRhueMtgtxmoTQg">
+      {`(function() {function signalGooglefcPresent() {if (!window.frames['googlefcPresent']) {if (document.body) {const iframe = document.createElement('iframe'); iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;'; iframe.style.display = 'none'; iframe.name = 'googlefcPresent'; document.body.appendChild(iframe);} else {setTimeout(signalGooglefcPresent, 0);}}}signalGooglefcPresent();})();
+      `}
+    </Script>
+
+
 
     <div style={{fontFamily: 'Roboto Mono'}} className="bg-gradient-to-r from-exclpurple to-exclpurple-dark text-center text-white text-sm md:text-md">
         <h1>This is a beta version of ExamClutch not for public use (v.DEV.0.1.0). <Link href="/beta"><a style={{textDecorationLine:'underline'}}>Learn More</a></Link></h1> 

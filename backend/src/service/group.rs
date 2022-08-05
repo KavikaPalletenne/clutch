@@ -13,6 +13,7 @@ use sea_orm::{
     ActiveModelTrait, ColumnTrait, DatabaseConnection, DbErr, DeleteResult, EntityTrait,
     QueryFilter, Set,
 };
+use crate::service::id::generate_alphanumeric_nanoid;
 
 static INVITE_CODE_ALPHABET: [char; 36] = [
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
@@ -27,7 +28,7 @@ pub async fn create(
     conn: &Data<DatabaseConnection>,
 ) -> Result<String> {
     // TODO: Change this to get nicer ids - see invite code generation with custom alphabet
-    let group_id = nanoid!().to_string();
+    let group_id = generate_alphanumeric_nanoid(24);
     group::ActiveModel {
         id: Set(group_id.clone()),
         name: Set(group.name),
@@ -175,16 +176,16 @@ pub async fn get_invite_code_group(
 pub async fn add_to_group(
     group_id: String,
     user_id: String,
-    conn: &Data<DatabaseConnection>
+    conn: &Data<DatabaseConnection>,
 ) -> Result<()> {
     group_user::ActiveModel {
         user_id: Set(user_id),
         group_id: Set(group_id),
         ..Default::default()
     }
-        .insert(conn.get_ref())
-        .await
-        .expect("Could not insert group_user");
+    .insert(conn.get_ref())
+    .await
+    .expect("Could not insert group_user");
 
     Ok(())
 }

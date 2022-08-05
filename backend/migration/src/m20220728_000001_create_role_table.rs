@@ -46,17 +46,17 @@ impl MigrationTrait for Migration {
                     .on_update(ForeignKeyAction::Cascade)
                     .to_owned()
             ).await?;
-        manager
-            .drop_index(
-                Index::drop()
-                    .name("idx-group-id")
-                    .table(role::Entity)
-                    .to_owned()
-            ).await?;
+        // manager
+        //     .drop_index(
+        //         Index::drop()
+        //             .name("idx-group-id")
+        //             .table(role::Entity)
+        //             .to_owned()
+        //     ).await?;
         manager
             .create_index(
                 Index::create()
-                    .name("idx-group-id")
+                    .name("idx-role-group-id")
                     .table(role::Entity)
                     .col(role::Column::GroupId)
                     .to_owned()

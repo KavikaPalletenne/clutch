@@ -68,7 +68,7 @@
     .heroSectionH1 {
         font-size: 100px;
         font-weight: 700;
-        font-family: 'Space Mono', 'Mono';
+        font-family: 'Space Mono', monospace, Roboto Mono;
 
         color: White;
     }
@@ -76,6 +76,8 @@
     .heroSectionH2 {
         font-size: 50px;
         font-weight: bold;
+        font-family: 'Space Mono', monospace, Roboto Mono;
+
         color: White;
     }
 }
