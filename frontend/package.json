@@ -11,6 +11,7 @@
     "@heroicons/react": "^1.0.5",
     "@tailwindcss/forms": "^0.4.0",
     "@types/js-cookie": "^3.0.1",
+    "@types/react-content-loader": "^4.0.0",
     "axios": "^0.26.1",
     "dropzone": "^6.0.0-beta.2",
     "js-cookie": "^3.0.1",
@@ -19,6 +20,7 @@
     "nprogress": "^0.2.0",
     "pretty-bytes": "^6.0.0",
     "react": "17.0.2",
+    "react-content-loader": "^6.2.0",
     "react-dom": "17.0.2",
     "react-icons": "^4.3.1",
     "react-password-strength-bar": "^0.4.0"

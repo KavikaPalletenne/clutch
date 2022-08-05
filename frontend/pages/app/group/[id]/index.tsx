@@ -10,6 +10,7 @@ import GroupNavigation from "../../../../components/app/GroupNavigation";
 import GroupTitle from "../../../../components/app/GroupTitle";
 import HeaderBar from "../../../../components/app/HeaderBar";
 import ResourceCard from "../../../../components/app/ResourceCard";
+import LoadingResourceCard from "../../../../components/app/LoadingResourceCard";
 import GroupName from "../../../../components/app/GroupName";
 import { GetServerSideProps } from "next";
 
@@ -64,9 +65,12 @@ export default function GroupPage({ group, loggedIn }: {
             </div>
     );
 
+    const [fetchedResources, setFetchedResources] = useState(false)
+
     useEffect(() => {
 
         setUserId(Cookies.get('user_id'))
+        setFetchedResources(false)
 
         fetch(`https://api.examclutch.com/api/resource/get_all/${id}?page=0&num_per_page=2000000`, {
             credentials: 'include'
@@ -74,11 +78,13 @@ export default function GroupPage({ group, loggedIn }: {
             if (!r.ok) {
                 setStateResources([] as Resource[])
                 setFullResources([] as Resource[])
+                setFetchedResources(true)
                 return
             }
             r.json().then(function(data) {
             setStateResources(data as Resource[])
             setFullResources(data as Resource[])
+            setFetchedResources(true)
         })});
 
         fetch(`https://api.examclutch.com/api/user/username/${userId}`, {
@@ -207,7 +213,28 @@ export default function GroupPage({ group, loggedIn }: {
                 { loggedIn ? <Members admins={group.administrators} members={group.members} /> : null }
                 </div>
                 <div className="row-start-2 col-start-2 col-span-2 pt-5">
-                    { listResources }
+                    { listResources } 
+                    {
+                     fetchedResources ? null :
+                     <div>
+                     <div className="pb-3">
+                        <LoadingResourceCard />
+                     </div>
+                     <div className="pb-3">
+                        <LoadingResourceCard />
+                     </div>
+                     <div className="pb-3">
+                        <LoadingResourceCard />
+                     </div>
+                     <div className="pb-3">
+                        <LoadingResourceCard />
+                     </div>
+                     <div className="pb-3">
+                        <LoadingResourceCard />
+                     </div>
+                     </div>
+                    }
+                    
                     <div className="text-gray-300 text-sm grid justify-items-center align-items-center" style={{fontFamily: "Roboto Mono"}}>
                         <div>Help {group.name} by adding more resources</div>
                     </div>
