@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { GetServerSideProps } from "next";
+import ContentLoader from 'react-content-loader'
+import Rect from 'react-content-loader'
 
 // type Resource = {
 //     _id: ObjectId;
@@ -36,6 +38,12 @@ export default function UserName(props: {
 }) {
     const [data, setData] = useState<User>()
     const [isLoading, setLoading] = useState(false)
+
+    const NameLoader = () => (
+      <ContentLoader viewBox='0 0 275 10'>
+        <rect x="3" y="0" rx="3" ry="3" width="50" height="7" />
+      </ContentLoader>
+    );
   
     useEffect(() => {
       setLoading(true)
@@ -50,8 +58,8 @@ export default function UserName(props: {
     }, [])
   
     if (isLoading) return (
-        <div>
-          <h1>@loading</h1>
+        <div className='flex inline-flex'>
+          <NameLoader />
         </div>
     )
 
