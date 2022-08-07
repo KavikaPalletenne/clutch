@@ -34,7 +34,7 @@ pub async fn download_file(
       //////////////////////////////////////////////////////////////////////////
 
     let file_download_url = bucket
-        .presign_get(format!("/{}/{}/{}", group_id, resource_id, id), 3600, None)
+        .presign_get(format!("/{}/{}/{}", group_id, resource_id, id), 30, None) // Give 30 seconds to open file link
         .unwrap(); // 1 hour expiry
     HttpResponse::TemporaryRedirect()
         .append_header(("Location", file_download_url))

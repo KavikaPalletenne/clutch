@@ -130,7 +130,7 @@ pub async fn create_resource(
                                 &f.name
                             )
                             .as_str(),
-                            3600,
+                            600, // 10 min expiry to upload a file (even if uploading multiple files, this should be enough time as they files are small (10-100 MB))
                             None,
                         )
                         .unwrap(),
