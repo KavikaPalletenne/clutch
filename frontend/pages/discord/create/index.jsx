@@ -221,11 +221,7 @@ export default function NewResourcePage(props) {
           <meta name="referrer" content="no-referrer" />
           <title>Create New Resource for {props.group_name} - ExamClutch</title>
           <link rel="icon" href="/gradient_logo.svg" />
-
-          {/* <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7136601653169605"
-          crossOrigin="anonymous"></script> */}
-
-        <script async src="//www.ezojs.com/basicads.js?d=examclutch.com" type="text/javascript"></script>
+          <script async src="//www.ezojs.com/basicads.js?d=examclutch.com" type="text/javascript"></script>
         </Head>
 
         
