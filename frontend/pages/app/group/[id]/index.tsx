@@ -71,6 +71,8 @@ export default function GroupPage({ group, loggedIn }: {
 
         setUserId(Cookies.get('user_id'))
         setFetchedResources(false)
+        setStateResources([] as Resource[])
+        setFullResources([] as Resource[])
 
         fetch(`https://api.examclutch.com/api/resource/get_all/${id}?page=0&num_per_page=2000000`, {
             credentials: 'include'
