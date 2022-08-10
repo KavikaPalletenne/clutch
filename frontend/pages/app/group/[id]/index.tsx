@@ -60,9 +60,22 @@ export default function GroupPage({ group, loggedIn }: {
     const [fullResources, setFullResources] = useState([] as Resource[])
     const [stateResources, setStateResources] = useState([] as Resource[])
     const listResources = stateResources.map((r: Resource) =>
+            <>
             <div key={r.title} className="pb-3">
                 <ResourceCard propResource={r} />
             </div>
+            <ins className="adsbygoogle"
+                style={{'display':'block'}}
+                data-ad-format="fluid"
+                data-ad-layout-key="-fb+5w+4e-db+86"
+                data-ad-client="ca-pub-7136601653169605"
+                data-ad-slot="2587920457"></ins>
+            <script id="google-resource-feed-ad">
+                {`
+                (adsbygoogle = window.adsbygoogle || []).push({});
+                `} 
+            </script>
+            </>
     );
 
     const [fetchedResources, setFetchedResources] = useState(false)
@@ -179,7 +192,29 @@ export default function GroupPage({ group, loggedIn }: {
             <div className="flex justify-center">
             <div className="pt-10 grid grid-flow-col auto-cols-min">
                 <div className="pr-3 row-span-3 col-span-1">
-                {loggedIn ? <GroupNavigation currentGroupId={id as string} /> : null }                
+                {loggedIn ? <GroupNavigation currentGroupId={id as string} /> : null }              
+                </div>
+                <div className="pr-3 row-span-10 row-start-4 col-span-1 col-start-1">
+                <ins className="adsbygoogle"
+                    style={{"display":"block"}}
+                    data-ad-client="ca-pub-7136601653169605"
+                    data-ad-slot="2738580801"
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"></ins>
+                <script id="google-group-side-ad">
+                    {`(adsbygoogle = window.adsbygoogle || []).push({});`}
+                </script>  
+                </div>
+                <div className="pr-3 row-span-10 row-start-3 col-span-1 col-start-3">
+                <ins className="adsbygoogle"
+                    style={{"display":"block"}}
+                    data-ad-client="ca-pub-7136601653169605"
+                    data-ad-slot="2738580801"
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"></ins>
+                <script id="google-group-side-ad">
+                    {`(adsbygoogle = window.adsbygoogle || []).push({});`}
+                </script>  
                 </div>
                 <div className="">
                 <GroupTitle propGroup={group} />
