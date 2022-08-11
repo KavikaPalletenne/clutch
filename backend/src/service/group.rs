@@ -80,8 +80,8 @@ pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<G
         if let Ok(is_admin) = is_admin_result {
             if is_admin {
                 administrators.push(user.user_id);
+                continue;
             }
-            continue;
         }
         users.push(user.user_id);
     }
