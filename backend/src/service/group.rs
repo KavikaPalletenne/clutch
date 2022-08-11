@@ -76,9 +76,11 @@ pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<G
     let mut users = Vec::<String>::new();
     let mut administrators = Vec::<String>::new();
     for user in u {
-        let is_admin = user_is_admin(group_id.clone(), user.user_id.clone(), &conn).await;
-        if let Ok(_) = is_admin {
-         administrators.push(user.user_id);
+        let is_admin_result = user_is_admin(group_id.clone(), user.user_id.clone(), &conn).await;
+        if let Ok(is_admin) = is_admin_result {
+            if is_admin {
+                administrators.push(user.user_id);
+            }
             continue;
         }
         users.push(user.user_id);
@@ -90,7 +92,7 @@ pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<G
         discord_link: g.discord_id,
         private: g.private,
         members: users,
-        administrators: vec![], // TODO: Make roles in group_user table and return admins
+        administrators: administrators, // TODO: Make roles in group_user table and return admins
     })
 }
 
