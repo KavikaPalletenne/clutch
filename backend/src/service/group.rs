@@ -15,11 +15,6 @@ use sea_orm::{
 };
 use crate::service::id::generate_alphanumeric_nanoid;
 
-static INVITE_CODE_ALPHABET: [char; 36] = [
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-    'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-];
-
 /// Create new group from form.
 /// Returns created group's id.
 pub async fn create(
@@ -79,7 +74,13 @@ pub async fn read(group_id: String, conn: &Data<DatabaseConnection>) -> Result<G
 
     let (g, u) = response[0].clone();
     let mut users = Vec::<String>::new();
+    let mut administrators = Vec::<String>::new();
     for user in u {
+        let is_admin = user_is_admin(group_id.clone(), user.user_id.clone(), &conn).await;
+        if let Ok(_) = is_admin {
+         administrators.push(user.user_id);
+            continue;
+        }
         users.push(user.user_id);
     }
     Ok(GroupResponse {
@@ -119,10 +120,10 @@ pub async fn generate_invite_code(
     expiry_hours: i64, // Number of hours from now
     conn: &Data<DatabaseConnection>,
 ) -> Result<String> {
-    let mut code = nanoid!(10, &INVITE_CODE_ALPHABET);
+    let mut code = generate_alphanumeric_nanoid(10);
 
     while code_exists(code.clone(), &conn).await? {
-        let code = nanoid!(10, &INVITE_CODE_ALPHABET);
+        let code = generate_alphanumeric_nanoid(10);
     }
 
     let res: Result<entity::group_invite::Model, DbErr> = group_invite::ActiveModel {
@@ -288,5 +289,9 @@ pub async fn user_is_admin(
     user_id: String,
     conn: &Data<DatabaseConnection>,
 ) -> Result<bool> {
-    Ok(false)
+    let user_permissions = Role::get_user_permissions(group_id, user_id, &conn)
+        .await
+        .expect("Error getting user permissions");
+
+    Ok(user_permissions.contains(&"administrator".to_string()) || user_permissions.contains(&"owner".to_string()))
 }
