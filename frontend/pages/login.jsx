@@ -92,11 +92,19 @@ export default function Login() {
                 </h2>
                 <p className="mt-2 text-center text-sm text-gray-600">
                     Or
+                    { redirect == null ?
+                    <Link href={`/sign-up`}>
+                        <a className="pl-1 font-medium text-exclpurple hover:text-exclpurple-dark">
+                            sign up for an account
+                        </a>
+                    </Link>
+                    :
                     <Link href={`/sign-up?redirect=${redirect}`}>
                         <a className="pl-1 font-medium text-exclpurple hover:text-exclpurple-dark">
                             sign up for an account
                         </a>
                     </Link>
+                    }
                 </p>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={submit}>

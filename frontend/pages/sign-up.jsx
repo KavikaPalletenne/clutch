@@ -128,11 +128,19 @@ export default function Register() {
                 </h2>
                 <p className="mt-2 text-center text-sm text-gray-600">
                     Or
+                    { redirect == null ?
                     <Link href="/login">
                         <a className="pl-1 font-medium text-exclpurple hover:text-exclpurple-dark">
                             sign in to your account
                         </a>
                     </Link>
+                    :
+                    <Link href={`/login?redirect=${redirect}`}>
+                        <a className="pl-1 font-medium text-exclpurple hover:text-exclpurple-dark">
+                            sign in to your account
+                        </a>
+                    </Link>
+                    }
                 </p>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={submit}>
