@@ -193,6 +193,17 @@ pub async fn add_to_group(
     Ok(())
 }
 
+pub async fn get_invites(
+    group_id: String,
+    conn: &Data<DatabaseConnection>,
+) -> Result<Vec<group_invite::Model>> {
+    let res: Vec<group_invite::Model> = group_invite::Entity::find_by_group_id(group_id.clone())
+        .all(conn.get_ref())
+        .await?;
+
+    Ok(res)
+}
+
 pub async fn join_group(
     code: String,
     user_id: String,
@@ -207,12 +218,18 @@ pub async fn join_group(
         if invite.expiry.timestamp() > Utc::now().timestamp() {
             group_user::ActiveModel {
                 user_id: Set(user_id),
-                group_id: Set(invite.group_id),
+                group_id: Set(invite.clone().group_id),
                 ..Default::default()
             }
             .insert(conn.get_ref())
             .await
             .expect("Could not insert group_user");
+
+            // Increase role uses by 1 upon use
+            let uses = invite.clone().uses;
+            let mut invite_active_model: group_invite::ActiveModel = invite.into();
+            invite_active_model.uses = Set(uses + 1);
+            let updated = invite_active_model.update(conn.get_ref()).await?;
 
             return Ok(());
         }

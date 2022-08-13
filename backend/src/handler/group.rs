@@ -4,7 +4,7 @@ use crate::auth::middleware::{
 use crate::models::{CreateInviteCodeQuery, NewGroupForm};
 use crate::service;
 use crate::service::group;
-use crate::service::group::{generate_invite_code, get_invite_code_group, read, user_in_group};
+use crate::service::group::{generate_invite_code, get_invite_code_group, read, user_in_group, user_is_admin};
 use crate::service::role::Role;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use jsonwebtoken::DecodingKey;
@@ -170,6 +170,38 @@ pub async fn join_group(
     }
 
     HttpResponse::BadRequest().body("No such invite code")
+}
+
+#[get("/api/group/{group_id}/invites")]
+pub async fn get_invites(
+    req: HttpRequest,
+    path: web::Path<String>,
+    conn: web::Data<DatabaseConnection>,
+    dk: web::Data<DecodingKey>,
+) -> impl Responder {
+    if !is_logged_in(&req, &dk) {
+        return HttpResponse::TemporaryRedirect()
+            .append_header(("Location", "https://examclutch.com/login"))
+            .finish(); // Redirect to login
+    }
+    let possible_user_id = get_user_id(&req, &dk);
+    if let Some(user_id) = possible_user_id {
+        let group_id = path.into_inner();
+        if let Ok(is_admin) = user_is_admin(group_id.clone(), user_id.clone(), &conn).await {
+            if !is_admin {
+                return HttpResponse::Unauthorized()
+                    .finish();
+            }
+            let invites = service::group::get_invites(group_id.clone(), &conn).await;
+            if let Ok(i) = invites {
+                return HttpResponse::Ok()
+                    .append_header(("Content-Type", "application/json"))
+                    .body(serde_json::to_string(&i).unwrap());
+            }
+        }
+    }
+    HttpResponse::BadRequest()
+        .body("Could not find group")
 }
 
 #[post("/api/group/leave/{group_id}")]

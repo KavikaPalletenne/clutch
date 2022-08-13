@@ -121,6 +121,7 @@ async fn main() -> Result<()> {
             .service(group::join_group)
             .service(group::leave_group)
             .service(group::get_user_groups)
+            .service(group::get_invites)
             // User Service
             .service(user::create_user)
             .service(user::get)
