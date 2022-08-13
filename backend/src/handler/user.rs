@@ -52,6 +52,7 @@ pub async fn get_username(
     if let Ok(user) = res {
         return HttpResponse::Ok()
             .append_header(("Content-Type", "application/json"))
+            .append_header(("Cache-Control", "private, max-age=3600"))
             .body(format!("{{\"username\": \"{}\"}}", user.username).to_string());
     }
     HttpResponse::BadRequest().body("Invalid user id provided")
