@@ -123,8 +123,6 @@ pub struct Group {
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct GroupResponse {
-    #[serde(rename = "id")]
-    // rename to _id and use and document id in database
     pub id: String, // Same id as Discord guild id
     pub name: String,
     pub description: String,
