@@ -8,7 +8,6 @@ use crate::service::role::Role;
 use entity::group;
 use entity::group_invite;
 use entity::group_user;
-use nanoid::nanoid;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, DatabaseConnection, DbErr, DeleteResult, EntityTrait,
     QueryFilter, Set,
@@ -125,7 +124,7 @@ pub async fn generate_invite_code(
     let mut code = generate_alphanumeric_nanoid(10);
 
     while code_exists(code.clone(), &conn).await? {
-        let code = generate_alphanumeric_nanoid(10);
+        code = generate_alphanumeric_nanoid(10);
     }
 
     let res: Result<entity::group_invite::Model, DbErr> = group_invite::ActiveModel {
