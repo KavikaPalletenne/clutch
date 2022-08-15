@@ -39,7 +39,7 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [privateGroup, setPrivateGroup] = useState(false);
+    const [privateGroup, setPrivateGroup] = useState(group.private);
     
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -208,7 +208,7 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
                   <label htmlFor="default-toggle" className="inline-flex relative items-center cursor-pointer">
                   <input type="checkbox" defaultChecked={group.private} id="default-toggle" className="sr-only peer" onChange={e => setGroupPrivacy(e)} />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-exclpurple dark:peer-focus:ring-exclpurple rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-exclpurple-dark"></div>
-                  { group.private ?
+                  { privateGroup ?
                     <span className="ml-3 font-medium text-exclpurple font-bold text-md">Private</span> :
                     <span className="ml-3 font-medium text-exclpurple font-bold text-md">Public</span>
                   }
