@@ -9,7 +9,7 @@ type GroupUser = {
 }
 
 type Group = {
-    id: string;
+    _id: string;
     name: string;
     description: string;
     discord_link: string;

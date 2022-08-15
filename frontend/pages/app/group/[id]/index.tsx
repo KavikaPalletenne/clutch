@@ -15,7 +15,7 @@ import GroupName from "../../../../components/app/GroupName";
 import { GetServerSideProps } from "next";
 
 export type Group = {
-    id: string;
+    _id: string;
     name: string;
     description: string;
     discord_link: string;
