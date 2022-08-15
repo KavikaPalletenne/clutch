@@ -111,6 +111,7 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
         }).then(r =>  r.json().then(async function(data) {
             if (r.ok) {
                 setUpdateMessage("Successfully updated group")
+                setSubmitted(false);
             } else {
                 setUpdateMessage("Failed to update group")
             }
@@ -119,9 +120,8 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
                 setUpdateMessageVisible(false)
                 setUpdateMessage("")
             }, 3000);
-          setUpdateFailed(true);
-          setSubmitted(false);
-        
+            // setUpdateFailed(true);
+            setSubmitted(false);
         }
         ))
       }
