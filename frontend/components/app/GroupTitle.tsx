@@ -9,7 +9,7 @@ type GroupUser = {
 }
 
 type Group = {
-    _id: string;
+    id: string;
     name: string;
     description: string;
     discord_link: string;
@@ -40,7 +40,7 @@ export default function GroupTitle(props: {
             
             {
                     props.isAdmin ?
-                    <Link href={`/app/group/${props.propGroup._id}/manage`}>
+                    <Link href={`/app/group/${props.propGroup.id}/manage`}>
                     <a className="float-right hover:text-exclpurple duration-150 inline-block pt-2 flex items-center">
                     <h1>Manage</h1> 
                     </a>

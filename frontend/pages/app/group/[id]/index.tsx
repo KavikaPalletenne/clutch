@@ -15,7 +15,7 @@ import GroupName from "../../../../components/app/GroupName";
 import { GetServerSideProps } from "next";
 
 export type Group = {
-    _id: string;
+    id: string;
     name: string;
     description: string;
     discord_link: string;
@@ -147,7 +147,7 @@ export default function GroupPage({ group, loggedIn, isGroupAdmin }: {
             { loggedIn ? null :
                 <div style={{'fontFamily': 'Roboto Mono'}} className='justify-content-center justify-center float align-items-center sticky top-0 pt-2 px-96'>
                     <div className="bg-exclpurple-dark px-5 py-3 focus:text-white rounded-2xl shadow-xl text-xl font-bold text-center">
-                    <Link href={`/login?redirect=${router.route.replace('[id]', group._id)}`}>
+                    <Link href={`/login?redirect=${router.route.replace('[id]', group.id)}`}>
                             <a>
                                 <h1 style={{fontFamily: "Roboto Mono"}} className="text-lg text-white">Sign up to share resources and create your own groups</h1>
                             </a>
