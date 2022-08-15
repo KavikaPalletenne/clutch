@@ -26,7 +26,7 @@ pub async fn download_file(
             .append_header((
                 "Location",
                 format!(
-                    "https://examclutch.com/login?redirect=/cdn/file/{}/{}/{}",
+                    "https://examclutch.com/login?redirect=https://api.examclutch.com/cdn/file/{}/{}/{}",
                     group_id.clone(),
                     resource_id.clone(),
                     id.clone()
