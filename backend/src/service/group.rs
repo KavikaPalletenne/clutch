@@ -13,6 +13,7 @@ use sea_orm::{
     ActiveModelTrait, ColumnTrait, DatabaseConnection, DbErr, DeleteResult, EntityTrait,
     QueryFilter, Set,
 };
+use crate::group::GroupUpdateRequest;
 
 /// Create new group from form.
 /// Returns created group's id.
@@ -297,6 +298,42 @@ pub async fn user_is_admin(
     Ok(user_permissions.contains(&"administrator".to_string())
         || user_permissions.contains(&"owner".to_string()))
 }
+
+pub async fn update_group(
+    group_id: String,
+    update_request: GroupUpdateRequest,
+    conn: &Data<DatabaseConnection>,
+) -> Result<()> {
+    let response: Option<group::Model> = group::Entity::find_by_id(group_id.clone())
+        .one(conn.get_ref())
+        .await?;
+
+    if let Some(g) = response {
+        if update_request.name.ne(&g.name) || update_request.description.ne(&g.description) {
+            let mut g: group::ActiveModel = g.into();
+
+            if update_request.name.ne(&g.name) {
+                g.name = Set(update_request.name.clone());
+            } else {
+                g.description = Set(update_request.description.clone());
+            }
+
+            let new: group::Model = g.update(conn.get_ref()).await?;
+
+            if new.private.ne(&private) {
+                bail!(MyDbError::BadUpdate {
+                    id: group_id.clone(),
+                    table_name: "groups".to_string()
+                });
+            }
+        }
+        return Ok(());
+    }
+    bail!(MyDbError::NoSuchRow {
+        id: group_id.clone()
+    })
+}
+
 
 pub async fn change_group_privacy(
     group_id: String,

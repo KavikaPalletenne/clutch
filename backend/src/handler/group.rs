@@ -90,7 +90,6 @@ pub async fn create_group(
     HttpResponse::BadRequest().body("Could not create group")
 }
 
-// TODO: update group function
 // TODO: delete group function
 
 #[post("/api/group/{group_id}/create_invite")]
@@ -288,6 +287,46 @@ pub async fn check_user_is_admin(
 #[derive(Deserialize, Serialize, Clone)]
 pub struct GroupPrivacyRequest {
     pub value: bool,
+}
+
+#[derive(Deserialize, Serialize, Clone)]
+pub struct GroupUpdateRequest {
+    pub name: String,
+    pub description: String,
+}
+
+#[post("/api/group/{group_id}/update")]
+pub async fn update_group(
+    req: HttpRequest,
+    path: web::Path<String>,
+    web::Query(group_update_request): web::Query<GroupUpdateRequest>,
+    conn: web::Data<DatabaseConnection>,
+    dk: web::Data<DecodingKey>,
+) -> impl Responder {
+    if !is_logged_in(&req, &dk) {
+        return HttpResponse::Unauthorized().finish();
+    }
+    let group_id = path.into_inner();
+    let res = group::read(group_id.clone(), &conn).await;
+
+    if let Ok(group) = res {
+        let user_id = get_user_id(&req, &dk);
+        if let Some(uid) = user_id {
+            if user_is_admin(group.id.clone(), uid.clone(), &conn)
+                .await
+                .expect("Error getting user permissions")
+            {
+                let result =
+                    service::group::update_group(group.id, group_privacy_request.value, &conn).await;
+                if let Ok(_) = result {
+                    return HttpResponse::Ok().finish();
+                }
+                return HttpResponse::BadRequest().body("Unable to update group");
+            }
+            return HttpResponse::Unauthorized().body("User is not an admin");
+        }
+    }
+    HttpResponse::BadRequest().body("No such group")
 }
 
 #[post("/api/group/{group_id}/private")]
