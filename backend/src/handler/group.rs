@@ -4,7 +4,7 @@ use crate::auth::middleware::{
 use crate::models::{CreateInviteCodeQuery, NewGroupForm};
 use crate::service;
 use crate::service::group;
-use crate::service::group::{generate_invite_code, get_invite_code_group, read, user_in_group};
+use crate::service::group::{generate_invite_code, get_invite_code_group, read, user_in_group, user_is_admin};
 use crate::service::role::Role;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use jsonwebtoken::DecodingKey;
@@ -238,4 +238,41 @@ pub async fn get_user_groups(
     }
 
     HttpResponse::BadRequest().body("Could not find user")
+}
+
+#[get("/api/group/{group_id}/user_is_admin")]
+pub async fn check_user_is_admin(
+    req: HttpRequest,
+    path: web::Path<String>,
+    conn: web::Data<DatabaseConnection>,
+    dk: web::Data<DecodingKey>,
+) -> impl Responder {
+    let group_id = path.into_inner();
+    let res = group::read(group_id.clone(), &conn).await;
+
+    if let Ok(group) = res {
+        if group.private {
+            if !is_logged_in(&req, &dk) {
+                return HttpResponse::Unauthorized().finish();
+            } else if !has_group_viewing_permission(group_id.clone(), &req, &conn, &dk)
+                .await
+                .expect("Error")
+            {
+                return HttpResponse::Unauthorized().finish();
+            }
+        }
+
+        let user_id = get_user_id(&req, &dk);
+        if let Some(uid) = user_id {
+            if user_is_admin(group_id.clone(), uid.clone(), &conn).await.expect("Error checking if admin") {
+                return HttpResponse::Ok()
+                    .append_header(("Content-Type", "application/json"))
+                    .body(format!("{{\"message\": \"user is admin\"}}"));
+            }
+            return HttpResponse::Forbidden()
+                .append_header(("Content-Type", "application/json"))
+                .body(format!("{{\"message\": \"user is not admin\"}}"));
+        }
+    }
+    HttpResponse::NotFound().finish()
 }
