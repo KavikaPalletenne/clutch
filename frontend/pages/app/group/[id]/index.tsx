@@ -14,11 +14,12 @@ import LoadingResourceCard from "../../../../components/app/LoadingResourceCard"
 import GroupName from "../../../../components/app/GroupName";
 import { GetServerSideProps } from "next";
 
-type Group = {
+export type Group = {
     id: string;
     name: string;
     description: string;
     discord_link: string;
+    private: boolean;
     members: string[];
     administrators: string[];
 }
@@ -48,10 +49,11 @@ export type FileReference = {
     size: number;
 }
 
-export default function GroupPage({ group, loggedIn }: {
+export default function GroupPage({ group, loggedIn, isGroupAdmin }: {
     group: Group;
     loggedIn: boolean;
     // resources: Resource[];
+    isGroupAdmin: boolean;
 }) {
     const router = useRouter();
     let { id, page_num } = router.query;
@@ -145,7 +147,7 @@ export default function GroupPage({ group, loggedIn }: {
             { loggedIn ? null :
                 <div style={{'fontFamily': 'Roboto Mono'}} className='justify-content-center justify-center float align-items-center sticky top-0 pt-2 px-96'>
                     <div className="bg-exclpurple-dark px-5 py-3 focus:text-white rounded-2xl shadow-xl text-xl font-bold text-center">
-                    <Link href="/login">
+                    <Link href={`/login?redirect=${router.route.replace('[id]', group.id)}`}>
                             <a>
                                 <h1 style={{fontFamily: "Roboto Mono"}} className="text-lg text-white">Sign up to share resources and create your own groups</h1>
                             </a>
@@ -217,7 +219,7 @@ export default function GroupPage({ group, loggedIn }: {
                 </script>  
                 </div>
                 <div className="">
-                <GroupTitle propGroup={group} />
+                <GroupTitle propGroup={group} isAdmin={isGroupAdmin} />
                 </div>
                 <div className="pt-2 row-start-1">
                 { loggedIn ? <Link href={`/app/group/${id}/new`}>  
@@ -293,6 +295,16 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
         credentials: 'include',
         headers: context.req ? {cookie: context.req.headers.cookie} : undefined
     });
+
+    const is_admin_res = await fetch(`https://api.examclutch.com/api/group/${context.params.id}/user_is_admin`, {
+        credentials: 'include',
+        headers: context.req ? {cookie: context.req.headers.cookie} : undefined
+    });
+
+    let is_admin = false
+    if (is_admin_res.ok) {
+        is_admin = true
+    }
     
     if (!group_res.ok) {
         if (group_res.status == 401) {
@@ -337,6 +349,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
             props: {
                 group,
                 loggedIn: true,
+                isGroupAdmin: is_admin,
             }
         }
     }
@@ -345,6 +358,7 @@ export const getServerSideProps: GetServerSideProps = async (context: any) => {
         props: {
             group,
             loggedIn: false,
+            isGroupAdmin: is_admin,
         }
     }
     

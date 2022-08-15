@@ -19,7 +19,8 @@ type Group = {
 
 export default function GroupTitle(props: {
     propGroup: Group;
-    }) {
+    isAdmin: boolean;
+}) {
     
     const groupTitle = props.propGroup.name;
     const groupDescription = props.propGroup.description;
@@ -35,12 +36,26 @@ export default function GroupTitle(props: {
                 {/* <h1>{ groupDescription }</h1> */}
             </div>
             
-            <a target="_blank" href={ discordLink } rel="noopener noreferrer" className="float-right hover:text-exclpurple duration-150 inline-block pt-2 flex items-center">
+            
+            
+            {
+                    props.isAdmin ?
+                    <Link href={`/app/group/${props.propGroup.id}/manage`}>
+                    <a className="float-right hover:text-exclpurple duration-150 inline-block pt-2 flex items-center">
+                    <h1>Manage</h1> 
+                    </a>
+                    </Link>
+                    : null
+            }
+           
+            
+        
+            {/* <a target="_blank" href={ discordLink } rel="noopener noreferrer" className="float-right hover:text-exclpurple duration-150 inline-block pt-2 flex items-center">
                 <FaDiscord className="pr-2" size="25px"/>
                 <h1>
                     Discord
                 </h1>
-            </a>
+            </a> */}
 
         </div>
         </div>
