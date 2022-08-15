@@ -37,8 +37,8 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
 
     const [isKeyReleased, setIsKeyReleased] = useState(false);
 
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
+    const [name, setName] = useState(group.name);
+    const [description, setDescription] = useState(group.description);
     const [privateGroup, setPrivateGroup] = useState(group.private);
     
     const [loading, setLoading] = useState(false);
