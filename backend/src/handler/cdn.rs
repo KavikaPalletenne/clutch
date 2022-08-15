@@ -23,8 +23,16 @@ pub async fn download_file(
     // Auth //
     if !is_logged_in(&req, &dk) {
         return HttpResponse::TemporaryRedirect()
-            .append_header(("Location", "https://examclutch.com/login"))
-            .finish(); // Redirect to login
+            .append_header((
+                "Location",
+                format!(
+                    "https://examclutch.com/login?redirect=/cdn/file/{}/{}/{}",
+                    group_id.clone(),
+                    resource_id.clone(),
+                    id.clone()
+                )
+            )
+            ).finish(); // Redirect to login
     } // else if !has_resource_viewing_permission(resource_id.clone(), &req, &conn, &dk)
       //     .await
       //     .expect("Error")
