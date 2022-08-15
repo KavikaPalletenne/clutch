@@ -36,9 +36,9 @@ pub async fn get(
 #[get("/api/user/username/{user_id}")]
 pub async fn get_username(
     path: web::Path<String>,
-    req: HttpRequest,
+    // req: HttpRequest,
     conn: web::Data<DatabaseConnection>,
-    dk: web::Data<DecodingKey>,
+    // dk: web::Data<DecodingKey>,
 ) -> impl Responder {
     let user_id = path.into_inner();
 
