@@ -67,7 +67,6 @@ impl Role {
         user_id: String,
         conn: &Data<DatabaseConnection>,
     ) -> Result<Vec<String>> {
-
         // Get all roles in the group
         let group_roles: Vec<role::Model> = role::Entity::find_by_group(group_id.clone())
             .all(conn.get_ref())
@@ -78,9 +77,10 @@ impl Role {
 
         for role in group_roles {
             // Check if user has the specific role
-            let possible_user_role: Option<user_role::Model> = user_role::Entity::find_by_user_and_role_id(user_id.clone(), role.id.clone())
-                .one(conn.get_ref())
-                .await?;
+            let possible_user_role: Option<user_role::Model> =
+                user_role::Entity::find_by_user_and_role_id(user_id.clone(), role.id.clone())
+                    .one(conn.get_ref())
+                    .await?;
 
             // If the user has the specific role, continue
             if let Some(role) = possible_user_role {
