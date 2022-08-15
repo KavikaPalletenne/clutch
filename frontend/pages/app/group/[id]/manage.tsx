@@ -65,7 +65,7 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
     const setGroupPrivacy = async (e: any) => {
         let is_private = e.target.checked
 
-        let res = await fetch(`https://api.examclutch.com/api/group/${group.id}/private?value=${is_private}`, {
+        let res = await fetch(`https://api.examclutch.com/api/group/${group._id}/private?value=${is_private}`, {
             method: 'POST',
             credentials: 'include',
         })
@@ -95,7 +95,7 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
           return;
         }
 
-        fetch(`https://api.examclutch.com/api/group/${group.id}/update?name=${name}&description=${description}`, {
+        fetch(`https://api.examclutch.com/api/group/${group._id}/update?name=${name}&description=${description}`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -151,7 +151,7 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
           <div className='flex justify-items-center align-items-center'>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or
-            <Link href={`/app/group/${group.id}`}>
+            <Link href={`/app/group/${group._id}`}>
                 <a className="pl-1 font-medium text-exclpurple hover:text-exclpurple-dark duration-300">
                     return to group
                 </a>
@@ -217,7 +217,7 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
                 </div>
                 
                 <div className="px-4 py-3 bg-white text-right sm:px-6">
-                  <Link href={`/app/group/${group.id}`}>
+                  <Link href={`/app/group/${group._id}`}>
                   <a className="pr-1">
                   <button
                     className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:shadow-md duration-150"
