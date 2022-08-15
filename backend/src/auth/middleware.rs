@@ -92,7 +92,7 @@ pub fn has_user_viewing_permission(
 }
 
 pub async fn has_resource_viewing_permission(
-    resource_id: i64,
+    resource_id: String,
     req: &HttpRequest,
     conn: &web::Data<DatabaseConnection>,
     decoding_key: &DecodingKey,

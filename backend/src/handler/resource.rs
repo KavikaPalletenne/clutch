@@ -18,7 +18,7 @@ use sea_orm::DatabaseConnection;
 #[get("/api/resource/{resource_id}")]
 pub async fn get(
     req: HttpRequest,
-    path: web::Path<i64>,
+    path: web::Path<String>,
     conn: web::Data<DatabaseConnection>,
     dk: web::Data<DecodingKey>,
 ) -> impl Responder {
@@ -178,7 +178,7 @@ pub async fn create_resource(
 #[get("/api/resource/delete/{id}")]
 pub async fn delete_resource(
     req: HttpRequest,
-    path: web::Path<i64>,
+    path: web::Path<String>,
     dk: web::Data<DecodingKey>,
     conn: web::Data<DatabaseConnection>,
     bucket: web::Data<Bucket>,
@@ -202,7 +202,7 @@ pub async fn delete_resource(
         let res = read(resource_id.clone(), &conn).await;
         if let Ok(resource) = res {
             if resource.clone().user_id.eq(&uid) {
-                service::resource::delete(resource.clone().id.parse::<i64>().unwrap(), &conn)
+                service::resource::delete(resource.clone().id, &conn)
                     .await
                     .unwrap();
                 let _delete_result = index.delete_document(resource.clone().id).await;

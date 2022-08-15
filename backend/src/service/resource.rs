@@ -5,7 +5,7 @@ use chrono::Utc;
 use crate::errors::MyDbError;
 use crate::models::{FileReference, Resource, ResourceForm};
 use crate::service::group;
-use crate::service::id::generate_snowflake;
+use crate::service::id::{generate_alphanumeric_nanoid, generate_snowflake};
 use entity::file_reference;
 use entity::resource;
 use entity::sea_orm;
@@ -17,11 +17,11 @@ use sea_orm::{DatabaseConnection, DeleteResult, Set};
 
 /// Inserts a new resource in the DB, along with files and tags.
 /// Returns created resource's id (nanoid)
-pub async fn create(resource: ResourceForm, conn: &Data<DatabaseConnection>) -> Result<i64> {
+pub async fn create(resource: ResourceForm, conn: &Data<DatabaseConnection>) -> Result<String> {
     // let conn = sea_orm::Database::connect("postgres://jcgvqsxa:lk0y4RIhtAFb4hu87EGSRxCnD_EDeBo7@rosie.db.elephantsql.com/jcgvqsxa")
     //     .await.unwrap();
 
-    let resource_id = generate_snowflake();
+    let resource_id = generate_alphanumeric_nanoid(22);
     resource::ActiveModel {
         id: Set(resource_id.clone()),
         user_id: Set(resource.user_id),
@@ -87,7 +87,7 @@ pub async fn create(resource: ResourceForm, conn: &Data<DatabaseConnection>) -> 
 }
 
 /// Read a resource by id.
-pub async fn read(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result<Resource> {
+pub async fn read(resource_id: String, conn: &Data<DatabaseConnection>) -> Result<Resource> {
     //TODO: Use custom joins to also include tags - https://www.sea-ql.org/SeaORM/docs/advanced-query/custom-joins
     let mut response: Vec<(resource::Model, Vec<file_reference::Model>)> =
         resource::Entity::find_by_id(resource_id.clone())
@@ -111,7 +111,7 @@ pub async fn read(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result<R
     }
 
     Ok(Resource {
-        id: resource.id.to_string(),
+        id: resource.id,
         user_id: resource.user_id,
         group_id: resource.group_id,
         title: resource.title,
@@ -134,14 +134,14 @@ pub async fn read(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result<R
 // }
 
 /// Deletes a resource by id.
-pub async fn delete(resource_id: i64, conn: &Data<DatabaseConnection>) -> Result<()> {
+pub async fn delete(resource_id: String, conn: &Data<DatabaseConnection>) -> Result<()> {
     let res: DeleteResult = resource::Entity::delete_by_id(resource_id.clone())
         .exec(conn.get_ref())
         .await?;
 
     if res.rows_affected == 0 {
         bail!(MyDbError::NoSuchRow {
-            id: resource_id.to_string()
+            id: resource_id
         });
     }
 
@@ -201,7 +201,7 @@ pub async fn get_resource_by_group(
         }
 
         resources.push(Resource {
-            id: resource.id.to_string(),
+            id: resource.id,
             user_id: resource.user_id,
             group_id: resource.group_id,
             title: resource.title,
@@ -265,7 +265,7 @@ pub async fn get_resource_by_group(
 
 pub async fn user_can_view_resource(
     user_id: String,
-    resource_id: i64,
+    resource_id: String,
     conn: &Data<DatabaseConnection>,
 ) -> Result<bool> {
     let res: Option<resource::Model> = resource::Entity::find_by_id(resource_id.clone())

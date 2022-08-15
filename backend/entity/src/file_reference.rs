@@ -9,7 +9,7 @@ pub struct Model {
     pub id: i64,
     pub name: String, // Name of the file
     pub size: i32, // Size in bytes
-    pub resource_id: i64,
+    pub resource_id: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

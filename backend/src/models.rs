@@ -82,7 +82,7 @@ pub struct FileReference {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct CreatedResourceResponse {
-    pub resource_id: i64,
+    pub resource_id: String,
     pub group_id: String,
     pub file_put_urls: Option<Vec<String>>,
 }
