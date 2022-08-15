@@ -312,20 +312,13 @@ pub async fn update_group(
         if update_request.name.ne(&g.name) || update_request.description.ne(&g.description) {
             let mut g: group::ActiveModel = g.into();
 
-            if update_request.name.ne(&g.name) {
+            if update_request.name.ne(&g.name.clone().unwrap()) {
                 g.name = Set(update_request.name.clone());
             } else {
                 g.description = Set(update_request.description.clone());
             }
 
-            let new: group::Model = g.update(conn.get_ref()).await?;
-
-            if new.private.ne(&private) {
-                bail!(MyDbError::BadUpdate {
-                    id: group_id.clone(),
-                    table_name: "groups".to_string()
-                });
-            }
+            let _new: group::Model = g.update(conn.get_ref()).await?;
         }
         return Ok(());
     }
