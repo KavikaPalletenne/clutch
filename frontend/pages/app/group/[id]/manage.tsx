@@ -95,7 +95,7 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
           return;
         }
 
-        fetch(`https://api.examclutch.com/api/group/${group._id}/update?name=${name}&description=${description}`, {
+        fetch(`https://api.examclutch.com/api/group/${group._id}/update`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -105,8 +105,6 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
             body: JSON.stringify({
                 'name': name,
                 'description': description,
-                'discord_id': '',
-                'private': privateGroup,
             })
         }).then(r =>  r.json().then(async function(data) {
             if (r.ok) {

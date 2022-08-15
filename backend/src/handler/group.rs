@@ -299,7 +299,7 @@ pub struct GroupUpdateRequest {
 pub async fn update_group(
     req: HttpRequest,
     path: web::Path<String>,
-    web::Query(group_update_request): web::Query<GroupUpdateRequest>,
+    group_update_request: web::Json<GroupUpdateRequest>,
     conn: web::Data<DatabaseConnection>,
     dk: web::Data<DecodingKey>,
 ) -> impl Responder {
@@ -317,7 +317,7 @@ pub async fn update_group(
                 .expect("Error getting user permissions")
             {
                 let result =
-                    service::group::update_group(group.id, group_privacy_request.value, &conn).await;
+                    service::group::update_group(group.id, group_update_request.into_inner(), &conn).await;
                 if let Ok(_) = result {
                     return HttpResponse::Ok().finish();
                 }
