@@ -107,14 +107,14 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
                 'name': name,
                 'description': description,
             })
-        }).then(r =>  r.json().then(async function(data) {
+        }).then(r => function(r: any) {
             if (r.ok) {
                 setUpdateMessage("Successfully updated group")
                 setSubmitted(false);
             } else {
                 setUpdateMessage("Failed to update group")
             }
-    
+            
             setTimeout(function () {
                 setUpdateMessageVisible(false)
                 setUpdateMessage("")
@@ -122,7 +122,7 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
             // setUpdateFailed(true);
             setSubmitted(false);
         }
-        ))
+        )
       }
     }
 
