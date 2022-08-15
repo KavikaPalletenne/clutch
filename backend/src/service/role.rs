@@ -67,31 +67,39 @@ impl Role {
         user_id: String,
         conn: &Data<DatabaseConnection>,
     ) -> Result<Vec<String>> {
-        let roles: Vec<user_role::Model> = user_role::Entity::find_by_user_id(user_id.clone())
+
+        // Get all roles in the group
+        let group_roles: Vec<role::Model> = role::Entity::find_by_group(group_id.clone())
             .all(conn.get_ref())
             .await?;
 
+        // Initialise a vector to return the permissions
         let mut full_permissions = Vec::<String>::new();
 
-        // Go through all of the user's roles
-        for role in roles {
-            // Get permissions for specific role
-            let role_permissions: Vec<role_permission::Model> =
-                role_permission::Entity::find_by_role(role.role_id)
-                    .all(conn.get_ref())
-                    .await?;
+        for role in group_roles {
+            // Check if user has the specific role
+            let possible_user_role: Option<user_role::Model> = user_role::Entity::find_by_user_and_role_id(user_id.clone(), role.id.clone())
+                .one(conn.get_ref())
+                .await?;
 
-            // Go through all of the permissions for specific role
-            for permission in role_permissions {
-                // If permission is not already granted from
-                // another role, add it to full_permissions vector
-                if full_permissions.contains(&permission.key) {
-                    continue;
+            // If the user has the specific role, continue
+            if let Some(role) = possible_user_role {
+                // Get all permissions of the role
+                let role_permissions: Vec<role_permission::Model> =
+                    role_permission::Entity::find_by_role(role.role_id)
+                        .all(conn.get_ref())
+                        .await?;
+
+                // Add each permission of the role to full_permissions vector
+                // if not already in it (some roles have overlapping permissions)
+                for permission in role_permissions {
+                    if full_permissions.contains(&permission.key) {
+                        continue;
+                    }
+                    full_permissions.push(permission.key);
                 }
-                full_permissions.push(permission.key);
             }
         }
-
         Ok(full_permissions)
     }
 
