@@ -122,6 +122,7 @@ async fn main() -> Result<()> {
             .service(group::leave_group)
             .service(group::get_user_groups)
             .service(group::check_user_is_admin)
+            .service(group::set_group_privacy)
             // User Service
             .service(user::create_user)
             .service(user::get)

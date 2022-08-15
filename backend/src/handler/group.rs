@@ -4,11 +4,15 @@ use crate::auth::middleware::{
 use crate::models::{CreateInviteCodeQuery, NewGroupForm};
 use crate::service;
 use crate::service::group;
-use crate::service::group::{generate_invite_code, get_invite_code_group, read, user_in_group, user_is_admin};
+use crate::service::group::{
+    change_group_privacy, generate_invite_code, get_invite_code_group, read, user_in_group,
+    user_is_admin,
+};
 use crate::service::role::Role;
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use jsonwebtoken::DecodingKey;
 use sea_orm::DatabaseConnection;
+use serde::{Deserialize, Serialize};
 
 #[get("/api/group/{group_id}")]
 pub async fn get(
@@ -264,7 +268,10 @@ pub async fn check_user_is_admin(
 
         let user_id = get_user_id(&req, &dk);
         if let Some(uid) = user_id {
-            if user_is_admin(group_id.clone(), uid.clone(), &conn).await.expect("Error checking if admin") {
+            if user_is_admin(group_id.clone(), uid.clone(), &conn)
+                .await
+                .expect("Error checking if admin")
+            {
                 return HttpResponse::Ok()
                     .append_header(("Content-Type", "application/json"))
                     .body(format!("{{\"message\": \"user is admin\"}}"));
@@ -275,4 +282,44 @@ pub async fn check_user_is_admin(
         }
     }
     HttpResponse::NotFound().finish()
+}
+
+// Update functions
+#[derive(Deserialize, Serialize, Clone)]
+pub struct GroupPrivacyRequest {
+    pub value: bool,
+}
+
+#[post("/api/group/{group_id}/private")]
+pub async fn set_group_privacy(
+    req: HttpRequest,
+    path: web::Path<String>,
+    web::Query(group_privacy_request): web::Query<GroupPrivacyRequest>,
+    conn: web::Data<DatabaseConnection>,
+    dk: web::Data<DecodingKey>,
+) -> impl Responder {
+    if !is_logged_in(&req, &dk) {
+        return HttpResponse::Unauthorized().finish();
+    }
+    let group_id = path.into_inner();
+    let res = group::read(group_id.clone(), &conn).await;
+
+    if let Ok(group) = res {
+        let user_id = get_user_id(&req, &dk);
+        if let Some(uid) = user_id {
+            if user_is_admin(group.id.clone(), uid.clone(), &conn)
+                .await
+                .expect("Error getting user permissions")
+            {
+                let result =
+                    change_group_privacy(group.id, group_privacy_request.value, &conn).await;
+                if let Ok(_) = result {
+                    return HttpResponse::Ok().finish();
+                }
+                return HttpResponse::BadRequest().body("Unable to update group privacy");
+            }
+            return HttpResponse::Unauthorized().body("User is not an admin");
+        }
+    }
+    HttpResponse::BadRequest().body("No such group")
 }

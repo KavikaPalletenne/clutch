@@ -4,6 +4,7 @@ use chrono::{Duration, Utc};
 
 use crate::errors::MyDbError;
 use crate::models::{GroupResponse, NewGroupForm};
+use crate::service::id::generate_alphanumeric_nanoid;
 use crate::service::role::Role;
 use entity::group;
 use entity::group_invite;
@@ -12,7 +13,6 @@ use sea_orm::{
     ActiveModelTrait, ColumnTrait, DatabaseConnection, DbErr, DeleteResult, EntityTrait,
     QueryFilter, Set,
 };
-use crate::service::id::generate_alphanumeric_nanoid;
 
 /// Create new group from form.
 /// Returns created group's id.
@@ -294,5 +294,36 @@ pub async fn user_is_admin(
         .await
         .expect("Error getting user permissions");
 
-    Ok(user_permissions.contains(&"administrator".to_string()) || user_permissions.contains(&"owner".to_string()))
+    Ok(user_permissions.contains(&"administrator".to_string())
+        || user_permissions.contains(&"owner".to_string()))
+}
+
+pub async fn change_group_privacy(
+    group_id: String,
+    private: bool,
+    conn: &Data<DatabaseConnection>,
+) -> Result<()> {
+    let response: Option<group::Model> = group::Entity::find_by_id(group_id.clone())
+        .one(conn.get_ref())
+        .await?;
+
+    if let Some(g) = response {
+        if private.ne(&g.private) {
+            let mut g: group::ActiveModel = g.into();
+            g.private = Set(private.clone());
+
+            let new: group::Model = g.update(conn.get_ref()).await?;
+
+            if new.private.ne(&private) {
+                bail!(MyDbError::BadUpdate {
+                    id: group_id.clone(),
+                    table_name: "groups".to_string()
+                });
+            }
+        }
+        return Ok(());
+    }
+    bail!(MyDbError::NoSuchRow {
+        id: group_id.clone()
+    })
 }
