@@ -64,6 +64,7 @@ export default function NewResourcePage({ group, loggedIn, isGroupAdmin }: {
 
     const setGroupPrivacy = async (e: any) => {
         let is_private = e.target.checked
+        setPrivateGroup(e.target.checked)
 
         let res = await fetch(`https://api.examclutch.com/api/group/${group.id}/private?value=${is_private}`, {
             method: 'POST',
