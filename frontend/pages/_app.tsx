@@ -43,6 +43,15 @@ function MyApp({ Component, pageProps }: AppProps) {
     </div>
 
     <Component {...pageProps} />
+
+    <div className='bg-slate-500 text-white py-10 px-5 flex'>
+      <Link href="/legal/privacy-policy">
+        Contact
+      </Link>
+      <Link href="/legal/privacy-policy">
+        Privacy
+      </Link>
+    </div>
   </div>
   )
 }
