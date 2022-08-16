@@ -71,7 +71,7 @@ export default function Login() {
 
         <Head>
           <meta charSet="utf-8" />
-          <meta name="description" content="Login to ScanTag - The Modern Name Tag" />
+          <meta name="description" content="Login to ExamClutch - Study together. Clutch your exams." />
           <meta name="robots" content="all" />
           <meta name="googlebot" content="all" />
           <title>Sign In - ExamClutch</title>
