@@ -135,7 +135,8 @@ export default function GroupPage({ group, loggedIn, isGroupAdmin }: {
             <Head>
                 <title>{group.name} - ExamClutch</title>
                 <meta name="description" content="Exam Clutch Dashboard" />
-                <meta name="robots" content="noindex" />
+                { group.private ? <meta name="robots" content="noindex" /> : <meta name="robots" content="all" /> }
+                { group.private ? <meta name="googlebot" content="noindex" /> : <meta name="googlebot" content="all" /> }
                 <link rel="icon" href="/gradient_logo.svg" />
                 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7136601653169605" crossOrigin="anonymous"></script>
 
