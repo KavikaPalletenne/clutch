@@ -63,7 +63,8 @@ async fn main() -> Result<()> {
     //     .unwrap();
 
     // Initialise S3 Bucket
-    let bucket = init_bucket();
+    let mut bucket = init_bucket();
+    bucket.add_header("AllowedOrigin", "*.examclutch.com");
 
     println!("Starting server on port {}.", actix_port.clone());
 
